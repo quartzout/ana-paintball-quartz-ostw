@@ -1,0 +1,37 @@
+import "_constants.ostw";
+import "_helpers.ostw";
+
+enum SupportedLanguage {
+    Russian,
+    English
+}
+
+playervar SupportedLanguage language = SupportedLanguage.English;
+playervar Color color = Color.White;
+playervar Boolean isActive = false;
+playervar Player[] enemies = [];
+
+// scopeTimer is used in scope_limit, and isScoped is used in some HUD events to stop showing in-world text while while in scope because camera is zoomed in
+// For this reason scope_timer is in _shared and is managed by scope_timer.ostw  
+playervar Number scopeTimer = 0;
+Boolean IsScoped(in Player player): player.scopeTimer > 0;
+
+
+String LangString(String en, String ru):
+    LocalPlayer.language == SupportedLanguage.Russian ? ru : en;
+
+
+globalvar Player[] activePlayers = [];
+globalvar Number secondsElapsed = 0;
+
+void ResetPlayerPhysicsSettings(in Player player)
+{
+    # Physics settings
+    SetMoveSpeed(player, 100 * MOVING_SPEED_SCALAR);
+    SetGravity(player, 100 * GRAVITY_SCALAR);
+    SetJumpVerticalSpeed(player, 100 * JUMP_VELOCITY_SCALAR);
+    SetProjectileSpeed(player, 100 * PROJECTILE_VELOCITY_SCALAR);
+    SetProjectileGravity(player, 100 * PROJECTILE_GRAVITY_SCALAR);
+}
+
+

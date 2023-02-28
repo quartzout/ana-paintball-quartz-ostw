@@ -1,0 +1,22 @@
+import "../Namespaces/_shared.ostw";
+
+rule: "Starting scope timer when player starts to ender scope"
+Event.OngoingPlayer
+if (UpdateEveryFrame(IsButtonHeld(EventPlayer, Button.SecondaryFire)))
+if (UpdateEveryFrame(IsFiringSecondary(EventPlayer)))
+{
+    EventPlayer.scopeTimer = -0.2;
+    
+    ChaseVariableAtRate(EventPlayer.scopeTimer, MAX_SCOPE_TIME, 1, RateChaseReevaluation.None);
+}
+
+rule: "Stop timer when not in scope"
+Event.OngoingPlayer
+if (
+    UpdateEveryFrame(!IsFiringSecondary(EventPlayer)) || 
+    UpdateEveryFrame(!IsButtonHeld(EventPlayer, Button.SecondaryFire))
+)
+{
+    StopChasingVariable(EventPlayer.scopeTimer);
+    EventPlayer.scopeTimer = -1;
+}

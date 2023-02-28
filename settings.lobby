@@ -1,0 +1,63 @@
+{
+  "Lobby": {
+    "Allow Players Who Are In Queue": true,
+    "Match Voice Chat": true,
+    "Max FFA Players": 10,
+    "Max Spectators": 12,
+    "Return To Lobby": "Never"
+  },
+  "Modes": {
+    "All": {
+      "Allow Hero Switching": false,
+      "Enemy Health Bars": false,
+      "Game Mode Start": "Immediately",
+      "Hero Limit": "Off",
+      "Kill Feed": false,
+      "Respawn As Random Hero": true,
+      "Respawn Time Scalar": 0.0,
+      "Spawn Health Packs": "Disabled"
+    },
+    "Deathmatch": {
+      "Game Length In Minutes": 15,
+      "Score To Win": 50,
+      "Enabled Maps": ["Château Guillard", "Kanezaka"]
+    },
+    "Elimination": {
+      "Limited Choice Pool": "Team Size",
+      "Enabled": false
+    },
+    "Practice Range": {
+      "Training Bot Respawn Time Scalar": 10.0,
+      "Enabled": false
+    }
+  },
+  "Heroes": {
+    "General": {
+      "Enabled Heroes": [
+        "Ana"
+      ],
+      "Ana": {
+        "Biotic Grenade Cooldown Time": 30.0,
+        "No Ammunition Requirement": true,
+        "Sleep Dart Cooldown Time": 16.0,
+        "Ultimate Generation - Combat (Nano Boost)": 0.0,
+        "Ultimate Generation - Passive (Nano Boost)": 0.0,
+        "Ultimate Generation (Nano Boost)": 10.0
+      }
+    }
+  },
+  "Description": "--Impulse Grenades—\\r\\n--Portals—\\r\\n--Dynamic Leaderboard—\\r\\n--Endless Match—\\r\\n--English / Russian--\\r\\n--Chataeu Guillard / Kanezaka--\\r\\nAuthor: пупа#21361",
+  "Mode Name": "Ana Paintball Quartz",
+  "Workshop": {
+    "Grаvity": 1.0,
+    "Grаvitу": 2.2,
+    "Impulse Grenade Cooldown": 1.0,
+    "Jump Sрeed": 1.0,
+    "Portal Uses before it despawns": 5.0
+  },
+  "Extensions": {
+    "Beam Effects": true,
+    "Debuff Status Effects": true,
+    "Energy Explosion Effects": true
+  }
+}

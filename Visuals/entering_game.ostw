@@ -1,0 +1,76 @@
+import "../Namespaces/_shared.ostw";
+import "../Namespaces/_player_scores.ostw";
+import "../Modules/entering_game.ostw";
+
+
+playervar Number scoreboardEntryHudId = null;
+
+rule: "Instantiating modules" {
+    OnActivePlayerAddedEvent = AddScoreboardEntryForPlayer;
+    OnActivePlayerRemovedEvent = RemoveScoreboardEntryForPlayer;
+}
+
+
+void AddScoreboardEntryForPlayer(in Player player) {
+
+    if (player.scoreboardEntryHudId != null) return;
+
+    Player FrozenEventPlayer: EvaluateOnce(EventPlayer);
+
+    scoreboardEntryHudId = CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        Subheader: 
+            LocalPlayer != EvaluateOnce(EventPlayer) ? 
+            $"{FrozenEventPlayer.place}: {FrozenEventPlayer} - {FrozenEventPlayer.averageKillsPerPeriod}" : 
+            "", 
+        Text: 
+            LocalPlayer == EvaluateOnce(EventPlayer) ? 
+            $"{FrozenEventPlayer.place}: {FrozenEventPlayer} - {FrozenEventPlayer.averageKillsPerPeriod}" : 
+            "", 
+        Location: Location.Right, 
+        SortOrder: FrozenEventPlayer.place, 
+        SubheaderColor: FrozenEventPlayer.color, 
+        TextColor: Color.White,
+        Reevaluation: HudTextRev.VisibleToSortOrderStringAndColor
+    );
+}
+
+void RemoveScoreboardEntryForPlayer(in Player player) {
+    DestroyHudText(scoreboardEntryHudId);
+    scoreboardEntryHudId = null;
+}
+
+
+
+
+rule: "Create Welcome Screen HUD"
+{
+    #Player still can rotate camera while in welcome screen, so custom origin and direction must be set
+    #English
+    CreateInWorldText(
+        VisibleTo: VisibleIf(!LocalPlayer.isActive),
+        Header: "JUMP TO START", 
+        Position: LpFloatingHUDPosition(
+            XOffset: 0, 
+            YOffset: 0.5, 
+            Origin: MAP_SETTINGS.WelcomeScreenViewPoint, 
+            Direction: MAP_SETTINGS.WelcomeScreenDirection),
+        Scale: 4, 
+        TextColor: Color.Aqua,
+        Clipping: Clipping.DoNotClip,
+        Reevaluation: InworldTextRev.VisibleToAndPosition);
+    
+    #Russian
+    CreateInWorldText(
+        VisibleTo: VisibleIf(!LocalPlayer.isActive),
+        Header: "E - НАЧАТЬ НА РУССКОМ", 
+        Position: LpFloatingHUDPosition(
+            XOffset: 0, 
+            YOffset: 0.6, 
+            Origin: MAP_SETTINGS.WelcomeScreenViewPoint, 
+            Direction: MAP_SETTINGS.WelcomeScreenDirection),
+        Scale: 3, 
+        TextColor: Color.SkyBlue,
+        Clipping: Clipping.DoNotClip,
+        Reevaluation: InworldTextRev.VisibleToAndPosition);
+}

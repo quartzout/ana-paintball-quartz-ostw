@@ -1,0 +1,65 @@
+import "procedures.ostw";
+
+disabled rule: "-------------------------ULTIMATE-------------------------"
+{
+}
+
+rule: "Player started using ultimate"
+Event.OngoingPlayer
+if (IsUsingUltimate(EventPlayer) == true)
+{
+    killsToUltimate = 0;
+    # Physics
+    SetMoveSpeed(EventPlayer, 100 * const_ultimateMoveSpeedMultiplie);
+    SetGravity(EventPlayer, 100 * const_UltimateGravityMultiplier);
+    SetJumpVerticalSpeed(EventPlayer, 100 * const_ultimateJumpVelocityMultip);
+    # Start Compensating Damage Mods (to keep event damage values roughly the same)
+    StartDamageModification(AllPlayers(Team.All), EventPlayer, 66.666, DamageModificationRev.ReceiversAndDamagers);
+    ultimateGivenDamageModID = LastDamageModificationID();
+    StartDamageModification(EventPlayer, AllPlayers(Team.All), 200, DamageModificationRev.ReceiversAndDamagers);
+    ultimateRecievedDamageModID = LastDamageModificationID();
+    # Reset Ability Cooldowns
+    SetAbilityCooldown(EventPlayer, Button.Ability1, 0);
+    SetAbilityCooldown(EventPlayer, Button.Ability2, 0);
+}
+
+rule: "Player stopped using ultimate"
+Event.OngoingPlayer
+if (IsUsingUltimate(EventPlayer) == false)
+{
+    ResetPlayerPhysicsSettings();
+    StopDamageModification(ultimateGivenDamageModID);
+    StopDamageModification(ultimateRecievedDamageModID);
+}
+
+rule: "Add ultimate charge on player kill"
+Event.OnElimination
+if (IsUsingUltimate(EventPlayer) == false)
+{
+    killsToUltimate += 1;
+    SetUltimateCharge(EventPlayer, killsToUltimate / const_KillsToUltimate * 100);
+}
+
+rule: "Reset ultimate charge on player death"
+Event.OnDeath
+{
+    killsToUltimate = 0;
+}
+
+rule: "Player used Sleep in ultimate"
+Event.OngoingPlayer
+if (IsUsingUltimate(EventPlayer) == true)
+if (IsUsingAbility1(EventPlayer) == true)
+{
+    Wait(1, WaitBehavior.IgnoreCondition);
+    SetAbilityCooldown(EventPlayer, Button.Ability1, const_ultimateSleepCD);
+}
+
+rule: "Player used Grenade in ultimate"
+Event.OngoingPlayer
+if (IsUsingUltimate(EventPlayer) == true)
+if (IsUsingAbility2(EventPlayer) == true)
+{
+    Wait(1, WaitBehavior.IgnoreCondition);
+    SetAbilityCooldown(EventPlayer, Button.Ability2, const_ultimateGrenadeCD);
+}

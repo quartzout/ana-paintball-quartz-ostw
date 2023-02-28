@@ -1,0 +1,263 @@
+import "../Namespaces/_helpers.ostw";
+import "../Namespaces/_constants.ostw";
+import "../Namespaces/_impulse_explosion.ostw";
+import "../Namespaces/_map_constants.ostw";
+import "../Namespaces/_shared.ostw";
+
+// import "visual_effects.ostw";
+
+class Portal {
+    public Vector Position;
+    public Number UsesLeft;
+    public Number CooldownTimer = 0; 
+
+    public constructor(Vector position, Number usesLeft) {
+        Position = position;
+        usesLeft = usesLeft;
+    }
+
+    public Boolean IsOnCooldown(): CooldownTimer != 0;
+} 
+
+// Events
+globalvar Portal => void OnPortalSpawnedEvent = null; 
+globalvar Player => void OnNoWallMetOnTeleportEvent = null;
+globalvar (Vector, Vector) => void OnTeleportedEvent = null;
+globalvar Portal => void OnPortalUsedEvent = null;
+globalvar Portal => void OnPortalDespawnedEvent = null;
+globalvar Portal => void OnPortalCooldownFinished = null;
+
+
+globalvar Portal[] existingPortals;
+
+rule: "Spawn Portals when theres not enough of them in the world"
+if (existingPortals.Length < MAP_SETTINGS.MaxPortalsInWorld)
+{
+
+    # Spawning portals until maximum is reached
+    while(existingPortals.Length < MAP_SETTINGS.MaxPortalsInWorld) {
+    
+        # Getting a list of all unoccupied positions
+        Vector[] unoccupiedPortalPositions = 
+            FilteredArray(
+                MAP_SETTINGS.PortalPositions, 
+                availablePos => IsTrueForAll(
+                    existingPortals, 
+                    existingPortal => existingPortal.Position != availablePos
+                )
+            );
+
+
+        # Safety check
+        if (unoccupiedPortalPositions.Length == 0)
+        {
+            SmallMessage(HostPlayer, "Cant spawn a portal, all predetermined places are occupied with other portals");
+            return;
+        }
+
+        # Spawning a portal
+        SpawnPortal(unoccupiedPortalPositions.Random());
+        
+        # Playing sound
+        //PlayEffect(AllPlayers(Team.All), PlayEffect.DebuffImpactSound, Color.White, parameter_portalPosition, 100);
+    }
+
+}
+
+void SpawnPortal(in Vector spawnpoint)
+{
+    Portal newPortal = new Portal(position: spawnpoint, usesLeft: PORTAL_USES);
+    existingPortals.Append(newPortal);
+    OnPortalSpawnedEvent(newPortal);
+}
+
+globalvar Number ANGLE_CONSTANT;
+rule: "Set angle constant" {
+    ANGLE_CONSTANT = ArctangentInDegrees(PORTAL_RADIUS / 10, 1);
+}
+
+rule: "Player interacted with portal"
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer, Button.Interact))
+if (EventPlayer.isActive)
+{
+    foreach (Portal portal in existingPortals) {
+        
+        if (portal.IsOnCooldown()) continue;
+
+        # maximum angle of activation from player eyes to portals position. If player looks at the portal within this angle, portal could be used by this player
+        Number portalEdgeAngle = 
+            (
+                ArctangentInDegrees(PORTAL_RADIUS / DistanceBetween(EyePosition(EventPlayer), portal.Position), 1) 
+                / ANGLE_CONSTANT - 0.07
+            ) ^ 1.3 * ANGLE_CONSTANT;
+
+        # checking if player looking withing this angle
+        if (
+            AngleBetweenVectors(
+                FacingDirectionOf(EventPlayer), 
+                VectorTowards(EyePosition(EventPlayer), portal.Position)
+            ) > portalEdgeAngle
+        ) continue;
+
+        
+        # Point where players view vector and portals plane intersect 
+        # (portal plane is always looking at player, ie strictly perpendicular to the vector from player's eyes to portal's position) 
+        # If raycast to this point isnt obstructed with anything, then the player is looking right through the portal
+        Vector temp_position = 
+            EyePosition(EventPlayer) +
+            FacingDirectionOf(EventPlayer) * 
+            DistanceBetween(
+                EyePosition(EventPlayer), 
+                portal.Position) / 
+            CosineFromDegrees(
+                AngleBetweenVectors(
+                    FacingDirectionOf(EventPlayer), 
+                    VectorTowards(
+                        EyePosition(EventPlayer), 
+                        portal.Position)
+                )
+            );
+        
+        if (IsRayObstructed(
+            From: EyePosition(EventPlayer), 
+            To: temp_position, 
+            PlayersToInclude: AllPlayers(Team.All), 
+            PlayersToExclude: EventPlayer)) continue;
+
+        TryTeleportPlayerToWhereTheyLook(EventPlayer);
+        UsePortal(portal);
+        break;
+
+    }
+    
+}
+
+void UsePortal(Portal portal) {
+
+    # Despawning fully used portal
+    if (portal.UsesLeft == 1) {
+        DespawnPortal(portal);
+        return;
+    }
+
+    portal.UsesLeft -= 1;
+
+    # Initiating cooldown
+    portal.CooldownTimer = PORTAL_USE_COOLDOWN;
+
+    OnPortalUsedEvent(portal);
+    # updating color
+    //portalDefaultColor_array[parameter_portalIndex] = const_portalDefaultColor_array[RoundToInteger(portalUsesLeft_array[parameter_portalIndex] / PORTAL_USES * (CountOf(const_portalDefaultColor_array) - 1), Rounding.Down)];
+}
+
+void DespawnPortal(in Portal portal)
+{
+    existingPortals.ModRemoveByValue(portal);
+    OnPortalDespawnedEvent(portal);
+}
+
+
+Boolean TryTeleportPlayerToWhereTheyLook(in Player player)
+{
+    Boolean return_success = true;
+    
+    # Maximum position for the raycasts
+    Vector EndPosition = FacingDirectionOf(EventPlayer) * 100 + EyePosition(EventPlayer);
+    
+    # Position thats been hit by raycast
+    Vector TeleportPosition = RayCastHitPosition(
+        StartPOS: EyePosition(EventPlayer), 
+        EndPOS: EndPosition, 
+        PlayersToInclude: AllPlayers(Team.All), 
+        PlayersToExclude: EventPlayer);
+   
+    # Normal to hit surface
+    Vector TeleportNormal = RayCastHitNormal(
+        StartPOS: EyePosition(EventPlayer), 
+        EndPOS: EndPosition, 
+        PlayersToInclude: AllPlayers(Team.All), 
+        PlayersToExclude: EventPlayer);
+    
+    # if no wall met
+    if (EndPosition == TeleportPosition)
+    {
+        OnNoWallMetOnTeleportEvent(EventPlayer);
+        // aimAtTheWallTimer = 1;
+        // ChaseVariableAtRate(aimAtTheWallTimer, 0, 1, RateChaseReevaluation.None);
+        return false;
+    }
+    
+    // # Resetting tooltip
+    // aimAtTheWallTimer = 0;
+    
+    # Do Impulse Explosion At Teleportation point
+    DoImpulseExplosionInRange(
+        blastPosition: TeleportPosition + TeleportNormal * 0.05, 
+        immunePlayer: EventPlayer,
+        envCredit: EventPlayer
+    );
+    
+    # Argument for OnTeleportedEvent
+    Vector InitialPosition = EyePosition(EventPlayer);
+    
+    # Cancel motion
+    CancelAllPlayerMotion(EventPlayer);
+    
+    Boolean isPlayerInWay = RayCastHitPlayer(
+        StartPOS: EyePosition(EventPlayer), 
+        EndPOS: EndPosition, 
+        PlayersToInclude: AllPlayers(Team.All), 
+        PlayersToExclude: EventPlayer
+    ) != null;
+
+    # If player teleports into another player, just teleport them stright to other player
+    if (isPlayerInWay)
+    {
+        Teleport(EventPlayer, TeleportPosition);
+    }
+
+    # If player teleports to a perpendicular-ish wall
+    else if (AbsoluteValue(VerticalAngleFromDirection(TeleportNormal)) < 45)
+    {
+        # Teleport player slightly off the wall
+        Teleport(EventPlayer, TeleportPosition + TeleportNormal);
+
+        # Set facing in the horizontal direction of walls normal
+        SetFacing(EventPlayer, DirectionFromAngles(HorizontalAngleFromDirection(TeleportNormal), 0), Relative.ToWorld);
+        
+        # Send player a little up and from the wall 
+        ApplyImpulse(EventPlayer, Up(), 2, Relative.ToWorld, ContraryMotion.Cancel);
+        ApplyImpulse(EventPlayer, TeleportNormal, 2.5, Relative.ToWorld, ContraryMotion.Cancel);
+    }
+
+    # If player is teleported to horizonal surfaces like floor or ceiling, teleport it even more further from the surface and does not change facing direction
+    else if (VerticalAngleFromDirection(TeleportNormal) >= 45) Teleport(EventPlayer, TeleportPosition + TeleportNormal * 2);
+
+    # In other potential cases, just teleport player
+    else Teleport(EventPlayer, TeleportPosition);
+    
+    OnTeleportedEvent(InitialPosition, EyePosition(EventPlayer));
+}
+
+
+void CancelAllPlayerMotion(in Player player)
+{
+    ApplyImpulse(player, Right(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Left(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Up(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Down(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Forward(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Backward(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+}
+
+rule: "Ticking portals cooldowns" {
+    
+    Number Delay: 0.3;
+
+    Loop(Delay, () => {
+        foreach (Portal portal in existingPortals) {
+            if (portal.CooldownTimer > 0) portal.CooldownTimer = Max(0, portal.CooldownTimer - Delay);
+        }
+    });
+}

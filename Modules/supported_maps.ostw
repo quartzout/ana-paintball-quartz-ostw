@@ -1,0 +1,15 @@
+import "../Namespaces/_map_constants.ostw";
+
+rule: "Set map settings after match begins"
+{
+    # Wait until map loads
+    Wait(3);
+    if (CurrentMap() == Map.Chateau_Guillard)
+        MAP_SETTINGS = CHATEU_GUILLARD_SETTINGS;
+    else if (CurrentMap() == Map.Kanezaka)
+        MAP_SETTINGS = KANEZAKA_SETTINGS;
+    else
+        ReturnToLobby();
+
+    // temp_avalablePortalPositions = MAP_SETTINGS.PortalPositions;
+}

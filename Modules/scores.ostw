@@ -1,0 +1,199 @@
+import "../Namespaces/_constants.ostw";
+import "../Namespaces/_shared.ostw";
+import "../Namespaces/_helpers.ostw";
+import "../Namespaces/_player_scores.ostw";
+
+
+//Events
+globalvar (Player, Number) => void OnKillStreakEvent = null;
+
+
+// Kills or deaths marked by their timestamps are saved in the arrays and the oldest ones are deleted once they are older then period or long period.
+
+playervar Number[] killTimestampsInLastPeriod = [];
+playervar Number[] killTimestampsInLastLongPeriod = [];
+playervar Number[] scopedKillTimestampsInLastLongPeriod = [];
+playervar Number[] unscopedKillTimestampsInLastLongPeriod = [];
+playervar Number[] sleepKillTimestampsInLastLongPeriod = [];
+playervar Number[] deathTimestampsInLastLongPeriod = [];
+
+globalvar Number LONG_TIME_PERIOD: TIME_PERIOD_FOR_STATS * PERIODS_IN_LONG_PERIOD;
+
+void UpdatePlayerScore(in Player player)
+{
+    # Score Metric (avg kill per multiple time periods)
+    player.averageKillsPerPeriod = CountOf(player.killTimestampsInLastLongPeriod) / PERIODS_IN_LONG_PERIOD + 0.001;
+    
+    # Updating everyones places after recalculating player leaderboard score
+    UpdatePlacesForEveryPlayer();
+}
+
+
+
+
+void UpdateLocalPlayerStats(in Player player)
+{
+    # KDR
+    player.killDeathRatio = CountOf(player.killTimestampsInLastLongPeriod) / Max(1, CountOf(player.deathTimestampsInLastLongPeriod)) + 0.001;
+    
+    # Kills for the last time period
+    player.killsPerPeriod = CountOf(killTimestampsInLastPeriod);
+    
+    # Saving overall number of kills with any method
+    Number totalKillsInLastLongPeriod = 
+        CountOf(player.sleepKillTimestampsInLastLongPeriod) + 
+        CountOf(player.scopedKillTimestampsInLastLongPeriod) + 
+        CountOf(player.unscopedKillTimestampsInLastLongPeriod);
+    
+    # Sleep %
+    player.sleepKillsPercent = RoundToInteger(100 * CountOf(player.sleepKillTimestampsInLastLongPeriod) / totalKillsInLastLongPeriod, Rounding.Nearest);
+    
+    # Scoped %
+    player.scopedKillsPercent = RoundToInteger(100 * CountOf(player.scopedKillTimestampsInLastLongPeriod) / totalKillsInLastLongPeriod, Rounding.Nearest);
+    
+    # Unscope %
+    player.unscopedKillsPercent = RoundToInteger(100 * CountOf(player.unscopedKillTimestampsInLastLongPeriod) / totalKillsInLastLongPeriod, Rounding.Nearest);
+}
+
+
+
+
+
+rule: "Add kill to killTimestampsInLastLongPeriod"
+Event.OnElimination
+{
+    ModifyVariable(EventPlayer.killTimestampsInLastLongPeriod, Operation.AppendToArray, RoundToInteger(secondsElapsed, Rounding.Down));
+    
+    # Calculating stats
+    UpdatePlayerScore(EventPlayer);
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+rule: "Removing old kill from killTimestampsInLastLongPeriod"
+Event.OngoingPlayer
+if (FirstOf(EventPlayer.killTimestampsInLastLongPeriod) == RoundToInteger(secondsElapsed, Rounding.Down) - LONG_TIME_PERIOD)
+{
+    ModifyVariable(EventPlayer.killTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
+    UpdatePlayerScore(EventPlayer);
+}
+
+
+
+
+
+rule: "Add kill to killTimestampsInLastPeriod"
+Event.OnElimination
+{
+    # Adding entry to kill array
+    ModifyVariable(EventPlayer.killTimestampsInLastPeriod, Operation.AppendToArray, RoundToInteger(secondsElapsed, Rounding.Down));
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+rule: "Remove kill from killTimestampsInLastPeriod"
+Event.OngoingPlayer
+if (FirstOf(EventPlayer.killTimestampsInLastPeriod) == RoundToInteger(secondsElapsed, Rounding.Down) - TIME_PERIOD_FOR_STATS)
+{
+    ModifyVariable(EventPlayer.killTimestampsInLastPeriod, Operation.RemoveFromArrayByIndex, 0);
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+
+
+
+
+rule: "Add kill entriy to ScopeKillTracking"
+Event.OnElimination
+if (IsFiringSecondary(EventPlayer))
+{
+    ModifyVariable(EventPlayer.scopedKillTimestampsInLastLongPeriod, Operation.AppendToArray, RoundToInteger(secondsElapsed, Rounding.Down));
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+rule: "Removing kill from ScopeKillTracking"
+Event.OngoingPlayer
+if (FirstOf(EventPlayer.scopedKillTimestampsInLastLongPeriod) == RoundToInteger(secondsElapsed, Rounding.Down) - LONG_TIME_PERIOD)
+{
+    ModifyVariable(EventPlayer.scopedKillTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+
+
+
+
+rule: "Add kill entriy to sleepKillTimestampsInLastLongPeriod"
+Event.OnDamageDealt
+if (RoundToInteger(EventDamage(), Rounding.Down) == 5)
+{
+    ModifyVariable(EventPlayer.sleepKillTimestampsInLastLongPeriod, Operation.AppendToArray, RoundToInteger(secondsElapsed, Rounding.Down));
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+rule: "Removing old kill entries from sleepKillTimestampsInLastLongPeriod"
+Event.OngoingPlayer
+if (FirstOf(EventPlayer.sleepKillTimestampsInLastLongPeriod) == RoundToInteger(secondsElapsed, Rounding.Down) - LONG_TIME_PERIOD)
+{
+    ModifyVariable(EventPlayer.sleepKillTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+
+
+
+
+rule: "Add kill to unscopedKillTimestampsInLastLongPeriod"
+Event.OnDamageDealt
+if (!IsFiringSecondary(EventPlayer))
+if (RoundToInteger(EventDamage(), Rounding.Down) == 2)
+{
+    ModifyVariable(EventPlayer.unscopedKillTimestampsInLastLongPeriod, Operation.AppendToArray, RoundToInteger(secondsElapsed, Rounding.Down));
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+rule: "Removing kill from unscopedKillTimestampsInLastLongPeriod"
+Event.OngoingPlayer
+if (FirstOf(EventPlayer.unscopedKillTimestampsInLastLongPeriod) == RoundToInteger(secondsElapsed, Rounding.Down) - LONG_TIME_PERIOD)
+{
+    ModifyVariable(EventPlayer.unscopedKillTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+
+
+
+
+rule: "Add death to deathTimestampsInLastLongPeriod"
+Event.OnDeath
+{
+    ModifyVariable(EventPlayer.deathTimestampsInLastLongPeriod, Operation.AppendToArray, RoundToInteger(secondsElapsed, Rounding.Down));
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+rule: "Removing death from deathTimestampsInLastLongPeriod"
+Event.OngoingPlayer
+if (FirstOf(EventPlayer.deathTimestampsInLastLongPeriod) == RoundToInteger(secondsElapsed, Rounding.Down) - LONG_TIME_PERIOD)
+{
+    ModifyVariable(EventPlayer.deathTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
+    UpdateLocalPlayerStats(EventPlayer);
+}
+
+
+
+
+
+
+rule: "Increment killstreak counter for player when they kill"
+Event.OnElimination
+{
+    EventPlayer.killstreak += 1;
+}
+
+rule: "Show killstreak message when player dies"
+Event.OnDeath
+{
+    # if killstreak was more then const, call event for hud
+    if (EventPlayer.killstreak >= KILLS_FOR_KILL_STREAK) OnKillStreakEvent(EventPlayer, EventPlayer.killstreak);
+
+    # Reset killstreaks
+    EventPlayer.killstreak = 0;
+}

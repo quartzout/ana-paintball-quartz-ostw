@@ -1,0 +1,20 @@
+import "../Namespaces/_helpers.ostw";
+
+playervar Boolean showLoadHud = false; 
+rule: "Create Load HUD"
+{
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer.showLoadHud), 
+        Subheader: <"avg. server load (R to hide): <0>", ServerLoadAverage()>,
+        Location: Location.Left, 
+        SortOrder: -1, 
+        SubheaderColor: Color.Rose, 
+        Reevaluation: HudTextRev.VisibleToAndString
+    );
+}
+
+rule: "Turn off/on"
+if (IsButtonHeld(HostPlayer, Button.Reload) == true)
+{
+    HostPlayer.showLoadHud = !HostPlayer.showLoadHud;
+}

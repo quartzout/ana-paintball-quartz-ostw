@@ -1,0 +1,100 @@
+struct Dictionary<K, V>
+{
+    public K[] Keys;
+    public V[] Values;
+
+    public V Get(K key)
+    {
+        return Values[Keys.IndexOf(key)];
+    }
+    
+    // Sets a value in the dictionary.
+    public static void Set(ref Dictionary<K, V> dictionary, in K key, in V value)
+    {
+        dictionary.Values[dictionary.Keys.IndexOf(key)] = value;
+    }
+    
+    // Adds a value to the dictionary.
+    public static void Add(ref Dictionary<K, V> dictionary, in K key, in V value)
+    {
+        dictionary.Keys += key;
+        dictionary.Values += value;
+    }
+
+    // Sets a value in the dictionary. Will add the key if it doesn't exist.
+    public static void SetOrAdd(ref Dictionary<K, V> dictionary, in K key, in V value)
+    {
+        Number index = dictionary.Keys.IndexOf(key);
+        if (index == -1) // Key not found; add it.
+            Add(dictionary, key, value);
+        else
+            dictionary.Values[index] = value;
+    }
+}
+
+Vector LpFloatingHUDPosition(
+    Number XOffset, 
+    Number YOffset, 
+    Vector Origin = EyePosition(LocalPlayer), 
+    Vector Direction = FacingDirectionOf(LocalPlayer)) : 
+
+    UpdateEveryFrame(
+        Origin + 10 * 
+        (Direction + 
+
+        XOffset * DirectionFromAngles(
+            HorizontalAngleFromDirection(Direction) + 90, 
+            VerticalAngleFromDirection(Direction)) +
+
+        YOffset * DirectionFromAngles(
+            HorizontalAngleFromDirection(Direction), 
+            VerticalAngleFromDirection(Direction) + 90)));
+
+Player[] VisibleIf(Boolean condition):
+    condition ? AllPlayers(Team.All) : null;
+
+T[] FilteredArray<T>(T[] array, const T => Boolean condition):
+    FilteredArray(array, condition(ArrayElement()));
+
+Boolean IsTrueForAll<T>(T[] array, const T => Boolean condition):
+    IsTrueForAll(array, condition(ArrayElement()));
+
+Boolean IsTrueForAny<T>(T[] array, const T => Boolean condition):
+    IsTrueForAny(array, condition(ArrayElement()));
+
+T[] SortedArray<T>(T[] array, const T => Number rankLambda):
+    SortedArray(array, rankLambda(ArrayElement()));
+
+void Loop(in Number delay, const () => void actions) {
+    actions();
+    Wait(delay, WaitBehavior.IgnoreCondition);
+    Loop();
+}
+
+
+Player EventPlayer: EventPlayer();
+Player LocalPlayer: LocalPlayer();
+Player HostPlayer: HostPlayer();
+
+
+Boolean IsRayObstructed(
+    Vector From, 
+    Vector To, 
+    Player | Player[] PlayersToInclude = null, 
+    Player | Player[] PlayersToExclude = null,
+    Boolean IncludePlayerOwnedObjects = false): 
+    RayCastHitPosition(
+        StartPOS: From,
+        EndPOS: To,
+        PlayersToInclude: PlayersToInclude,
+        PlayersToExclude: PlayersToExclude,
+        IncludePlayerOwnedObjects: IncludePlayerOwnedObjects) 
+    != To;
+
+
+Vector Reverse(in Vector vector): Vector(0, 0, 0) - vector;
+
+void HealPlayer(in Player player)
+{
+    SetPlayerHealth(player, MaxHealth(player));
+}

@@ -1,0 +1,83 @@
+import "../Modules/portals.ostw";
+
+# Stores existing portals effect ids
+globalvar Dictionary<Portal, Number> PortalToPortalEffectIds = { Keys: [], Values: [] };
+
+rule: "Initialising portal events" {
+    OnPortalSpawnedEvent = CreatePortalEffect;
+    OnPortalDespawnedEvent = DestroyPortalEffect;
+}
+
+
+void CreatePortalEffect(in Portal portal) {
+    
+    // class object are passed by and copied *by reference* (and under the hood, a "reference" to an object is just its numeric index in the global list of all objects). 
+    // This means that when we use EvaluateOnce(portal) inside Reev exspressions we do not freeze _the values_ of object, but just its reference - 
+    // and when "portal" variable changes, such reev expression is still pointing to the original object instead of to a new one, and correctly 
+    // reflecting changes to its members. And since we assign this method to a non-constant delegate event,
+    // whatever is passed to "portal" argument variable when the delegate is called is not imprinted directly into actions - instead, an actual workshop
+    // global variable is set with the value of the argument that we want to pass to the method, and then, when the delegate with this
+    // method assigned to it is called, it gets the argument value from this global variable. Long story short - the "portal" 
+    // is an actual workshop variable that is changing on different method calls, and so we cant directly put "portal.<member>" into reev expression
+    // when we need to read from its members, instead we need to freeze the reference to it with EvaluateOnce(portal).<member>.
+
+    // Using macro instead of local variable because on compilation local variable will turn into a workshop global as well.
+    Portal FrozenPortalRef: EvaluateOnce(portal);
+
+    Number DistanceBetweenPlayerAndPortal: DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer)), FrozenPortalRef.Position);
+
+    Number LocalPlayerViewToPortalAngleDeviation: 
+        AngleBetweenVectors(
+            UpdateEveryFrame(FacingDirectionOf(LocalPlayer)), 
+            VectorTowards(
+                UpdateEveryFrame(EyePosition(LocalPlayer)), 
+                FrozenPortalRef.Position
+            )
+        );
+
+    Number MaxAllowedViewAngleDeviation: 
+        (
+            ArctangentInDegrees(
+                PORTAL_RADIUS / DistanceBetweenPlayerAndPortal, 
+                1
+            ) / ANGLE_CONSTANT - 0.07
+        ) ^ 1.3 * ANGLE_CONSTANT ;
+
+    Boolean IsLocalPlayerLookingInsidePortal: LocalPlayerViewToPortalAngleDeviation <= MaxAllowedViewAngleDeviation;
+
+    Boolean IsLocalPlayerViewToPortalObstructed: 
+        IsRayObstructed(
+            From: UpdateEveryFrame(EyePosition(LocalPlayer)), 
+            To: (
+                UpdateEveryFrame(EyePosition(LocalPlayer)) + 
+                UpdateEveryFrame(FacingDirectionOf(LocalPlayer)) * 
+                DistanceBetweenPlayerAndPortal / 
+                CosineFromDegrees(LocalPlayerViewToPortalAngleDeviation)
+            ),
+            PlayersToInclude: AllPlayers(Team.All), 
+            PlayersToExclude: LocalPlayer
+        );
+
+    CreateEffect(
+        VisibleTo: VisibleIf(LocalPlayer.isActive),
+        Type: Effect.GoodAura, 
+        Color: 
+            !FrozenPortalRef.IsOnCooldown() ?
+            ( 
+                IsLocalPlayerLookingInsidePortal && !IsLocalPlayerViewToPortalObstructed ?
+                PORTAL_HIGHLIGHT_COLOR : 
+                IDLE_PORTAL_COLORS_BY_USES_LEFT[FrozenPortalRef.UsesLeft] 
+            ) : 
+            PORTAL_ON_COOLDOWN_COLOR, 
+
+        Position: FrozenPortalRef.Position, 
+        Radius: PORTAL_RADIUS, 
+        Reevaluation: EffectRev.VisibleToPositionRadiusAndColor
+    );
+
+    Dictionary<Portal, Number>.Add(PortalToPortalEffectIds, portal, LastCreatedEntity()); 
+}
+
+void DestroyPortalEffect(in Portal portal) {
+    DestroyEffect(PortalToPortalEffectIds.Get(portal));
+}

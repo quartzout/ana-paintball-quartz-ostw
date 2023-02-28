@@ -1,0 +1,32 @@
+import "_shared.ostw";
+import "_helpers.ostw";
+import "_constants.ostw";
+
+// Period - time period determined by TIME_PERIOD_FOR_STATS (default 30s). "Kills per last <Period>s" uses this timeframe. Other stats use Long period
+// or Long period that is averaged for Period.
+
+// Long period - time period determined by LONG_TIME_PERIOD (default 6 * 30s = 3 mins). 
+
+playervar Number killsPerPeriod = 0;
+playervar Number averageKillsPerPeriod = 0; //used for leaderboard score
+
+playervar Number place = 0;
+playervar Number killstreak = 0;
+playervar Number killDeathRatio = 0;
+
+
+playervar Number sleepKillsPercent = 0;
+playervar Number scopedKillsPercent = 0;
+playervar Number unscopedKillsPercent = 0;
+
+
+void UpdatePlacesForEveryPlayer()
+{
+    # Getting a list of active players sorted by avg. kill per period descending
+    Player[] playersSortedByScore = SortedArray(activePlayers, p => -p.averageKillsPerPeriod);
+    
+    // Updating place of every player
+    foreach (Player player in playersSortedByScore) {
+        player.place = 1 + 1 + IndexOfArrayValue(playersSortedByScore, player);
+    }
+}

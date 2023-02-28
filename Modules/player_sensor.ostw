@@ -1,0 +1,55 @@
+import "../Namespaces/_helpers.ostw";
+import "../Namespaces/_shared.ostw";
+import "../Namespaces/_constants.ostw";
+
+enum ClosestPlayerSensorState {
+    Back,
+    Front,
+    Right, 
+    Left, 
+    Close,
+    No
+}
+
+playervar ClosestPlayerSensorState closestPlayerSensorState;
+
+
+
+rule: "Updating state of the Closest Player Sensor for player"
+Event.OngoingPlayer
+{
+    Loop(0.5, () => {
+
+        # No enemies
+        if (CountOf(enemies) == 0) {
+            closestPlayerSensorState = ClosestPlayerSensorState.No;
+            return;
+        }
+
+        # determining closest player
+        Player closestPlayer = FirstOf(SortedArray(enemies, p => DistanceBetween(p, EventPlayer)));
+
+        # Closest player is closer then 20 units
+        if (DistanceBetween(EyePosition(EventPlayer), EyePosition(closestPlayer)) <= 20) {
+            closestPlayerSensorState = ClosestPlayerSensorState.Close;
+            return;
+        }
+
+        # Angle difference between Event Player and Closest Player
+        Number angleDif = AngleDifference(
+            HorizontalFacingAngleOf(EventPlayer), 
+            HorizontalAngleFromDirection(DirectionTowards(EventPlayer, closestPlayer))
+        );
+        
+        if (AbsoluteValue(angleDif) <= BACKSENSOR_FOV / 2) 
+            closestPlayerSensorState = ClosestPlayerSensorState.Front;
+        else if (angleDif > 0 && angleDif < 180 - BACKSENSOR_FOV / 2) 
+            closestPlayerSensorState = ClosestPlayerSensorState.Left;
+        else if (angleDif < 0 && angleDif > -180 + BACKSENSOR_FOV / 2)
+            closestPlayerSensorState = ClosestPlayerSensorState.Right;
+        else 
+            closestPlayerSensorState = ClosestPlayerSensorState.Back;
+
+    });
+
+}

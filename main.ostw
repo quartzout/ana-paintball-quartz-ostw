@@ -1,0 +1,112 @@
+import "settings.lobby";
+
+// Import everything from Visuals 
+import "Visuals/portals.ostw";
+import "Visuals/scores.ostw";
+import "Visuals/visual_effects.ostw";
+import "Visuals/back_sensor.ostw";
+import "Visuals/player_sensor.ostw";
+import "Visuals/scope_limit.ostw";
+import "Visuals/match.ostw";
+import "Visuals/general.ostw";
+import "Visuals/entering_game.ostw";
+
+//Import everything from Modules (in case that there are modules that werent imported in any visual)
+import "Modules/supported_maps.ostw";
+import "Modules/match.ostw";
+import "Modules/entering_game.ostw";
+import "Modules/player_sensor.ostw";
+import "Modules/back_sensor.ostw";
+import "Modules/grenade.ostw";
+import "Modules/scope_timer.ostw";
+import "Modules/scope_limit.ostw";
+import "Modules/scores.ostw";
+import "Modules/combat.ostw";
+import "Modules/portals.ostw";
+// import "Modules/water_save.ostw";
+// import "Modules/ultimate.ostw";
+
+
+// rule: "debug hud" {
+//     CreateHudText(VisibleTo: VisibleIf(LocalPlayer == HostPlayer), Text: LocalPlayer.killstreak);
+// }
+
+
+rule: "Spawn bot by pressing CTRL+F"
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Crouch) == true)
+if (IsButtonHeld(EventPlayer(), Button.Interact) == true)
+{
+    CreateDummyBot(Hero.Ana, Team.All, -1, RayCastHitPosition(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, AllPlayers(Team.All), HostPlayer, true) + RayCastHitNormal(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, AllPlayers(Team.All), HostPlayer, true) * 2, Vector(0, 0, 0));
+    Wait(1, WaitBehavior.IgnoreCondition);
+}
+
+rule: "Go to welcome screen by pressing CTRL+R"
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
+{
+    Damage(EventPlayer, null, 20);
+}
+
+// disabled rule: "Go to welcome screen by pressing CTRL+R"
+// Event.OngoingPlayer
+// if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
+// if (IsButtonHeld(EventPlayer(), Button.Crouch) == true)
+// {
+//     Wait(1, WaitBehavior.IgnoreCondition);
+//     SendToWelcomeScreen(EventPlayer());
+// }
+
+// disabled rule: "Prepare debug_portalPositions array for saving portal positions"
+// {
+//     debug_portalPositionsArray = [];
+//     debug_portalID = -1;
+//     for (cycle_arraySlot = 0; CountOf(debug_portalPositionsArray); 1)
+//     {
+//         CreateEffect(AllPlayers(Team.All), Effect.Sphere, Color.White, EvaluateOnce(debug_portalPositionsArray[cycle_arraySlot]), 1, EffectRev.VisibleTo);
+//     }
+// }
+
+// disabled rule: "Creating/destroying portal by pressing CTRL+F"
+// if (IsButtonHeld(HostPlayer, Button.Crouch) == true)
+// if (IsButtonHeld(HostPlayer, Button.Interact) == true)
+// {
+//     if (debug_portalID == -1)
+//     {
+//         parameter_portalPosition = EyePosition(HostPlayer);
+//         SpawnPortal();
+//         debug_portalID = return_createdPortalIndex;
+//         PlayEffect(AllPlayers(Team.All), PlayEffect.BuffImpactSound, Color.White, HostPlayer, 100);
+//     }
+//     else
+//     {
+//         parameter_portalIndex = debug_portalID;
+//         DespawnPortal();
+//         debug_portalID = -1;
+//         PlayEffect(AllPlayers(Team.All), PlayEffect.DebuffImpactSound, Color.White, HostPlayer, 100);
+//     }
+//     Wait(1, WaitBehavior.IgnoreCondition);
+// }
+
+// disabled rule: "Saving portal position to debug_portalPositions by pressing F+R"
+// if (IsButtonHeld(HostPlayer, Button.Interact) == true)
+// if (IsButtonHeld(HostPlayer, Button.Reload) == true)
+// {
+//     ModifyVariable(debug_portalPositionsArray, Operation.AppendToArray, PortalPositions_array[debug_portalID]);
+//     CreateEffect(AllPlayers(Team.All), Effect.Sphere, Color.White, PortalPositions_array[debug_portalID], 1, EffectRev.None);
+//     PlayEffect(AllPlayers(Team.All), PlayEffect.RingExplosionSound, Color.White, HostPlayer, 100);
+// }
+
+// disabled rule: "Fly by holding F"
+// Event.OngoingPlayer
+// if (IsButtonHeld(EventPlayer(), Button.Interact) == true)
+// {
+//     SendToWelcomeScreen(EventPlayer());
+//     SetGravity(EventPlayer(), 0);
+//     // Teleport(EventPlayer(), PositionOf(EventPlayer()) + FacingDirectionOf(EventPlayer()));
+//     CancelAllEventPlayerMotion();
+//     Wait(0.1, WaitBehavior.IgnoreCondition);
+//     LoopIfConditionIsTrue();
+//     Teleport(EventPlayer(), map_specific_settings.Get("welcomeScreenViewPoint"));
+// }
+

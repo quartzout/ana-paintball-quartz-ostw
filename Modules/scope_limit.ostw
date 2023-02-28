@@ -1,0 +1,28 @@
+import "../Namespaces/_constants.ostw";
+import "../Namespaces/_helpers.ostw";
+import "../Namespaces/_shared.ostw";
+
+
+
+rule: "Leaving scope after a shot"
+Event.OngoingPlayer
+if (IsFiringPrimary(EventPlayer) == true)
+if (IsFiringSecondary(EventPlayer) == true)
+{
+    async ForcePlayerToExitScope(EventPlayer);
+}
+
+rule: "Leaving scope when timer exceeded"
+Event.OngoingPlayer
+if (EventPlayer.scopeTimer >= MAX_SCOPE_TIME)
+{
+    async ForcePlayerToExitScope(EventPlayer);
+}
+
+
+void ForcePlayerToExitScope(Player player) "--process-- Force Player To Exit Scope (Event Player)"
+{
+    SetSecondaryFireEnabled(player, false);
+    Wait(0.5, WaitBehavior.IgnoreCondition);
+    SetSecondaryFireEnabled(player, true);
+}

@@ -1,0 +1,86 @@
+import "../Modules/scores.ostw";
+
+rule: "Instantiating score module" {
+    OnKillStreakEvent = MessageOnKillStreak;
+}
+
+// bugfest
+void MessageOnKillStreak(in Player streaker, in Number killstreak) {
+
+    // without casting to strings and storing values to separate variables messages show "0" instead of nick and value. i dont know why this works on workshop code level
+    String killstring = <String>killstreak;
+    String name = <String>streaker;
+
+    //using + instead of $ interpolation because interpolation eats spaces for some reason
+    String messageEn = name + " killed " + killstring + " players in one life!";
+    String messageRu = name + " убил " + killstring + " игроков за одну жизнь!";
+
+    // without this delay between composing message and calling bigmessage, bigmessage somehow uses name and killstring values from previous function call. I have no clue
+    Wait(1);
+    
+    BigMessage(
+        VisibleTo: AllPlayers(Team.All), 
+        Header: LangString(messageEn, messageRu)
+    );
+}
+
+
+rule: "Create Leaderboard HUD"
+{
+    # Leaderboard head
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        Text: LangString(
+            $"--Average Kills in {TIME_PERIOD_FOR_STATS} sec--",
+            $"--Средние убийства за {TIME_PERIOD_FOR_STATS} cек--",     
+        ), 
+        Location: Location.Right, 
+        SortOrder: 0, 
+        Reevaluation: HudTextRev.VisibleToAndString);
+}
+
+
+rule: "Create Stats HUD"
+{
+
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        Text: LangString("Kills:", "Убийств:"),
+        Location: Location.Left, 
+        TextColor: Color.Aqua,
+        Reevaluation: HudTextRev.VisibleToStringAndColor
+    );
+
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        Subheader: LangString(
+            $"Scoped: {LocalPlayer.scopedKillsPercent}%\nUnscoped: {LocalPlayer.unscopedKillsPercent}%\nSleep: {LocalPlayer.sleepKillsPercent}%",
+            $"В прицеле: {LocalPlayer.scopedKillsPercent}%\n От бедра: {LocalPlayer.unscopedKillsPercent}%\nДротиком - {LocalPlayer.sleepKillsPercent}%"
+        ),
+        Location: Location.Left, 
+        Reevaluation: HudTextRev.VisibleToStringAndColor
+    );
+
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        Subheader: LangString(
+            $"In {TIME_PERIOD_FOR_STATS}s: {LocalPlayer.killsPerPeriod}",
+            $"За {TIME_PERIOD_FOR_STATS}с: {LocalPlayer.killsPerPeriod}"
+        ),
+        SubheaderColor: Color.SkyBlue,
+        Location: Location.Left, 
+        Reevaluation: HudTextRev.VisibleToAndString
+    );
+
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        Text: LangString(
+            $"KDR: {LocalPlayer.killDeathRatio}",
+            $"У/С: {LocalPlayer.killDeathRatio}",
+        ),
+        TextColor: LocalPlayer.killDeathRatio >= 1 ? Color.Blue : Color.Orange,
+        Location: Location.Left, 
+        Reevaluation: HudTextRev.VisibleToStringAndColor
+    );
+
+}

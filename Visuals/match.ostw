@@ -1,0 +1,16 @@
+import "../Namespaces/_shared.ostw";
+
+rule: "Create Match Time HUD"
+{
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer.isActive), 
+        Text: "{0} {1}:{2}".Format([
+            LangString(
+                ru: "До конца матча:", 
+                en: "Match is over in"), 
+            RoundToInteger((MATCH_TIME - secondsElapsed) / 60, Rounding.Down), 
+            RoundToInteger(MATCH_TIME - secondsElapsed, Rounding.Down) % 60]), 
+        Location: Location.Top, 
+        SortOrder: 1, 
+        Reevaluation: HudTextRev.VisibleToAndString);
+}

@@ -1,0 +1,136 @@
+import "../Namespaces/_helpers.ostw";
+import "../Namespaces/_constants.ostw";
+import "../Namespaces/_shared.ostw";
+
+
+
+rule: "Explosion effect on death"
+Event.OnDeath
+{
+    PlayEffect(AllPlayers(Team.All), PlayEffect.BadExplosion, LocalPlayer() == EventPlayer() ? Color.White : color, EventPlayer(), 2);
+    PlayEffect(AllPlayers(Team.All), PlayEffect.RingExplosion, EventPlayer() == LocalPlayer() ? Color.White : color, PositionOf(EventPlayer()) + Down() * 0, 4);
+}
+
+
+globalvar Number[] paintballEffects_array = [];
+playervar Number aimAtTheWallTimer = 0;
+
+
+rule: "Paintballs on shots hitting walls"
+Event.OngoingPlayer
+if (IsFiringPrimary(EventPlayer()) == true)
+{
+    # End point 
+    Vector temp_position = EyePosition(EventPlayer()) + FacingDirectionOf(EventPlayer()) * 100;
+    # Hit position
+    Vector temp_raycastPosition = RayCastHitPosition(EyePosition(EventPlayer()), temp_position, null, EventPlayer(), false);
+    # Hit player
+    Player temp_target = RayCastHitPlayer(EyePosition(EventPlayer()), temp_position, AllPlayers(Team.All), EventPlayer(), false);
+    # Stop if hit player
+    AbortIf(temp_target != null);
+    # Stop if doesnt hit wall
+    AbortIf(temp_raycastPosition == temp_position);
+    # Waiting projectile to hit the wall
+    if (!IsFiringSecondary(EventPlayer()))
+    {
+        Wait(DistanceBetween(EyePosition(EventPlayer()), temp_raycastPosition) / 125, WaitBehavior.IgnoreCondition);
+    }
+    # Explosion effect for event player
+    PlayEffect(EventPlayer(), PlayEffect.BadExplosion, Color.White, temp_raycastPosition, 0.2);
+    # Explosion effect for everyone else
+    
+    PlayEffect(EventPlayer.enemies, PlayEffect.BadExplosion, color, temp_raycastPosition, 0.2);
+    # Destroy the oldest paintball effect if the effect array is full
+    if (CountOf(paintballEffects_array) == 10)
+    {
+        DestroyEffect(paintballEffects_array[0]);
+        ModifyVariable(paintballEffects_array, Operation.RemoveFromArrayByIndex, 0);
+    }
+    # Create paintball effect
+    CreateEffect(AllPlayers(Team.All), Effect.Sphere, EvaluateOnce(EventPlayer()) == LocalPlayer() ? Color.White : color, temp_raycastPosition, 0.09, EffectRev.Color);
+    ModifyVariable(paintballEffects_array, Operation.AppendToArray, LastCreatedEntity());
+}
+
+rule: "Wipe paintballs when player left"
+Event.OnPlayerLeave
+{
+    for (define cycle_arrayIndex = 0; CountOf(paintballEffects_array); 1)
+    {
+        DestroyEffect(paintballEffects_array[cycle_arrayIndex]);
+    }
+}
+
+
+// rule: "Create \"aim at the wall\" tooltip"
+// {
+//     CreateInWorldText(LocalPlayer().aimAtTheWallTimer > 0 ? AllPlayers(Team.All) : null, LocalPlayer().isRussian ? "ЦЕЛЬТЕСЬ В СТЕНУ" : "AIM AT THE WALL", UpdateEveryFrame(EyePosition(LocalPlayer())) + (UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) + DirectionFromAngles(UpdateEveryFrame(HorizontalFacingAngleOf(LocalPlayer())), UpdateEveryFrame(VerticalFacingAngleOf(LocalPlayer())) + 90) * -0.1) * 100, 2.5, Clipping.DoNotClip, InworldTextRev.VisibleToPositionAndString, Color.Yellow, Spectators.DefaultVisibility);
+// }
+
+// rule: "Create Portal Tooltip HUD"
+// {
+//     # With advanced angle check, lang check, welcome screen check and distance position (DO NOT OPEN SERVER WILL CRASH)
+//     if (true)
+//     {
+//         CreateInWorldText(IsTrueForAny(FilteredPortalPositions_array, LocalPlayer().portalCooldownTimers_array[IndexOfArrayValue(PortalPositions_array, ArrayElement())] == 0 ? AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement())) <= (ArctangentInDegrees(const_portalRadius / DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()), 1) / const_angleCalculation - 0.07) ^ 1.3 * const_angleCalculation ? !LocalPlayer().isInWelcomeScreen ? true : false : false : false ? RayCastHitPosition(UpdateEveryFrame(EyePosition(LocalPlayer())), UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()))), AllPlayers(Team.All), LocalPlayer(), true) == UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()))) ? true : false : false) ? AllPlayers(Team.All) : null, <"<1> <0>", InputBindingString(Button.Interact), LocalPlayer().isRussian ? "Нажмите" : "press">, UpdateEveryFrame(EyePosition(LocalPlayer())) + (UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) + WorldVectorOf(Right(), LocalPlayer(), LocalVector.Rotation) * 0.2) * 100, 2, Clipping.DoNotClip, InworldTextRev.VisibleToPositionAndString, Color.White, Spectators.DefaultVisibility);
+//     }
+//     else if (true)
+//     {
+//         // CreateInWorldText(IsTrueForAny(FilteredPortalPositions_array, LocalPlayer().portalCooldownTimers_array[IndexOfArrayValue(PortalPositions_array, ArrayElement())] == 0 ? AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement())) <= (ArctangentInDegrees(const_portalRadius / DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()), 1) / const_angleCalculation - 0.07) ^ 1.3 * const_angleCalculation ? true : false : false ? RayCastHitPosition(UpdateEveryFrame(EyePosition(LocalPlayer())), UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()))), AllPlayers(Team.All), LocalPlayer(), true) == UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()))) ? true : false : false) ? AllPlayers(Team.All) : null, <"press <0>", InputBindingString(Button.Interact)>, UpdateEveryFrame(EyePosition(LocalPlayer())) + FacingDirectionOf(LocalPlayer()) + WorldVectorOf(Right(), LocalPlayer(), LocalVector.Rotation) * 0.2, 2, Clipping.DoNotClip, InworldTextRev.VisibleToPositionAndString, Color.White, Spectators.DefaultVisibility);
+//     }
+//     else
+//     {
+//         // CreateInWorldText(IsTrueForAny(FilteredPortalPositions_array, LocalPlayer().portalCooldownTimers_array[IndexOfArrayValue(PortalPositions_array, ArrayElement())] == 0 ? AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement())) <= ArctangentInDegrees(const_portalRadius / DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()), 1) ? true : false : false ? RayCastHitPosition(UpdateEveryFrame(EyePosition(LocalPlayer())), UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()))), AllPlayers(Team.All), LocalPlayer(), true) == UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), ArrayElement()))) ? true : false : false) ? AllPlayers(Team.All) : null, <"press <0>", InputBindingString(Button.Interact)>, UpdateEveryFrame(EyePosition(LocalPlayer())) + FacingDirectionOf(LocalPlayer()) + WorldVectorOf(Right(), LocalPlayer(), LocalVector.Rotation) * 0.2, 2, Clipping.DoNotClip, InworldTextRev.VisibleToPositionAndString, Color.White, Spectators.DefaultVisibility);
+//     }
+// }
+
+// rule: "Create Portal Ring Effect when queue is not empty"
+// if (CountOf(portalIDsQueue) > 0)
+// {
+//     # Clearing the queue from the first position
+//     temp_portalIndex = portalIDsQueue[0];
+//     CreateEffect(!LocalPlayer().isActive ? null : AllPlayers(Team.All), Effect.GoodAura, LocalPlayer().portalCooldownTimers_array[EvaluateOnce(temp_portalIndex)] == 0 ? AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_portalIndex)])) <= (ArctangentInDegrees(const_portalRadius / DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_portalIndex)]), 1) / const_angleCalculation - 0.07) ^ 1.3 * const_angleCalculation ? RayCastHitPosition(UpdateEveryFrame(EyePosition(LocalPlayer())), UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_portalIndex)]) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_portalIndex)]))), AllPlayers(Team.All), LocalPlayer(), true) == UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_portalIndex)]) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_portalIndex)]))) ? const_portalHighlightColor : portalDefaultColor_array[EvaluateOnce(temp_portalIndex)] : portalDefaultColor_array[EvaluateOnce(temp_portalIndex)] : const_portalCooldownColor, PortalPositions_array[EvaluateOnce(temp_portalIndex)], const_portalRadius, EffectRev.VisibleToPositionRadiusAndColor);
+//     PortalEffectIds_array[temp_portalIndex] = LastCreatedEntity();
+//     # Removing item from the queue
+//     ModifyVariable(portalIDsQueue, Operation.RemoveFromArrayByIndex, 0);
+//     # Creating more if queue is still is not empty
+//     LoopIfConditionIsTrue();
+//     // Backup, but without welcome screen check
+//     // if (true)
+//     {
+//         // uugh umm
+//         // CreateEffect(AllPlayers(Team.All), Effect.GoodAura, LocalPlayer().portalCooldownTimers_array[EvaluateOnce(temp_lastCreatedportalIndex)] == 0 ? AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)])) <= (ArctangentInDegrees(const_portalRadius / DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]), 1) / const_angleCalculation - 0.07) ^ 1.3 * const_angleCalculation ? RayCastHitPosition(UpdateEveryFrame(EyePosition(LocalPlayer())), UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]))), AllPlayers(Team.All), LocalPlayer(), true) == UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]))) ? const_portalHighlightColor : portalDefaultColor_array[EvaluateOnce(temp_lastCreatedportalIndex)] : portalDefaultColor_array[EvaluateOnce(temp_lastCreatedportalIndex)] : const_portalCooldownColor, PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)], const_portalRadius, EffectRev.VisibleToPositionRadiusAndColor);
+//     }
+//     //else
+//     {
+//         // uugh umm
+//         // CreateEffect(AllPlayers(Team.All), Effect.GoodAura, LocalPlayer().portalCooldownTimers_array[EvaluateOnce(temp_lastCreatedportalIndex)] == 0 ? AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)])) <= ArctangentInDegrees(const_portalRadius / DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]), 1) ? RayCastHitPosition(UpdateEveryFrame(EyePosition(LocalPlayer())), UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]))), AllPlayers(Team.All), LocalPlayer(), true) == UpdateEveryFrame(EyePosition(LocalPlayer())) + UpdateEveryFrame(FacingDirectionOf(LocalPlayer())) * DistanceBetween(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]) / CosineFromDegrees(AngleBetweenVectors(UpdateEveryFrame(FacingDirectionOf(LocalPlayer())), VectorTowards(UpdateEveryFrame(EyePosition(LocalPlayer())), PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)]))) ? const_portalHighlightColor : portalDefaultColor_array[EvaluateOnce(temp_lastCreatedportalIndex)] : portalDefaultColor_array[EvaluateOnce(temp_lastCreatedportalIndex)] : const_portalCooldownColor, PortalPositions_array[EvaluateOnce(temp_lastCreatedportalIndex)], const_portalRadius, EffectRev.VisibleToPositionRadiusAndColor);
+//     }
+// }
+
+// void PlayPortalUseEffects() "--process-- Play Portal Use Effects (Event Player, playerParameters: startingEyePos, raycastPosition, isBumpingInPlayer)"
+// {
+//     # Deleting previous lasting effects
+//     DestroyEffect(portal_POV_effect_id);
+//     DestroyEffect(portal_beam_effect_id);
+//     StopChasingVariable(ultimateBeamEffectChasePoint);
+//     PlayEffect(AllPlayers(Team.All), PlayEffect.ExplosionSound, Color.White, PositionOf(EventPlayer()), 100);
+//     PlayEffect(FilteredArray(AllPlayers(Team.All), ArrayElement() != EventPlayer()), PlayEffect.SombraTranslocatorReappearEffect, Color.White, PositionOf(EventPlayer()), 7);
+//     # Beam effect
+//     CreateBeamEffect(AllPlayers(Team.All), BeamType.TorbjornTurretSightBeam, playerParameter_raycastPos, ultimateBeamEffectChasePoint, Color.White, EffectRev.VisibleToPositionAndRadius);
+//     portal_beam_effect_id = LastCreatedEntity();
+//     ultimateBeamEffectChasePoint = playerParameter_startingEyePos;
+//     # Teleport From effect
+//     PlayEffect(AllPlayers(Team.All), PlayEffect.GoodExplosion, Color.White, playerParameter_startingEyePos, 0.2);
+//     # FPS effect
+//     CreateEffect(EventPlayer(), Effect.CassidyFlashbangStunnedEffect, Color.White, EventPlayer(), 1, EffectRev.VisibleToPositionAndRadius);
+//     portal_POV_effect_id = LastCreatedEntity();
+//     # Destroying POV effect after delay
+//     Wait(0.3, WaitBehavior.IgnoreCondition);
+//     DestroyEffect(portal_POV_effect_id);
+//     # Start shrinking the beam after delay
+//     Wait(0.3, WaitBehavior.IgnoreCondition);
+//     ChaseVariableOverTime(ultimateBeamEffectChasePoint, playerParameter_raycastPos, 0.2, TimeChaseReevaluation.None);
+//     # destroy the beam after delay
+//     Wait(0.2, WaitBehavior.IgnoreCondition);
+//     DestroyEffect(portal_beam_effect_id);
+// }

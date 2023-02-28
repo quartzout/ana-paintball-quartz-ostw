@@ -1,0 +1,21 @@
+import "../Namespaces/_shared.ostw";
+
+rule: "Create Scope Meter HUD"
+{
+    # Scope timer meter (wow funky font)
+    CreateInWorldText(
+        VisibleTo: VisibleIf(
+            LocalPlayer.scopeTimer / MAX_SCOPE_TIME > 0.25 && 
+            LocalPlayer.scopeTimer < MAX_SCOPE_TIME && 
+            UpdateEveryFrame(IsFiringSecondary(LocalPlayer))
+        ),
+        Header: 
+            LocalPlayer.scopeTimer / MAX_SCOPE_TIME > 0.5 ? 
+            (LocalPlayer.scopeTimer / MAX_SCOPE_TIME < 0.75 ? "■■" : "■■■") : 
+            "■", 
+        Position: LpFloatingHUDPosition(0, 0.05),
+        Scale: 1, 
+        Clipping.DoNotClip, 
+        InworldTextRev.VisibleToPositionAndString
+    );
+}
