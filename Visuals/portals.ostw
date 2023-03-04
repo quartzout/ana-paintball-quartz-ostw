@@ -4,13 +4,33 @@ import "../Modules/portals.ostw";
 globalvar Dictionary<Portal, Number> PortalToPortalEffectIds = { Keys: [], Values: [] };
 
 rule: "Initialising portal events" {
-    OnPortalSpawnedEvent = CreatePortalEffect;
+    Subscribe(OnPortalSpawnedEvent, CreatePortalEffect);
+    Subscribe(OnPortalSpawnedEvent, portal => 
+        PlayEffect(
+            VisibleTo: AllPlayers(Team.All), 
+            Type: PlayEffect.DebuffImpactSound,
+            Position: portal.Position,
+            Radius: 100,
+        )
+    );
+    Subscribe(OnTeleportedEvent, (prevPos, afterPos)  => {
+        PlayEffect(
+            VisibleTo: AllPlayers(Team.All), 
+            Type: PlayEffect.ExplosionSound,
+            Position: afterPos,
+            Radius: 100,
+        );
+    });
+
     OnPortalDespawnedEvent = DestroyPortalEffect;
 }
 
+String Stringify(Portal portal): $"<Portal {portal}>\nPos: {portal.Position}\nUsesLeft: {portal.UsesLeft}\nCooldown: {portal.IsOnCooldown() ? 'T' : 'F'}{portal.CooldownTimer}";
 
 void CreatePortalEffect(in Portal portal) {
     
+    LogToInspector("effect created");
+
     // class object are passed by and copied *by reference* (and under the hood, a "reference" to an object is just its numeric index in the global list of all objects). 
     // This means that when we use EvaluateOnce(portal) inside Reev exspressions we do not freeze _the values_ of object, but just its reference - 
     // and when "portal" variable changes, such reev expression is still pointing to the original object instead of to a new one, and correctly 
@@ -81,3 +101,4 @@ void CreatePortalEffect(in Portal portal) {
 void DestroyPortalEffect(in Portal portal) {
     DestroyEffect(PortalToPortalEffectIds.Get(portal));
 }
+
