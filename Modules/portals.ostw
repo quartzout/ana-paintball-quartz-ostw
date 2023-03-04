@@ -13,16 +13,16 @@ class Portal {
 
     public constructor(Vector position, Number usesLeft) {
         Position = position;
-        usesLeft = usesLeft;
+        UsesLeft = usesLeft;
     }
 
     public Boolean IsOnCooldown(): CooldownTimer != 0;
 } 
 
 // Events
-globalvar Portal => void OnPortalSpawnedEvent = null; 
+globalvar (Portal => void)[] OnPortalSpawnedEvent = null; 
 globalvar Player => void OnNoWallMetOnTeleportEvent = null;
-globalvar (Vector, Vector) => void OnTeleportedEvent = null;
+globalvar ((Vector, Vector) => void)[] OnTeleportedEvent = null;
 globalvar Portal => void OnPortalUsedEvent = null;
 globalvar Portal => void OnPortalDespawnedEvent = null;
 globalvar Portal => void OnPortalCooldownFinished = null;
@@ -30,23 +30,32 @@ globalvar Portal => void OnPortalCooldownFinished = null;
 
 globalvar Portal[] existingPortals;
 
+
+
 rule: "Spawn Portals when theres not enough of them in the world"
 if (existingPortals.Length < MAP_SETTINGS.MaxPortalsInWorld)
 {
-
-    # Spawning portals until maximum is reached
+    
+    // Spawning portals until maximum is reached
+     
+    # Getting a list of all unoccupied positions. IsTrueForAll doesnt work inside FilteredArray. 
     while(existingPortals.Length < MAP_SETTINGS.MaxPortalsInWorld) {
     
-        # Getting a list of all unoccupied positions
-        Vector[] unoccupiedPortalPositions = 
-            FilteredArray(
-                MAP_SETTINGS.PortalPositions, 
-                availablePos => IsTrueForAll(
+        Wait(2);
+
+        Vector[] unoccupiedPortalPositions = [];
+        foreach (Vector availablePos in MAP_SETTINGS.PortalPositions) {
+            if (
+                existingPortals.Length == 0 ||
+                IsTrueForAll(
                     existingPortals, 
                     existingPortal => existingPortal.Position != availablePos
-                )
-            );
+                ) 
+            ) {
+                unoccupiedPortalPositions.ModAppend(availablePos);
+            }
 
+        }
 
         # Safety check
         if (unoccupiedPortalPositions.Length == 0)
@@ -57,9 +66,6 @@ if (existingPortals.Length < MAP_SETTINGS.MaxPortalsInWorld)
 
         # Spawning a portal
         SpawnPortal(unoccupiedPortalPositions.Random());
-        
-        # Playing sound
-        //PlayEffect(AllPlayers(Team.All), PlayEffect.DebuffImpactSound, Color.White, parameter_portalPosition, 100);
     }
 
 }
@@ -67,8 +73,8 @@ if (existingPortals.Length < MAP_SETTINGS.MaxPortalsInWorld)
 void SpawnPortal(in Vector spawnpoint)
 {
     Portal newPortal = new Portal(position: spawnpoint, usesLeft: PORTAL_USES);
-    existingPortals.Append(newPortal);
-    OnPortalSpawnedEvent(newPortal);
+    existingPortals.ModAppend(newPortal);
+    CallEvent(OnPortalSpawnedEvent, newPortal);
 }
 
 globalvar Number ANGLE_CONSTANT;
@@ -147,8 +153,6 @@ void UsePortal(Portal portal) {
     portal.CooldownTimer = PORTAL_USE_COOLDOWN;
 
     OnPortalUsedEvent(portal);
-    # updating color
-    //portalDefaultColor_array[parameter_portalIndex] = const_portalDefaultColor_array[RoundToInteger(portalUsesLeft_array[parameter_portalIndex] / PORTAL_USES * (CountOf(const_portalDefaultColor_array) - 1), Rounding.Down)];
 }
 
 void DespawnPortal(in Portal portal)
@@ -199,7 +203,7 @@ Boolean TryTeleportPlayerToWhereTheyLook(in Player player)
     );
     
     # Argument for OnTeleportedEvent
-    Vector InitialPosition = EyePosition(EventPlayer);
+    Vector initialPlayerPos = EyePosition(EventPlayer);
     
     # Cancel motion
     CancelAllPlayerMotion(EventPlayer);
@@ -237,7 +241,14 @@ Boolean TryTeleportPlayerToWhereTheyLook(in Player player)
     # In other potential cases, just teleport player
     else Teleport(EventPlayer, TeleportPosition);
     
-    OnTeleportedEvent(InitialPosition, EyePosition(EventPlayer));
+    // PlayEffect(
+    //     VisibleTo: AllPlayers(Team.All), 
+    //     Type: PlayEffect.ExplosionSound,
+    //     Position: EyePosition(EventPlayer),
+    //     Radius: 100,
+    // );
+
+    CallEvent(OnTeleportedEvent, initialPlayerPos, EyePosition(EventPlayer));
 }
 
 
