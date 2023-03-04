@@ -27,9 +27,32 @@ import "Modules/portals.ostw";
 // import "Modules/ultimate.ostw";
 
 
-// rule: "debug hud" {
-//     CreateHudText(VisibleTo: VisibleIf(LocalPlayer == HostPlayer), Text: LocalPlayer.killstreak);
-// }
+
+rule: "debug hud" {
+
+    // Subscribe(OnPortalSpawnedEvent, (portal) => {
+    //     CreateHudText(
+    //         VisibleTo: VisibleIf(LocalPlayer == HostPlayer), 
+    //         Text: Stringify(EvaluateOnce(portal)) + "\n",
+    //         TextColor: Color.Aqua,
+    //         Location: Location.Left,
+    //         Reevaluation: HudTextRev.VisibleToSortOrderAndString
+    //     );
+    // });
+
+    
+    // CreateHudText(
+    //     VisibleTo: VisibleIf(LocalPlayer == HostPlayer), 
+    //     Text: $"{existingPortals.Length}, {MAP_SETTINGS.MaxPortalsInWorld}", 
+    //     TextColor: Color.Green,
+    //     Location: Location.Left,
+    //     Reevaluation: HudTextRev.VisibleToAndString
+    // );
+
+
+}
+
+
 
 
 rule: "Spawn bot by pressing CTRL+F"
