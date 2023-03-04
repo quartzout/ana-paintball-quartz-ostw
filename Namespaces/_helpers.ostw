@@ -77,6 +77,34 @@ Player LocalPlayer: LocalPlayer();
 Player HostPlayer: HostPlayer();
 
 
+String Stringify(Any[] array, Boolean newLines = false) {
+    String result = "[" + (newLines ? "\n" : "");
+    foreach (Any value in array) {
+        result = result + <String>value + (newLines ? "\n" : "");
+    }
+    return result + $"] ({array.Length})";
+}
+
+void CallEvent<ArgT>(in (ArgT => void)[] Event, in ArgT arg) {
+    foreach ((ArgT => void) subscriber in Event) {
+        subscriber(arg);
+    }
+}
+
+void CallEvent<ArgT1, ArgT2>(in ((ArgT1, ArgT2) => void)[] Event, in ArgT1 arg1, in ArgT2 arg2) {
+    foreach (((ArgT1, ArgT2) => void) subscriber in Event) {
+        subscriber(arg1, arg2);
+    }
+}
+
+void Subscribe<ArgT>(ref (ArgT => void)[] Event, in (ArgT => void) Subscriber) {
+    Event.ModAppend(Subscriber);
+}
+
+void Subscribe<ArgT1, ArgT2>(ref ((ArgT1, ArgT2) => void)[] Event, in ((ArgT1, ArgT2) => void) Subscriber) {
+    Event.ModAppend(Subscriber);
+}
+
 Boolean IsRayObstructed(
     Vector From, 
     Vector To, 
