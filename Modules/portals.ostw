@@ -21,11 +21,10 @@ class Portal {
 
 // Events
 globalvar (Portal => void)[] OnPortalSpawnedEvent = null; 
-globalvar Player => void OnNoWallMetOnTeleportEvent = null;
-globalvar ((Vector, Vector) => void)[] OnTeleportedEvent = null;
-globalvar Portal => void OnPortalUsedEvent = null;
-globalvar Portal => void OnPortalDespawnedEvent = null;
-globalvar Portal => void OnPortalCooldownFinished = null;
+globalvar (Player => void)[] OnNoWallMetOnTeleportEvent = null;
+globalvar ((Vector, Vector, Player) => void)[] OnTeleportedEvent = null;
+globalvar (Portal => void)[] OnPortalDespawnedEvent = null;
+globalvar (Portal => void)[] OnPortalCooldownFinished = null;
 
 
 globalvar Portal[] existingPortals;
