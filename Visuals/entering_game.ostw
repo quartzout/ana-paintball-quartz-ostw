@@ -6,10 +6,42 @@ import "../Modules/entering_game.ostw";
 playervar Number scoreboardEntryHudId = null;
 
 rule: "Instantiating modules" {
-    OnActivePlayerAddedEvent = AddScoreboardEntryForPlayer;
-    OnActivePlayerRemovedEvent = RemoveScoreboardEntryForPlayer;
+    Subscribe(OnActivePlayerAddedEvent, AddScoreboardEntryForPlayer);
+    Subscribe(OnActivePlayerAddedEvent, AddPlayerOutlines);
+    Subscribe(OnActivePlayerRemovedEvent, RemoveScoreboardEntryForPlayer);
+    Subscribe(OnPlayerGoesToWelcomeScreen, PlayerGoesToWelcomeScreen);
+    Subscribe(OnPlayerLeavesWelcomeScreen, PlayerLeavesWelcomeScreen);
 }
 
+
+void PlayerGoesToWelcomeScreen(in Player player) {
+    
+    DisableHeroHud(player);
+    StartCamera(
+        player, 
+        EyePosition: MAP_SETTINGS.WelcomeScreenViewPoint, 
+        LookAtPosition: MAP_SETTINGS.WelcomeScreenViewPoint + MAP_SETTINGS.WelcomeScreenDirection
+    );
+}
+
+void PlayerLeavesWelcomeScreen(in Player player) {
+    StopCamera(EventPlayer);
+    EnableHeroHud(EventPlayer);
+}
+
+void AddPlayerOutlines(in Player player) {
+    
+    color = AVAILABLE_PLAYER_COLORS[StringLength(<String>player) % CountOf(AVAILABLE_PLAYER_COLORS)];
+
+    # Turning on coloring of this player for everyone else
+    StartForcingPlayerOutlines(player, activePlayers, true, color, OutlineType.Default);
+
+    // Turning on coloring of everyone else for this player
+    foreach (Player activePlayer in activePlayers)
+    {
+        StartForcingPlayerOutlines(activePlayer, player, true, activePlayer.color, OutlineType.Default);
+    }
+}
 
 void AddScoreboardEntryForPlayer(in Player player) {
 
@@ -40,6 +72,10 @@ void RemoveScoreboardEntryForPlayer(in Player player) {
     scoreboardEntryHudId = null;
 }
 
+rule: "On Player Joined" 
+Event.OnPlayerJoin {
+    DisableGameModeHud(EventPlayer);
+}
 
 
 

@@ -4,18 +4,17 @@ import "../Namespaces/_player_scores.ostw";
 
 
 // Events
-globalvar Player => void OnActivePlayerAddedEvent = null;
-globalvar Player => void OnActivePlayerRemovedEvent = null;
-
+globalvar (Player => void)[] OnActivePlayerAddedEvent = null;
+globalvar (Player => void)[] OnActivePlayerRemovedEvent = null;
+globalvar (Player => void)[] OnPlayerGoesToWelcomeScreen = null;
+globalvar (Player => void)[] OnPlayerLeavesWelcomeScreen = null;
 
 
 
 rule: "On Player Joined"
 Event.OnPlayerJoin
 {
-    # Presets
-    DisableGameModeHud(EventPlayer);
-
+    
     # Entering Welcome screen (or just making active if its a bot)
     if (EventPlayer.IsDummy()) AddNewActivePlayer(EventPlayer);
     else SendToWelcomeScreen(EventPlayer); 
@@ -42,12 +41,7 @@ void SendToWelcomeScreen(in Player player)
     SetGravity(player, 0);
     SetInvisible(player, InvisibleTo.All);
 
-    # Visuals
-    DisableHeroHud(player);
-    StartCamera(
-        player, 
-        EyePosition: MAP_SETTINGS.WelcomeScreenViewPoint, 
-        LookAtPosition: MAP_SETTINGS.WelcomeScreenViewPoint + MAP_SETTINGS.WelcomeScreenDirection);
+    CallEvent(OnPlayerGoesToWelcomeScreen, player);
 
     # Moving and looking
     SetMoveSpeed(player, 0);
@@ -67,7 +61,6 @@ void SendToWelcomeScreen(in Player player)
 }
 
 
-globalvar Any typehack;
 
 void AddNewActivePlayer(in Player player)
 {
@@ -75,9 +68,6 @@ void AddNewActivePlayer(in Player player)
     WaitUntil(HasSpawned(player), 99999);
 
     Wait(0.25, WaitBehavior.IgnoreCondition);
-
-    # HUD event invoking
-    OnActivePlayerAddedEvent(player);
 
     // filling players enemy array
     player.enemies = activePlayers;
@@ -96,29 +86,20 @@ void AddNewActivePlayer(in Player player)
     # Resetting physics
     ResetPlayerPhysicsSettings(player);
 
-    typehack = player;
-    color = AVAILABLE_PLAYER_COLORS[StringLength(typehack) % CountOf(AVAILABLE_PLAYER_COLORS)];
-
-    # Turning on coloring of this player for everyone else
-    StartForcingPlayerOutlines(player, activePlayers, true, color, OutlineType.Default);
-
-    // Turning on coloring of everyone else for this player
-    foreach (Player activePlayer in activePlayers)
-    {
-        StartForcingPlayerOutlines(activePlayer, player, true, activePlayer.color, OutlineType.Default);
-    }
-
     # Start afk timer
     player.afkTimer = 0;
     ChaseVariableAtRate(player.afkTimer, AFK_TRIGGER_TIME, 1, RateChaseReevaluation.None);
+
+    CallEvent(OnActivePlayerAddedEvent, player);
 }
 
 
 void RemovePlayerFromActive(in Player player)
 {
-    OnActivePlayerRemovedEvent(player);
+    CallEvent(OnActivePlayerRemovedEvent, player);
 
-    ModifyVariable(activePlayers, Operation.RemoveFromArrayByValue, player);
+    activePlayers.ModRemoveByValue(player);
+    
     // Updating everyones enemy array
     foreach (Player activePlayer in activePlayers) {
         if (activePlayer == player) continue;
@@ -164,9 +145,7 @@ if (!isActive)
     # Waiting until spawn
     Wait(0.25, WaitBehavior.IgnoreCondition);
 
-    # Reset visuals
-    StopCamera(EventPlayer);
-    EnableHeroHud(EventPlayer);
+    CallEvent(OnPlayerLeavesWelcomeScreen, EventPlayer);
 
     # buttons
     AllowButton(EventPlayer, Button.PrimaryFire);
