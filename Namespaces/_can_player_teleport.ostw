@@ -1,0 +1,51 @@
+import "../Modules/portals.ostw";
+
+Number DistanceBetweenPlayerAndPortal(in Player player, in Portal portal): 
+    DistanceBetween(
+        UpdateEveryFrame(EyePosition(player)), 
+        portal.Position
+    );
+
+
+Number PlayerViewToPortalAngleDeviation(in Player player, in Portal portal): 
+    AngleBetweenVectors(
+        UpdateEveryFrame(FacingDirectionOf(player)), 
+        VectorTowards(
+            UpdateEveryFrame(EyePosition(player)), 
+            portal.Position
+        )
+    );
+
+
+Number MaxAllowedViewAngleDeviation(in Player player, in Portal portal): 
+    (
+        ArctangentInDegrees(
+            PORTAL_RADIUS / DistanceBetweenPlayerAndPortal(player, portal), 
+            1
+        ) / ANGLE_CONSTANT - 0.07
+    ) ^ 1.3 * ANGLE_CONSTANT ;
+
+
+Boolean IsPlayerLookingInsidePortal(in Player player, in Portal portal): 
+    PlayerViewToPortalAngleDeviation(player, portal) <= MaxAllowedViewAngleDeviation(player, portal);
+
+
+Boolean IsLocalPlayerViewToPortalObstructed(in Player player, in Portal portal): 
+    IsRayObstructed(
+        From: UpdateEveryFrame(EyePosition(player)), 
+        To: (
+            UpdateEveryFrame(EyePosition(player)) + 
+            UpdateEveryFrame(FacingDirectionOf(player)) * 
+            DistanceBetweenPlayerAndPortal(player, portal) / 
+            CosineFromDegrees(PlayerViewToPortalAngleDeviation(player, portal))
+        ),
+        PlayersToInclude: All, 
+        PlayersToExclude: player
+    );
+
+# Can given player teleport through given portal right now 
+# (means portal is not on cooldown and player is looking into in without obstructions on the way)
+Boolean CanPlayerTeleport(in Player player, in Portal portal):
+    !portal.IsOnCooldown() &&
+    IsPlayerLookingInsidePortal(player, portal) && 
+    !IsLocalPlayerViewToPortalObstructed(player, portal);
