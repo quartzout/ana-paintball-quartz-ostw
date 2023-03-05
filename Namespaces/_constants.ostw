@@ -30,7 +30,7 @@ globalvar Number EXPLOSION_IMPULSE = WorkshopSettingReal("Grenade Physics", "Kno
 globalvar Number EXPLOSION_UPWARD_SKEW_COEF = WorkshopSettingReal("Grenade Physics", "Grenade Upward Coefficient", 1, 0, 10, 10);
 
 // water saves
-globalvar Number const_waterSaves = WorkshopSettingInteger("Save player from falling in water", "Number of bounces player has before they die", 2, 0, 4, 11);
+globalvar Number WATER_SAVES = WorkshopSettingInteger("Save player from falling in water", "Number of bounces player has before they die", 2, 0, 4, 11);
 
 // Portals
 globalvar Number PORTAL_RADIUS = WorkshopSettingReal("Portals", "Portal radius", 2, 0.5, 4, 11);

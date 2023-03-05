@@ -2,41 +2,51 @@ import "../Namespaces/_map_constants.ostw";
 import "../Namespaces/_helpers.ostw";
 import "../Namespaces/_constants.ostw";
 
+//Events
+globalvar (Player => void)[] OnWaterSaveActivatedEvent;
+globalvar (Player => void)[] OnWaterSaveDeactivatedEvent;  
+
 playervar Number waterSavesLeft = 0;
 
+// Keeping ifs separate to boost performance (i suspect that each if is evaluated and its value cached separately)
 rule: "Saving player from falling in water"
 Event.OngoingPlayer
-if (YOf(PositionOf(EventPlayer)) <= MAP_SETTINGS.EnviromentalHeight)
+
+if (PositionOf(EventPlayer).Y <= MAP_SETTINGS.EnviromentalHeight)
 if (waterSavesLeft > 0)
-# if player is above water, thier altitude is for some reason always bigger then 20 (10 for sure)
+
+# if player is above water, thier altitude is for some reason always bigger then 20
 if (AltitudeOf(EventPlayer) > 10 == true)
+
 {
     waterSavesLeft -= 1;
-    # Frozen
-    SetStatus(EventPlayer, null, Status.Invincible, 1);
+    
     # Disabling guns
     SetPrimaryFireEnabled(EventPlayer, false);
     SetAbility1Enabled(EventPlayer, false);
     SetAbility2Enabled(EventPlayer, false);
+    
     # Impulse up
     ApplyImpulse(EventPlayer, Up(), MAP_SETTINGS.WaterSaveImpulse, Relative.ToWorld, ContraryMotion.Cancel);
-    # Effects
-    PlayEffect(All, PlayEffect.BuffExplosionSound, Color.White, EventPlayer, 100);
-    CreateEffect(All, Effect.MeiFrozenEffect, Color.White, EventPlayer, 1, EffectRev.VisibleToPositionAndRadius);
-    define waterSaveEffectId = LastCreatedEntity();
+    
+    CallEvent(OnWaterSaveActivatedEvent, EventPlayer);
+
     # Waiting for freeze to be over
     Wait(1, WaitBehavior.IgnoreCondition);
-    # Stop frozen effect
-    DestroyEffect(waterSaveEffectId);
+    
+
+    CallEvent(OnWaterSaveDeactivatedEvent, EventPlayer);
+    
     # Enabling guns back
     SetPrimaryFireEnabled(EventPlayer, true);
     SetAbility1Enabled(EventPlayer, true);
     SetAbility2Enabled(EventPlayer, true);
 }
 
+
 rule: "Resetting player's WaterSavesLeft when they touch ground"
 Event.OngoingPlayer
 if (IsOnGround(EventPlayer) == true)
 {
-    waterSavesLeft = const_waterSaves;
+    waterSavesLeft = WATER_SAVES;
 }
