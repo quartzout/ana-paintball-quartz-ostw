@@ -12,6 +12,7 @@ import "Visuals/match.ostw";
 import "Visuals/general.ostw";
 import "Visuals/entering_game.ostw";
 import "Visuals/water_save.ostw";
+import "Visuals/host_load.ostw";
 
 //Import everything from Modules (in case that there are modules that werent imported in any visual)
 import "Modules/supported_maps.ostw";
@@ -28,140 +29,10 @@ import "Modules/portals.ostw";
 import "Modules/water_save.ostw";
 import "Modules/ultimate.ostw";
 
-import "Visuals/host_load.ostw";
+import "debug.ostw";
 
 
-rule: "debug hud" {
-
-    // CreateHudText(
-    //     VisibleTo: HostPlayer, 
-    //     Text: HostPlayer.waterSavesLeft,
-    //     TextColor: Color.Green,
-    //     Location: Location.Left,
-    //     Reevaluation: HudTextRev.VisibleToAndString
-    // );
 
 
-}
 
-// playervar String enemiesString;
-// rule: "update enemiesString" 
-// Event.OngoingPlayer{
-//     Loop(0.3, () => {
-//         EventPlayer.enemiesString = Stringify(EventPlayer.enemies, true);
-//     });
-// }
-
-
-// rule: "df" {
-//     CreateHudText(
-//         VisibleTo: HostPlayer, 
-//         Text: HostPlayer.enemiesString,
-//         Reevaluation: HudTextRev.VisibleToAndString,
-//         TextColor: Color.Aqua
-//     );
-// }
-
-rule: "Spawn bot by pressing CTRL+F"
-Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Crouch) == true)
-if (IsButtonHeld(EventPlayer(), Button.Interact) == true)
-{
-
-    Vector pos = RayCastHitPosition(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, All, HostPlayer, true) + RayCastHitNormal(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, All, HostPlayer, true) * 2;
-
-    Player bot = CreateDummyBot(Hero.Ana, Team.All, -1, pos, Vector(0, 0, 0));
-    
-    // CreateHudText(
-    //     VisibleTo: HostPlayer, 
-    //     Text: EvaluateOnce(bot).enemiesString,
-    //     Reevaluation: HudTextRev.VisibleToAndString
-    // );
-
-    // SpawnPortal(pos + FacingDirectionOf(bot) * 3);
-    // Wait(3, WaitBehavior.IgnoreCondition);
-    // PressButton(bot, Button.Ability1);
-
-    
-    
-
-}
-
-// rule: "bot shoots"
-// Event.OngoingPlayer
-// if(IsDummyBot(EventPlayer)) {
-//     Loop(1, () => {
-//         SetFacing(EventPlayer, FacingDirectionOf(EventPlayer) + (Up() * RandomReal(-0.1, 0.1)) + (Right() * RandomReal(-0.1, 0.1)));
-//         PressButton(EventPlayer, Button.PrimaryFire);
-//     });
-// }
-
-// rule: "Go to welcome screen by pressing CTRL+R"
-// Event.OngoingPlayer
-// if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
-// {
-//     Damage(EventPlayer, null, 20);
-// }
-
-// disabled rule: "Go to welcome screen by pressing CTRL+R"
-// Event.OngoingPlayer
-// if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
-// if (IsButtonHeld(EventPlayer(), Button.Crouch) == true)
-// {
-//     Wait(1, WaitBehavior.IgnoreCondition);
-//     SendToWelcomeScreen(EventPlayer());
-// }
-
-// disabled rule: "Prepare debug_portalPositions array for saving portal positions"
-// {
-//     debug_portalPositionsArray = [];
-//     debug_portalID = -1;
-//     for (cycle_arraySlot = 0; CountOf(debug_portalPositionsArray); 1)
-//     {
-//         CreateEffect(All, Effect.Sphere, Color.White, EvaluateOnce(debug_portalPositionsArray[cycle_arraySlot]), 1, EffectRev.VisibleTo);
-//     }
-// }
-
-// disabled rule: "Creating/destroying portal by pressing CTRL+F"
-// if (IsButtonHeld(HostPlayer, Button.Crouch) == true)
-// if (IsButtonHeld(HostPlayer, Button.Interact) == true)
-// {
-//     if (debug_portalID == -1)
-//     {
-//         parameter_portalPosition = EyePosition(HostPlayer);
-//         SpawnPortal();
-//         debug_portalID = return_createdPortalIndex;
-//         PlayEffect(All, PlayEffect.BuffImpactSound, Color.White, HostPlayer, 100);
-//     }
-//     else
-//     {
-//         parameter_portalIndex = debug_portalID;
-//         DespawnPortal();
-//         debug_portalID = -1;
-//         PlayEffect(All, PlayEffect.DebuffImpactSound, Color.White, HostPlayer, 100);
-//     }
-//     Wait(1, WaitBehavior.IgnoreCondition);
-// }
-
-// disabled rule: "Saving portal position to debug_portalPositions by pressing F+R"
-// if (IsButtonHeld(HostPlayer, Button.Interact) == true)
-// if (IsButtonHeld(HostPlayer, Button.Reload) == true)
-// {
-//     ModifyVariable(debug_portalPositionsArray, Operation.AppendToArray, PortalPositions_array[debug_portalID]);
-//     CreateEffect(All, Effect.Sphere, Color.White, PortalPositions_array[debug_portalID], 1, EffectRev.None);
-//     PlayEffect(All, PlayEffect.RingExplosionSound, Color.White, HostPlayer, 100);
-// }
-
-// disabled rule: "Fly by holding F"
-// Event.OngoingPlayer
-// if (IsButtonHeld(EventPlayer(), Button.Interact) == true)
-// {
-//     SendToWelcomeScreen(EventPlayer());
-//     SetGravity(EventPlayer(), 0);
-//     // Teleport(EventPlayer(), PositionOf(EventPlayer()) + FacingDirectionOf(EventPlayer()));
-//     CancelAllEventPlayerMotion();
-//     Wait(0.1, WaitBehavior.IgnoreCondition);
-//     LoopIfConditionIsTrue();
-//     Teleport(EventPlayer(), map_specific_settings.Get("welcomeScreenViewPoint"));
-// }
 
