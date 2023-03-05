@@ -12,14 +12,14 @@ globalvar Number JUMP_VELOCITY_SCALAR = WorkshopSettingReal("Player Physics", "J
 
 // Ultimate
 globalvar Boolean ultimateEnabled = WorkshopSettingToggle("Ultimate", "Enabled", true, 3);
-globalvar Number const_KillsToUltimate = WorkshopSettingInteger("Ultimate", "Kills to charge", 4, 1, 10, 4);
-globalvar Number const_ultimateSleepCD = WorkshopSettingReal("Ultimate", "Sleep Cooldown", 0, 0, 10, 5);
-globalvar Number const_ultimateGrenadeCD = WorkshopSettingReal("Ultimate", "Impulse Grenade Cooldown", 1.5, 1, 10, 6);
+globalvar Number KILLS_FOR_ULTIMATE = WorkshopSettingInteger("Ultimate", "Kills to charge", 4, 1, 10, 4);
+globalvar Number ULTIMATE_SLEEP_COOLDOWN = WorkshopSettingReal("Ultimate", "Sleep Cooldown", 0, 0, 10, 5);
+globalvar Number ULTIMATE_GRENADE_COOLDOWN = WorkshopSettingReal("Ultimate", "Impulse Grenade Cooldown", 1.5, 1, 10, 6);
 
 // Ultimate Physics
-globalvar Number const_ultimateMoveSpeedMultiplie = WorkshopSettingReal("Ultimate Physics", "Мove Speed", 2, 1, 3, 4);
-globalvar Number const_ultimateJumpVelocityMultip = WorkshopSettingReal("Ultimate Physics", "Jump Sрeed", 1.7, 1, 3, 5);
-globalvar Number const_UltimateGravityMultiplier = WorkshopSettingReal("Ultimate Physics", "Grаvity", 1.5, 1, 3, 6);
+globalvar Number ULTIMATE_MOVE_SPEED_SCALAR = WorkshopSettingReal("Ultimate Physics", "Мove Speed", 2, 1, 3, 4);
+globalvar Number ULTIMATE_JUMP_VELOCITY_SCALAR = WorkshopSettingReal("Ultimate Physics", "Jump Sрeed", 1.7, 1, 3, 5);
+globalvar Number ULTIMATE_GRAVITY_SCALAR = WorkshopSettingReal("Ultimate Physics", "Grаvity", 1.5, 1, 3, 6);
 
 // Projectile physics
 globalvar Number PROJECTILE_VELOCITY_SCALAR = WorkshopSettingReal("Projectile Physics", "Velocity", 1, 0.1, 10, 7);

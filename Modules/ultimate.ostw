@@ -1,23 +1,26 @@
-import "procedures.ostw";
+import "../Namespaces/_helpers.ostw";
+import "../Namespaces/_constants.ostw";
+import "../Namespaces/_shared.ostw";
 
-disabled rule: "-------------------------ULTIMATE-------------------------"
-{
-}
-
+playervar Number killsToUltimate = 0;
+playervar Number ultimateGivenDamageModID;
+playervar Number ultimateRecievedDamageModID;
 rule: "Player started using ultimate"
 Event.OngoingPlayer
-if (IsUsingUltimate(EventPlayer) == true)
+if (EventPlayer.isActive)
+if (IsUsingUltimate(EventPlayer))
 {
-    killsToUltimate = 0;
+    EventPlayer.killsToUltimate = 0;
+    
     # Physics
-    SetMoveSpeed(EventPlayer, 100 * const_ultimateMoveSpeedMultiplie);
-    SetGravity(EventPlayer, 100 * const_UltimateGravityMultiplier);
-    SetJumpVerticalSpeed(EventPlayer, 100 * const_ultimateJumpVelocityMultip);
-    # Start Compensating Damage Mods (to keep event damage values roughly the same)
-    StartDamageModification(All, EventPlayer, 66.666, DamageModificationRev.ReceiversAndDamagers);
-    ultimateGivenDamageModID = LastDamageModificationID();
-    StartDamageModification(EventPlayer, All, 200, DamageModificationRev.ReceiversAndDamagers);
-    ultimateRecievedDamageModID = LastDamageModificationID();
+    SetMoveSpeed(EventPlayer, 100 * ULTIMATE_MOVE_SPEED_SCALAR);
+    SetGravity(EventPlayer, 100 * ULTIMATE_GRAVITY_SCALAR);
+    SetJumpVerticalSpeed(EventPlayer, 100 * ULTIMATE_JUMP_VELOCITY_SCALAR);
+    
+    # Start Compensating Damage Mods (to keep event damage values roughly the same for combat and grenade event triggers)
+    EventPlayer.ultimateGivenDamageModID = StartDamageModification(All, EventPlayer, 66.666, DamageModificationRev.ReceiversAndDamagers);
+    EventPlayer.ultimateRecievedDamageModID = StartDamageModification(EventPlayer, All, 200, DamageModificationRev.ReceiversAndDamagers);
+    
     # Reset Ability Cooldowns
     SetAbilityCooldown(EventPlayer, Button.Ability1, 0);
     SetAbilityCooldown(EventPlayer, Button.Ability2, 0);
@@ -25,41 +28,46 @@ if (IsUsingUltimate(EventPlayer) == true)
 
 rule: "Player stopped using ultimate"
 Event.OngoingPlayer
-if (IsUsingUltimate(EventPlayer) == false)
+if (EventPlayer.isActive)
+if (!IsUsingUltimate(EventPlayer))
 {
-    ResetPlayerPhysicsSettings();
-    StopDamageModification(ultimateGivenDamageModID);
-    StopDamageModification(ultimateRecievedDamageModID);
+    ResetPlayerPhysicsSettings(EventPlayer);
+    StopDamageModification(EventPlayer.ultimateGivenDamageModID);
+    StopDamageModification(EventPlayer.ultimateRecievedDamageModID);
 }
 
 rule: "Add ultimate charge on player kill"
 Event.OnElimination
-if (IsUsingUltimate(EventPlayer) == false)
+if (EventPlayer.isActive)
+if (!IsUsingUltimate(EventPlayer))
 {
-    killsToUltimate += 1;
-    SetUltimateCharge(EventPlayer, killsToUltimate / const_KillsToUltimate * 100);
+    EventPlayer.killsToUltimate += 1;
+    SetUltimateCharge(EventPlayer, killsToUltimate / KILLS_FOR_ULTIMATE * 100);
 }
 
 rule: "Reset ultimate charge on player death"
 Event.OnDeath
+if (EventPlayer.isActive)
 {
-    killsToUltimate = 0;
+    EventPlayer.killsToUltimate = 0;
 }
 
 rule: "Player used Sleep in ultimate"
 Event.OngoingPlayer
-if (IsUsingUltimate(EventPlayer) == true)
-if (IsUsingAbility1(EventPlayer) == true)
+if (EventPlayer.isActive)
+if (IsUsingUltimate(EventPlayer))
+if (IsUsingAbility1(EventPlayer))
 {
     Wait(1, WaitBehavior.IgnoreCondition);
-    SetAbilityCooldown(EventPlayer, Button.Ability1, const_ultimateSleepCD);
+    SetAbilityCooldown(EventPlayer, Button.Ability1, ULTIMATE_SLEEP_COOLDOWN);
 }
 
 rule: "Player used Grenade in ultimate"
 Event.OngoingPlayer
-if (IsUsingUltimate(EventPlayer) == true)
-if (IsUsingAbility2(EventPlayer) == true)
+if (EventPlayer.isActive)
+if (IsUsingUltimate(EventPlayer))
+if (IsUsingAbility2(EventPlayer))
 {
     Wait(1, WaitBehavior.IgnoreCondition);
-    SetAbilityCooldown(EventPlayer, Button.Ability2, const_ultimateGrenadeCD);
+    SetAbilityCooldown(EventPlayer, Button.Ability2, ULTIMATE_GRENADE_COOLDOWN);
 }

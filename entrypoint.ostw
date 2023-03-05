@@ -25,7 +25,7 @@ import "Modules/scores.ostw";
 import "Modules/combat.ostw";
 import "Modules/portals.ostw";
 import "Modules/water_save.ostw";
-// import "Modules/ultimate.ostw";
+import "Modules/ultimate.ostw";
 
 import "Visuals/host_load.ostw";
 
