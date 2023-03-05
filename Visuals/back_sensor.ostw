@@ -9,10 +9,10 @@ rule: "Create Back Sensor HUD"
     # accept constant types as arguments
     (const (BackSensorState, Icon) => void) CreateBackSensorIcon = (state, icon) => {
         CreateIcon(
-            VisibleTo: VisibleIf(
-                IsScoped(LocalPlayer) && 
-                LocalPlayer.isActive && 
-                LocalPlayer.backSensorState == state),
+            VisibleTo: ActiveIf(
+                !IsScoped(LocalPlayer) && 
+                LocalPlayer.backSensorState == state
+            ),
             Position: LpFloatingHUDPosition(0, 0.25),
             Icon: icon, 
             Reevaluation: IconRev.VisibleToAndPosition, 
