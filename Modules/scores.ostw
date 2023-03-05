@@ -5,7 +5,7 @@ import "../Namespaces/_player_scores.ostw";
 
 
 //Events
-globalvar (Player, Number) => void OnKillStreakEvent = null;
+globalvar ((Player, Number) => void)[] OnKillStreakEvent = null;
 
 
 // Kills or deaths marked by their timestamps are saved in the arrays and the oldest ones are deleted once they are older then period or long period.
@@ -191,8 +191,8 @@ Event.OnElimination
 rule: "Show killstreak message when player dies"
 Event.OnDeath
 {
-    # if killstreak was more then const, call event for hud
-    if (EventPlayer.killstreak >= KILLS_FOR_KILL_STREAK) OnKillStreakEvent(EventPlayer, EventPlayer.killstreak);
+    # if killstreak was more then const, call event
+    if (EventPlayer.killstreak >= KILLS_FOR_KILL_STREAK) CallEvent(OnKillStreakEvent, EventPlayer, EventPlayer.killstreak);
 
     # Reset killstreaks
     EventPlayer.killstreak = 0;

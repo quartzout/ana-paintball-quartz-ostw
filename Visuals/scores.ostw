@@ -1,7 +1,7 @@
 import "../Modules/scores.ostw";
 
 rule: "Instantiating score module" {
-    OnKillStreakEvent = MessageOnKillStreak;
+    Subscribe(OnKillStreakEvent, MessageOnKillStreak);
 }
 
 // bugfest

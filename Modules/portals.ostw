@@ -5,8 +5,6 @@ import "../Namespaces/_map_constants.ostw";
 import "../Namespaces/_shared.ostw";
 import "../Namespaces/_can_player_teleport.ostw";
 
-// import "visual_effects.ostw";
-
 class Portal {
     public Vector Position;
     public Number UsesLeft;
