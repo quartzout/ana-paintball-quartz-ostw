@@ -3,6 +3,7 @@ import "../Namespaces/_constants.ostw";
 import "../Namespaces/_impulse_explosion.ostw";
 import "../Namespaces/_map_constants.ostw";
 import "../Namespaces/_shared.ostw";
+import "../Namespaces/_can_player_teleport.ostw";
 
 // import "visual_effects.ostw";
 
@@ -40,6 +41,7 @@ if (existingPortals.Length < MAP_SETTINGS.MaxPortalsInWorld)
     # Getting a list of all unoccupied positions. IsTrueForAll doesnt work inside FilteredArray. 
     while(existingPortals.Length < MAP_SETTINGS.MaxPortalsInWorld) {
     
+        // this is terribly inefficient and needs a Wait in between iterations to not crash the server, but it is called almost never so its fine for now 
         Wait(2);
 
         Vector[] unoccupiedPortalPositions = [];
@@ -81,58 +83,21 @@ rule: "Set angle constant" {
     ANGLE_CONSTANT = ArctangentInDegrees(PORTAL_RADIUS / 10, 1);
 }
 
-rule: "Player interacted with portal"
+rule: "Player pressed Interact"
 Event.OngoingPlayer
 if (IsButtonHeld(EventPlayer, Button.Interact))
 if (EventPlayer.isActive)
 {
+
+    LogToInspector($"{<String>EventPlayer} pressed Interact");
+
     foreach (Portal portal in existingPortals) {
         
-        if (portal.IsOnCooldown()) continue;
-
-        # maximum angle of activation from player eyes to portals position. If player looks at the portal within this angle, portal could be used by this player
-        Number portalEdgeAngle = 
-            (
-                ArctangentInDegrees(PORTAL_RADIUS / DistanceBetween(EyePosition(EventPlayer), portal.Position), 1) 
-                / ANGLE_CONSTANT - 0.07
-            ) ^ 1.3 * ANGLE_CONSTANT;
-
-        # checking if player looking withing this angle
-        if (
-            AngleBetweenVectors(
-                FacingDirectionOf(EventPlayer), 
-                VectorTowards(EyePosition(EventPlayer), portal.Position)
-            ) > portalEdgeAngle
-        ) continue;
-
-        
-        # Point where players view vector and portals plane intersect 
-        # (portal plane is always looking at player, ie strictly perpendicular to the vector from player's eyes to portal's position) 
-        # If raycast to this point isnt obstructed with anything, then the player is looking right through the portal
-        Vector temp_position = 
-            EyePosition(EventPlayer) +
-            FacingDirectionOf(EventPlayer) * 
-            DistanceBetween(
-                EyePosition(EventPlayer), 
-                portal.Position) / 
-            CosineFromDegrees(
-                AngleBetweenVectors(
-                    FacingDirectionOf(EventPlayer), 
-                    VectorTowards(
-                        EyePosition(EventPlayer), 
-                        portal.Position)
-                )
-            );
-        
-        if (IsRayObstructed(
-            From: EyePosition(EventPlayer), 
-            To: temp_position, 
-            PlayersToInclude: AllPlayers(Team.All), 
-            PlayersToExclude: EventPlayer)) continue;
-
-        TryTeleportPlayerToWhereTheyLook(EventPlayer);
-        UsePortal(portal);
-        break;
+        if (CanPlayerTeleport(EventPlayer, portal)) {
+            Boolean tpResult = TryTeleportPlayerToWhereTheyLook(EventPlayer);
+            if (tpResult) UsePortal(portal);
+            break;
+        }
 
     }
     
@@ -151,103 +116,94 @@ void UsePortal(Portal portal) {
     # Initiating cooldown
     portal.CooldownTimer = PORTAL_USE_COOLDOWN;
 
-    OnPortalUsedEvent(portal);
 }
 
 void DespawnPortal(in Portal portal)
 {
     existingPortals.ModRemoveByValue(portal);
-    OnPortalDespawnedEvent(portal);
+    CallEvent(OnPortalDespawnedEvent, portal);
 }
 
 
 Boolean TryTeleportPlayerToWhereTheyLook(in Player player)
 {
-    Boolean return_success = true;
     
+    LogToInspector($"trying to teleport {<String>player}");
+
     # Maximum position for the raycasts
-    Vector EndPosition = FacingDirectionOf(EventPlayer) * 100 + EyePosition(EventPlayer);
+    Vector EndPosition = FacingDirectionOf(player) * 100 + EyePosition(player);
     
     # Position thats been hit by raycast
-    Vector TeleportPosition = RayCastHitPosition(
-        StartPOS: EyePosition(EventPlayer), 
+    Vector wallHitPosition = RayCastHitPosition(
+        StartPOS: EyePosition(player), 
         EndPOS: EndPosition, 
-        PlayersToInclude: AllPlayers(Team.All), 
-        PlayersToExclude: EventPlayer);
+        PlayersToInclude: All, 
+        PlayersToExclude: player);
    
     # Normal to hit surface
-    Vector TeleportNormal = RayCastHitNormal(
-        StartPOS: EyePosition(EventPlayer), 
+    Vector wallHitNormal = RayCastHitNormal(
+        StartPOS: EyePosition(player), 
         EndPOS: EndPosition, 
-        PlayersToInclude: AllPlayers(Team.All), 
-        PlayersToExclude: EventPlayer);
+        PlayersToInclude: All, 
+        PlayersToExclude: player);
     
     # if no wall met
-    if (EndPosition == TeleportPosition)
+    if (EndPosition == wallHitPosition)
     {
-        OnNoWallMetOnTeleportEvent(EventPlayer);
-        // aimAtTheWallTimer = 1;
-        // ChaseVariableAtRate(aimAtTheWallTimer, 0, 1, RateChaseReevaluation.None);
+        CallEvent(OnNoWallMetOnTeleportEvent, player);
         return false;
     }
     
-    // # Resetting tooltip
-    // aimAtTheWallTimer = 0;
-    
     # Do Impulse Explosion At Teleportation point
     DoImpulseExplosionInRange(
-        blastPosition: TeleportPosition + TeleportNormal * 0.05, 
-        immunePlayer: EventPlayer,
-        envCredit: EventPlayer
+        blastPosition: wallHitPosition + wallHitNormal * 0.05, 
+        immunePlayer: player,
+        envCredit: player
     );
     
     # Argument for OnTeleportedEvent
-    Vector initialPlayerPos = EyePosition(EventPlayer);
+    Vector initialPlayerPos = EyePosition(player);
     
     # Cancel motion
-    CancelAllPlayerMotion(EventPlayer);
+    CancelAllPlayerMotion(player);
     
     Boolean isPlayerInWay = RayCastHitPlayer(
-        StartPOS: EyePosition(EventPlayer), 
+        StartPOS: EyePosition(player), 
         EndPOS: EndPosition, 
-        PlayersToInclude: AllPlayers(Team.All), 
-        PlayersToExclude: EventPlayer
+        PlayersToInclude: All, 
+        PlayersToExclude: player
     ) != null;
 
     # If player teleports into another player, just teleport them stright to other player
     if (isPlayerInWay)
     {
-        Teleport(EventPlayer, TeleportPosition);
+        Teleport(player, wallHitPosition);
     }
 
     # If player teleports to a perpendicular-ish wall
-    else if (AbsoluteValue(VerticalAngleFromDirection(TeleportNormal)) < 45)
+    else if (AbsoluteValue(VerticalAngleFromDirection(wallHitNormal)) < 45)
     {
         # Teleport player slightly off the wall
-        Teleport(EventPlayer, TeleportPosition + TeleportNormal);
+        Teleport(player, wallHitPosition + wallHitNormal);
 
         # Set facing in the horizontal direction of walls normal
-        SetFacing(EventPlayer, DirectionFromAngles(HorizontalAngleFromDirection(TeleportNormal), 0), Relative.ToWorld);
+        SetFacing(player, DirectionFromAngles(HorizontalAngleFromDirection(wallHitNormal), 0), Relative.ToWorld);
         
         # Send player a little up and from the wall 
-        ApplyImpulse(EventPlayer, Up(), 2, Relative.ToWorld, ContraryMotion.Cancel);
-        ApplyImpulse(EventPlayer, TeleportNormal, 2.5, Relative.ToWorld, ContraryMotion.Cancel);
+        ApplyImpulse(player, Up(), 2, Relative.ToWorld, ContraryMotion.Cancel);
+        ApplyImpulse(player, wallHitNormal, 2.5, Relative.ToWorld, ContraryMotion.Cancel);
     }
 
     # If player is teleported to horizonal surfaces like floor or ceiling, teleport it even more further from the surface and does not change facing direction
-    else if (VerticalAngleFromDirection(TeleportNormal) >= 45) Teleport(EventPlayer, TeleportPosition + TeleportNormal * 2);
+    else if (VerticalAngleFromDirection(wallHitNormal) >= 45) Teleport(player, wallHitPosition + wallHitNormal * 2);
 
     # In other potential cases, just teleport player
-    else Teleport(EventPlayer, TeleportPosition);
+    else Teleport(player, wallHitPosition);
     
-    // PlayEffect(
-    //     VisibleTo: AllPlayers(Team.All), 
-    //     Type: PlayEffect.ExplosionSound,
-    //     Position: EyePosition(EventPlayer),
-    //     Radius: 100,
-    // );
+    # Call Event
+    CallEvent(OnTeleportedEvent, initialPlayerPos, wallHitPosition, player);
 
-    CallEvent(OnTeleportedEvent, initialPlayerPos, EyePosition(EventPlayer));
+    return true;
 }
 
 
