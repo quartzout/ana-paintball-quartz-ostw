@@ -3,7 +3,7 @@ import "settings.lobby";
 // Import everything from Visuals 
 import "Visuals/portals.ostw";
 import "Visuals/scores.ostw";
-import "Visuals/visual_effects.ostw";
+// import "Visuals/visual_effects.ostw";
 import "Visuals/back_sensor.ostw";
 import "Visuals/player_sensor.ostw";
 import "Visuals/scope_limit.ostw";
@@ -26,6 +26,7 @@ import "Modules/portals.ostw";
 // import "Modules/water_save.ostw";
 // import "Modules/ultimate.ostw";
 
+import "Visuals/host_load.ostw";
 
 
 rule: "debug hud" {
@@ -52,24 +53,63 @@ rule: "debug hud" {
 
 }
 
+// playervar String enemiesString;
+// rule: "update enemiesString" 
+// Event.OngoingPlayer{
+//     Loop(0.3, () => {
+//         EventPlayer.enemiesString = Stringify(EventPlayer.enemies, true);
+//     });
+// }
 
 
+// rule: "df" {
+//     CreateHudText(
+//         VisibleTo: HostPlayer, 
+//         Text: HostPlayer.enemiesString,
+//         Reevaluation: HudTextRev.VisibleToAndString,
+//         TextColor: Color.Aqua
+//     );
+// }
 
 rule: "Spawn bot by pressing CTRL+F"
 Event.OngoingPlayer
 if (IsButtonHeld(EventPlayer(), Button.Crouch) == true)
 if (IsButtonHeld(EventPlayer(), Button.Interact) == true)
 {
-    CreateDummyBot(Hero.Ana, Team.All, -1, RayCastHitPosition(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, AllPlayers(Team.All), HostPlayer, true) + RayCastHitNormal(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, AllPlayers(Team.All), HostPlayer, true) * 2, Vector(0, 0, 0));
-    Wait(1, WaitBehavior.IgnoreCondition);
+
+    Vector pos = RayCastHitPosition(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, All, HostPlayer, true) + RayCastHitNormal(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, All, HostPlayer, true) * 2;
+
+    Player bot = CreateDummyBot(Hero.Ana, Team.All, -1, pos, Vector(0, 0, 0));
+    
+    // CreateHudText(
+    //     VisibleTo: HostPlayer, 
+    //     Text: EvaluateOnce(bot).enemiesString,
+    //     Reevaluation: HudTextRev.VisibleToAndString
+    // );
+
+    // SpawnPortal(pos + FacingDirectionOf(bot) * 3);
+    // Wait(3, WaitBehavior.IgnoreCondition);
+    // PressButton(bot, Button.Ability1);
+
+    
+    
+
 }
 
-rule: "Go to welcome screen by pressing CTRL+R"
-Event.OngoingPlayer
-if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
-{
-    Damage(EventPlayer, null, 20);
-}
+// rule: "bot teleports"
+// Event.OngoingPlayer
+// if(IsDummyBot(EventPlayer)) {
+//     Loop(1, () => {
+//         TryTeleportPlayerToWhereTheyLook(EventPlayer);
+//     });
+// }
+
+// rule: "Go to welcome screen by pressing CTRL+R"
+// Event.OngoingPlayer
+// if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
+// {
+//     Damage(EventPlayer, null, 20);
+// }
 
 // disabled rule: "Go to welcome screen by pressing CTRL+R"
 // Event.OngoingPlayer
@@ -86,7 +126,7 @@ if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
 //     debug_portalID = -1;
 //     for (cycle_arraySlot = 0; CountOf(debug_portalPositionsArray); 1)
 //     {
-//         CreateEffect(AllPlayers(Team.All), Effect.Sphere, Color.White, EvaluateOnce(debug_portalPositionsArray[cycle_arraySlot]), 1, EffectRev.VisibleTo);
+//         CreateEffect(All, Effect.Sphere, Color.White, EvaluateOnce(debug_portalPositionsArray[cycle_arraySlot]), 1, EffectRev.VisibleTo);
 //     }
 // }
 
@@ -99,14 +139,14 @@ if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
 //         parameter_portalPosition = EyePosition(HostPlayer);
 //         SpawnPortal();
 //         debug_portalID = return_createdPortalIndex;
-//         PlayEffect(AllPlayers(Team.All), PlayEffect.BuffImpactSound, Color.White, HostPlayer, 100);
+//         PlayEffect(All, PlayEffect.BuffImpactSound, Color.White, HostPlayer, 100);
 //     }
 //     else
 //     {
 //         parameter_portalIndex = debug_portalID;
 //         DespawnPortal();
 //         debug_portalID = -1;
-//         PlayEffect(AllPlayers(Team.All), PlayEffect.DebuffImpactSound, Color.White, HostPlayer, 100);
+//         PlayEffect(All, PlayEffect.DebuffImpactSound, Color.White, HostPlayer, 100);
 //     }
 //     Wait(1, WaitBehavior.IgnoreCondition);
 // }
@@ -116,8 +156,8 @@ if (IsButtonHeld(EventPlayer(), Button.Reload) == true)
 // if (IsButtonHeld(HostPlayer, Button.Reload) == true)
 // {
 //     ModifyVariable(debug_portalPositionsArray, Operation.AppendToArray, PortalPositions_array[debug_portalID]);
-//     CreateEffect(AllPlayers(Team.All), Effect.Sphere, Color.White, PortalPositions_array[debug_portalID], 1, EffectRev.None);
-//     PlayEffect(AllPlayers(Team.All), PlayEffect.RingExplosionSound, Color.White, HostPlayer, 100);
+//     CreateEffect(All, Effect.Sphere, Color.White, PortalPositions_array[debug_portalID], 1, EffectRev.None);
+//     PlayEffect(All, PlayEffect.RingExplosionSound, Color.White, HostPlayer, 100);
 // }
 
 // disabled rule: "Fly by holding F"
