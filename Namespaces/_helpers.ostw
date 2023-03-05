@@ -51,7 +51,7 @@ Vector LpFloatingHUDPosition(
             VerticalAngleFromDirection(Direction) + 90)));
 
 Player[] VisibleIf(Boolean condition):
-    condition ? AllPlayers(Team.All) : null;
+    condition ? All : null;
 
 T[] FilteredArray<T>(T[] array, const T => Boolean condition):
     FilteredArray(array, condition(ArrayElement()));
@@ -66,10 +66,15 @@ T[] SortedArray<T>(T[] array, const T => Number rankLambda):
     SortedArray(array, rankLambda(ArrayElement()));
 
 void Loop(in Number delay, const () => void actions) {
-    actions();
-    Wait(delay, WaitBehavior.IgnoreCondition);
-    Loop();
+    
+    while(true) {
+        actions();
+        Wait(delay, WaitBehavior.IgnoreCondition);
+    }
+    
 }
+
+Player[] All: AllPlayers(Team.All);
 
 
 Player EventPlayer: EventPlayer();
@@ -85,23 +90,38 @@ String Stringify(Any[] array, Boolean newLines = false) {
     return result + $"] ({array.Length})";
 }
 
+# Events should not contain waits because they are called syncronously.
 void CallEvent<ArgT>(in (ArgT => void)[] Event, in ArgT arg) {
     foreach ((ArgT => void) subscriber in Event) {
         subscriber(arg);
     }
 }
 
+# Events should not contain waits because they are called syncronously.
 void CallEvent<ArgT1, ArgT2>(in ((ArgT1, ArgT2) => void)[] Event, in ArgT1 arg1, in ArgT2 arg2) {
     foreach (((ArgT1, ArgT2) => void) subscriber in Event) {
         subscriber(arg1, arg2);
     }
 }
 
+# Events should not contain waits because they are called syncronously.
+void CallEvent<ArgT1, ArgT2, ArgT3>(in ((ArgT1, ArgT2, ArgT3) => void)[] Event, in ArgT1 arg1, in ArgT2 arg2, in ArgT3 arg3) {
+    foreach (((ArgT1, ArgT2, ArgT3) => void) subscriber in Event) {
+        subscriber(arg1, arg2, arg3);
+    }
+}
+
+# Events should not contain waits because they are called syncronously.
 void Subscribe<ArgT>(ref (ArgT => void)[] Event, in (ArgT => void) Subscriber) {
     Event.ModAppend(Subscriber);
 }
 
+# Events should not contain waits because they are called syncronously.
 void Subscribe<ArgT1, ArgT2>(ref ((ArgT1, ArgT2) => void)[] Event, in ((ArgT1, ArgT2) => void) Subscriber) {
+    Event.ModAppend(Subscriber);
+}
+
+void Subscribe<ArgT1, ArgT2, ArgT3>(ref ((ArgT1, ArgT2, ArgT3) => void)[] Event, in ((ArgT1, ArgT2, ArgT3) => void) Subscriber) {
     Event.ModAppend(Subscriber);
 }
 

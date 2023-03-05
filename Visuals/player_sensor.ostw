@@ -4,10 +4,7 @@ import "../Modules/player_sensor.ostw";
 rule: "Create Closest Player Sensor HUD" {
 
     CreateHudText(
-        VisibleTo: VisibleIf( 
-            LocalPlayer.closestPlayerSensorState != ClosestPlayerSensorState.No && 
-            LocalPlayer.isActive
-        ),
+        VisibleTo: ActiveIf(LocalPlayer.closestPlayerSensorState != ClosestPlayerSensorState.No),
         Header: 
             LocalPlayer.closestPlayerSensorState == ClosestPlayerSensorState.Close ? IconString(Icon.Bolt) : 
             (LocalPlayer.closestPlayerSensorState == ClosestPlayerSensorState.Right ? IconString(Icon.ArrowRight) : 

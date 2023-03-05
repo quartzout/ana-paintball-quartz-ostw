@@ -21,8 +21,8 @@ if (AltitudeOf(EventPlayer) > 10 == true)
     # Impulse up
     ApplyImpulse(EventPlayer, Up(), MAP_SETTINGS.WaterSaveImpulse, Relative.ToWorld, ContraryMotion.Cancel);
     # Effects
-    PlayEffect(AllPlayers(Team.All), PlayEffect.BuffExplosionSound, Color.White, EventPlayer, 100);
-    CreateEffect(AllPlayers(Team.All), Effect.MeiFrozenEffect, Color.White, EventPlayer, 1, EffectRev.VisibleToPositionAndRadius);
+    PlayEffect(All, PlayEffect.BuffExplosionSound, Color.White, EventPlayer, 100);
+    CreateEffect(All, Effect.MeiFrozenEffect, Color.White, EventPlayer, 1, EffectRev.VisibleToPositionAndRadius);
     define waterSaveEffectId = LastCreatedEntity();
     # Waiting for freeze to be over
     Wait(1, WaitBehavior.IgnoreCondition);

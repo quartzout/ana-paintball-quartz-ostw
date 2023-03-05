@@ -19,7 +19,7 @@ void MessageOnKillStreak(in Player streaker, in Number killstreak) {
     Wait(1);
     
     BigMessage(
-        VisibleTo: AllPlayers(Team.All), 
+        VisibleTo: All, 
         Header: LangString(messageEn, messageRu)
     );
 }
@@ -29,7 +29,7 @@ rule: "Create Leaderboard HUD"
 {
     # Leaderboard head
     CreateHudText(
-        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
         Text: LangString(
             $"--Average Kills in {TIME_PERIOD_FOR_STATS} sec--",
             $"--Средние убийства за {TIME_PERIOD_FOR_STATS} cек--",     
@@ -44,7 +44,7 @@ rule: "Create Stats HUD"
 {
 
     CreateHudText(
-        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
         Text: LangString("Kills:", "Убийств:"),
         Location: Location.Left, 
         TextColor: Color.Aqua,
@@ -52,7 +52,7 @@ rule: "Create Stats HUD"
     );
 
     CreateHudText(
-        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
         Subheader: LangString(
             $"Scoped: {LocalPlayer.scopedKillsPercent}%\nUnscoped: {LocalPlayer.unscopedKillsPercent}%\nSleep: {LocalPlayer.sleepKillsPercent}%",
             $"В прицеле: {LocalPlayer.scopedKillsPercent}%\n От бедра: {LocalPlayer.unscopedKillsPercent}%\nДротиком - {LocalPlayer.sleepKillsPercent}%"
@@ -62,7 +62,7 @@ rule: "Create Stats HUD"
     );
 
     CreateHudText(
-        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
         Subheader: LangString(
             $"In {TIME_PERIOD_FOR_STATS}s: {LocalPlayer.killsPerPeriod}",
             $"За {TIME_PERIOD_FOR_STATS}с: {LocalPlayer.killsPerPeriod}"
@@ -73,7 +73,7 @@ rule: "Create Stats HUD"
     );
 
     CreateHudText(
-        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
         Text: LangString(
             $"KDR: {LocalPlayer.killDeathRatio}",
             $"У/С: {LocalPlayer.killDeathRatio}",

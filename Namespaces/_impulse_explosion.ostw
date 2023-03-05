@@ -22,7 +22,7 @@ void DoImpulseExplosionForPlayer(in Vector blastPosition, in Player player, in P
 void DoImpulseExplosionInRange(in Vector blastPosition, in Player immunePlayer = null, in Player envCredit = null)
 {
     // Get all players in explosion range that are not immunePlayer and
-    Player[] victims: FilteredArray(AllPlayers(Team.All), p =>  DistanceBetween(p, blastPosition) <= 4 && p != immunePlayer);
+    Player[] victims: FilteredArray(All, p =>  DistanceBetween(p, blastPosition) <= 4 && p != immunePlayer);
     // Call single-victim explosion procedure for every player in the array
     foreach (Player player in victims) {
         DoImpulseExplosionForPlayer(blastPosition, player, envCredit);

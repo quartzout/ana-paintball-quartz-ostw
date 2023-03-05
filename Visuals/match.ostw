@@ -3,7 +3,7 @@ import "../Namespaces/_shared.ostw";
 rule: "Create Match Time HUD"
 {
     CreateHudText(
-        VisibleTo: VisibleIf(LocalPlayer.isActive), 
+        VisibleTo: Active, 
         Text: "{0} {1}:{2}".Format([
             LangString(
                 ru: "До конца матча:", 

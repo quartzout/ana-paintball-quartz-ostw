@@ -16,6 +16,12 @@ playervar Player[] enemies = [];
 playervar Number scopeTimer = 0;
 Boolean IsScoped(in Player player): player.scopeTimer > 0;
 
+Player[] ActiveIf(Boolean condition):
+    LocalPlayer.isActive && condition ? All : null;
+
+Player[] Active: LocalPlayer.isActive ? All : null;
+
+Player[] NotActive: !LocalPlayer.isActive ? All : null;
 
 String LangString(String en, String ru):
     LocalPlayer.language == SupportedLanguage.Russian ? ru : en;
@@ -23,6 +29,9 @@ String LangString(String en, String ru):
 
 globalvar Player[] activePlayers = [];
 globalvar Number secondsElapsed = 0;
+
+# Generates id from 0 to million using timestamp and random
+Number GenerateId(): (secondsElapsed % 10) * RandomInteger(0, 100000);
 
 void ResetPlayerPhysicsSettings(in Player player)
 {

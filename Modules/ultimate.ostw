@@ -14,9 +14,9 @@ if (IsUsingUltimate(EventPlayer) == true)
     SetGravity(EventPlayer, 100 * const_UltimateGravityMultiplier);
     SetJumpVerticalSpeed(EventPlayer, 100 * const_ultimateJumpVelocityMultip);
     # Start Compensating Damage Mods (to keep event damage values roughly the same)
-    StartDamageModification(AllPlayers(Team.All), EventPlayer, 66.666, DamageModificationRev.ReceiversAndDamagers);
+    StartDamageModification(All, EventPlayer, 66.666, DamageModificationRev.ReceiversAndDamagers);
     ultimateGivenDamageModID = LastDamageModificationID();
-    StartDamageModification(EventPlayer, AllPlayers(Team.All), 200, DamageModificationRev.ReceiversAndDamagers);
+    StartDamageModification(EventPlayer, All, 200, DamageModificationRev.ReceiversAndDamagers);
     ultimateRecievedDamageModID = LastDamageModificationID();
     # Reset Ability Cooldowns
     SetAbilityCooldown(EventPlayer, Button.Ability1, 0);

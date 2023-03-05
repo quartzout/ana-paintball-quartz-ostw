@@ -18,7 +18,7 @@ void AddScoreboardEntryForPlayer(in Player player) {
     Player FrozenEventPlayer: EvaluateOnce(EventPlayer);
 
     scoreboardEntryHudId = CreateHudText(
-        VisibleTo: VisibleIf(LocalPlayer.isActive && CountOf(activePlayers) >= 2), 
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
         Subheader: 
             LocalPlayer != EvaluateOnce(EventPlayer) ? 
             $"{FrozenEventPlayer.place}: {FrozenEventPlayer} - {FrozenEventPlayer.averageKillsPerPeriod}" : 
@@ -48,7 +48,7 @@ rule: "Create Welcome Screen HUD"
     #Player still can rotate camera while in welcome screen, so custom origin and direction must be set
     #English
     CreateInWorldText(
-        VisibleTo: VisibleIf(!LocalPlayer.isActive),
+        VisibleTo: NotActive,
         Header: "JUMP TO START", 
         Position: LpFloatingHUDPosition(
             XOffset: 0, 
@@ -62,7 +62,7 @@ rule: "Create Welcome Screen HUD"
     
     #Russian
     CreateInWorldText(
-        VisibleTo: VisibleIf(!LocalPlayer.isActive),
+        VisibleTo: NotActive,
         Header: "E - НАЧАТЬ НА РУССКОМ", 
         Position: LpFloatingHUDPosition(
             XOffset: 0, 
