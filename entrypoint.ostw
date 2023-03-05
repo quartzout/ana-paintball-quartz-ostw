@@ -10,6 +10,7 @@ import "Visuals/scope_limit.ostw";
 import "Visuals/match.ostw";
 import "Visuals/general.ostw";
 import "Visuals/entering_game.ostw";
+import "Visuals/water_save.ostw";
 
 //Import everything from Modules (in case that there are modules that werent imported in any visual)
 import "Modules/supported_maps.ostw";
@@ -23,7 +24,7 @@ import "Modules/scope_limit.ostw";
 import "Modules/scores.ostw";
 import "Modules/combat.ostw";
 import "Modules/portals.ostw";
-// import "Modules/water_save.ostw";
+import "Modules/water_save.ostw";
 // import "Modules/ultimate.ostw";
 
 import "Visuals/host_load.ostw";
@@ -31,20 +32,9 @@ import "Visuals/host_load.ostw";
 
 rule: "debug hud" {
 
-    // Subscribe(OnPortalSpawnedEvent, (portal) => {
-    //     CreateHudText(
-    //         VisibleTo: VisibleIf(LocalPlayer == HostPlayer), 
-    //         Text: Stringify(EvaluateOnce(portal)) + "\n",
-    //         TextColor: Color.Aqua,
-    //         Location: Location.Left,
-    //         Reevaluation: HudTextRev.VisibleToSortOrderAndString
-    //     );
-    // });
-
-    
     // CreateHudText(
-    //     VisibleTo: VisibleIf(LocalPlayer == HostPlayer), 
-    //     Text: $"{existingPortals.Length}, {MAP_SETTINGS.MaxPortalsInWorld}", 
+    //     VisibleTo: HostPlayer, 
+    //     Text: HostPlayer.waterSavesLeft,
     //     TextColor: Color.Green,
     //     Location: Location.Left,
     //     Reevaluation: HudTextRev.VisibleToAndString

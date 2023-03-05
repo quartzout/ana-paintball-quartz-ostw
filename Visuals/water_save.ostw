@@ -1,0 +1,35 @@
+import "../Modules/water_save.ostw";
+
+
+playervar Number waterSaveEffectId;
+rule: "Initiating visual effect events" {
+    
+    Subscribe(OnWaterSaveActivatedEvent, player => {
+        player.waterSaveEffectId = CreateEffect(
+            VisibleTo: All, 
+            Type: Effect.MeiFrozenEffect, 
+            Position: EventPlayer, 
+            Radius: 1, 
+            Reevaluation: EffectRev.VisibleToPositionAndRadius
+        );
+    });
+
+    Subscribe(OnWaterSaveDeactivatedEvent, player => {
+        DestroyEffect(player.waterSaveEffectId);
+    });
+
+}
+
+rule: "Initiating sound effect events" {
+
+    Subscribe(OnWaterSaveActivatedEvent, player => {
+        PlayEffect(
+            VisibleTo: All, 
+            Type: PlayEffect.BuffExplosionSound, 
+            Position: EventPlayer, 
+            Radius: 100
+        );
+    });
+
+}
+
