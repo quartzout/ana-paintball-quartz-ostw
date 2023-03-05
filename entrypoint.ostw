@@ -3,7 +3,8 @@ import "settings.lobby";
 // Import everything from Visuals 
 import "Visuals/portals.ostw";
 import "Visuals/scores.ostw";
-// import "Visuals/visual_effects.ostw";
+import "Visuals/death_explosion.ostw";
+import "Visuals/paintballs.ostw";
 import "Visuals/back_sensor.ostw";
 import "Visuals/player_sensor.ostw";
 import "Visuals/scope_limit.ostw";
@@ -86,11 +87,12 @@ if (IsButtonHeld(EventPlayer(), Button.Interact) == true)
 
 }
 
-// rule: "bot teleports"
+// rule: "bot shoots"
 // Event.OngoingPlayer
 // if(IsDummyBot(EventPlayer)) {
 //     Loop(1, () => {
-//         TryTeleportPlayerToWhereTheyLook(EventPlayer);
+//         SetFacing(EventPlayer, FacingDirectionOf(EventPlayer) + (Up() * RandomReal(-0.1, 0.1)) + (Right() * RandomReal(-0.1, 0.1)));
+//         PressButton(EventPlayer, Button.PrimaryFire);
 //     });
 // }
 
