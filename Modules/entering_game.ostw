@@ -76,21 +76,22 @@ void AddNewActivePlayer(in Player player)
 
     Wait(0.25, WaitBehavior.IgnoreCondition);
 
-    # Vars
-    player.isActive = true;
-
     # HUD event invoking
     OnActivePlayerAddedEvent(player);
 
-    # Adding player to array
-    ModifyVariable(activePlayers, Operation.AppendToArray, player);
-    UpdatePlacesForEveryPlayer();
-    
+    // filling players enemy array
+    player.enemies = activePlayers;
+
     // Updating everyones enemy array
     foreach (Player activePlayer in activePlayers) {
         if (activePlayer == player) continue;
-        ModifyVariable(activePlayer.enemies, Operation.AppendToArray, player);
+        activePlayer.enemies.ModAppend(player);
     }
+
+    # Making player active
+    player.isActive = true;
+    activePlayers.ModAppend(player);
+    UpdatePlacesForEveryPlayer();
 
     # Resetting physics
     ResetPlayerPhysicsSettings(player);
