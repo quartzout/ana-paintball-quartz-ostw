@@ -4,13 +4,9 @@ rule: "Create Match Time HUD"
 {
     CreateHudText(
         VisibleTo: Active, 
-        Text: "{0} {1}:{2}".Format([
-            LangString(
-                ru: "До конца матча:", 
-                en: "Match is over in"), 
-            RoundToInteger((MATCH_TIME - secondsElapsed) / 60, Rounding.Down), 
-            RoundToInteger(MATCH_TIME - secondsElapsed, Rounding.Down) % 60]), 
+        Text: LangString("Map switches in ", "Карта поменяется через ") + TimestampToReadable(MATCH_TIME - secondsElapsed),
         Location: Location.Top, 
         SortOrder: 1, 
-        Reevaluation: HudTextRev.VisibleToAndString);
+        TextColor: MatchTime() > 60 ? Color.White : Color.Blue,
+        Reevaluation: HudTextRev.VisibleToStringAndColor);
 }

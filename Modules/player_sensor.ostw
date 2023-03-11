@@ -13,6 +13,7 @@ enum ClosestPlayerSensorState {
 
 playervar ClosestPlayerSensorState closestPlayerSensorState;
 
+Number PLAYER_SENSOR_DISTANCE: 7;
 
 
 rule: "Updating state of the Closest Player Sensor for player"
@@ -30,7 +31,7 @@ Event.OngoingPlayer
         Player closestPlayer = FirstOf(SortedArray(enemies, p => DistanceBetween(p, EventPlayer)));
 
         # Closest player is closer then 20 units
-        if (DistanceBetween(EyePosition(EventPlayer), EyePosition(closestPlayer)) <= 20) {
+        if (DistanceBetween(EyePosition(EventPlayer), EyePosition(closestPlayer)) <= PLAYER_SENSOR_DISTANCE) {
             closestPlayerSensorState = ClosestPlayerSensorState.Close;
             return;
         }

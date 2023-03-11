@@ -4,10 +4,21 @@ rule: "Debug hud" {
     
     // CreateHudText(
     //     VisibleTo: HostPlayer, 
-    //     Text: 
-    //     Reevaluation: HudTextRev.VisibleToAndString
+    //     Text: secondsElapsed,
+    //     Reevaluation: HudTextRev.VisibleToAndString,
+    //     TextColor: Color.Blue
     // );
+    
 }
+    
+
+// playervar String killstring;
+// rule: "strign"
+// Event.OngoingPlayer {
+//     Loop(0.5, () => {
+//         EventPlayer.killstring = Stringify(EventPlayer.killTimestampsInLastLongPeriod);
+//     });
+// }
 
 globalvar Boolean debugMode = false;
 rule: "Turn off/on debug actions by pressing R + F + Shift"
@@ -62,8 +73,9 @@ Event.OngoingPlayer
 if(IsDummyBot(EventPlayer))
 if (debugMode) 
 {
+    StartHoldingButton(EventPlayer, Button.SecondaryFire);
     Loop(1, () => {
-        SetFacing(EventPlayer, FacingDirectionOf(EventPlayer) + (Up() * RandomReal(-0.1, 0.1)) + (Right() * RandomReal(-0.1, 0.1)));
+        //SetFacing(EventPlayer, FacingDirectionOf(EventPlayer) + (Up() * RandomReal(-0.1, 0.1)) + (Right() * RandomReal(-0.1, 0.1)));
         PressButton(EventPlayer, Button.PrimaryFire);
     });
 }

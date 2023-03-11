@@ -38,12 +38,12 @@ globalvar Number PORTAL_USES = WorkshopSettingInteger("Portals", "Portal Uses be
 globalvar Number PORTAL_USE_COOLDOWN = WorkshopSettingReal("Portals", "Cooldown for using the same portal", 1, 0, 10, 14);
 
 // Player stats
-globalvar Number TIME_PERIOD_FOR_STATS = WorkshopSettingReal("Tracking player statistics", "Time period for tracking kills (sec.)", 30, 5, 600, 15);
+globalvar Number TIME_PERIOD_FOR_STATS = WorkshopSettingReal("Tracking player statistics", "Time period for tracking kills (sec.)", 60, 5, 600, 15);
 globalvar Number PERIODS_IN_LONG_PERIOD = RoundToInteger(WorkshopSettingReal("Tracking player statistics", "Time period for averaging statistics (sec.)", 180, 30, 3600, 16) / TIME_PERIOD_FOR_STATS, Rounding.Nearest);
 globalvar Number KILLS_FOR_KILL_STREAK = 5;
 
 // Match
-globalvar Number MATCH_TIME = 60 * WorkshopSettingInteger("Match", "Match Time (minutes)", 10, 2, 240, 0);
+globalvar Number MATCH_TIME = 60 * WorkshopSettingInteger("Match", "Map switches every (minutes)", 20, 2, 240, 0);
 
 
 

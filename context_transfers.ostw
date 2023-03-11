@@ -1,5 +1,5 @@
 import "Visuals/portals.ostw";
-
+import "Modules/scope_limit.ostw";
 
 # Syncronous action that triggers execution of async subroutine with the same name and transforms player arguemnt into EventPlayer context
 void ct_PlayTeleportedBeamEffectAsync(Vector playerBeforePos, Vector playerAfterPos, Player player) { 
@@ -36,4 +36,19 @@ if (call_PlayTeleportedPovEffectAsync) {
     async PlayTeleportedPovEffectAsync(call_PlayTeleportedPovEffectAsync_playerBeforePos, call_PlayTeleportedPovEffectAsync_playerAfterPos);
     call_PlayTeleportedPovEffectAsync = false;
 }
+
+
+# Syncronous action that triggers execution of async subroutine with the same name and transforms player arguemnt into EventPlayer context
+void ct_ForcePlayerToExitScopeAsync(Player player) { 
+    call_ForcePlayerToExitScopeAsync = true;
+}
+
+playervar Boolean call_ForcePlayerToExitScopeAsync = false;
+rule: "player var to eventplayer context"
+Event.OngoingPlayer 
+if (call_ForcePlayerToExitScopeAsync) {
+    async ForcePlayerToExitScopeAsync();
+    call_ForcePlayerToExitScopeAsync = false;
+}
+
 

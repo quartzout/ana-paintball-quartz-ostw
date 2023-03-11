@@ -20,15 +20,22 @@ Event.OngoingGlobal
 
 
 rule: "Resume match timer 1 minute before match is over"
-if (secondsElapsed >= MATCH_TIME - 60)
 {
-    EnableAnnouncer();
-    UnpauseMatchTime();
-    SetMatchTime(60);
+    Loop(1, () => {
+        if (secondsElapsed >= MATCH_TIME - 60 && MatchTime() > 60)
+            {
+                LogToInspector("hey");
+                EnableAnnouncer();
+                UnpauseMatchTime();
+                SetMatchTime(60);
+            }
+    });
+        
 }
 
 rule: "Enable match completion when match time is over"
 if (MatchTime() == 0)
 {
     EnableCompletion();
+    RestartMatch();
 }

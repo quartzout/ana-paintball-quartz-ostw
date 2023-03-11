@@ -36,9 +36,6 @@ void UpdateLocalPlayerStats(in Player player)
     # KDR
     player.killDeathRatio = CountOf(player.killTimestampsInLastLongPeriod) / Max(1, CountOf(player.deathTimestampsInLastLongPeriod)) + 0.001;
     
-    # Kills for the last time period
-    player.killsPerPeriod = CountOf(killTimestampsInLastPeriod);
-    
     # Saving overall number of kills with any method
     Number totalKillsInLastLongPeriod = 
         CountOf(player.sleepKillTimestampsInLastLongPeriod) + 
@@ -61,7 +58,7 @@ void UpdateLocalPlayerStats(in Player player)
 
 rule: "Add kill to killTimestampsInLastLongPeriod"
 Event.OnElimination
-{
+{   
     ModifyVariable(EventPlayer.killTimestampsInLastLongPeriod, Operation.AppendToArray, RoundToInteger(secondsElapsed, Rounding.Down));
     
     # Calculating stats

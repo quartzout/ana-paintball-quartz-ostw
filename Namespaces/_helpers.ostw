@@ -81,8 +81,19 @@ Player EventPlayer: EventPlayer();
 Player LocalPlayer: LocalPlayer();
 Player HostPlayer: HostPlayer();
 
+String FixedTwoLength(String nums):
+    nums.Length < 2 ? 
+    "0" + nums :
+    nums;
 
-String Stringify(Any[] array, Boolean newLines = false) {
+String TimestampToReadable(Number seconds):
+    "{0}:{1}".Format([
+        RoundToInteger(seconds / 60, Rounding.Down),
+        FixedTwoLength("{0}".Format([(RoundToInteger(seconds, Rounding.Down) % 60)]))
+    ]);
+     
+
+String Stringify(Any[] array, Boolean newLines = true) {
     String result = "[" + (newLines ? "\n" : "");
     foreach (Any value in array) {
         result = result + <String>value + (newLines ? "\n" : "");

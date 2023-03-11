@@ -61,16 +61,6 @@ rule: "Create Stats HUD"
         Reevaluation: HudTextRev.VisibleToStringAndColor
     );
 
-    CreateHudText(
-        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
-        Subheader: LangString(
-            $"In {TIME_PERIOD_FOR_STATS}s: {LocalPlayer.killsPerPeriod}",
-            $"За {TIME_PERIOD_FOR_STATS}с: {LocalPlayer.killsPerPeriod}"
-        ),
-        SubheaderColor: Color.SkyBlue,
-        Location: Location.Left, 
-        Reevaluation: HudTextRev.VisibleToAndString
-    );
 
     CreateHudText(
         VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
