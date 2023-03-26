@@ -1,0 +1,165 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\portals\portals.ostw";
+import "\APQ\Modules\Gameplay\_Shared\player physics\player_physics.ostw";
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+rule: "Debug hud" {
+
+    // CreateHudText(
+    //     VisibleTo: HostPlayer, 
+    //     Text: 
+    //     Reevaluation: HudTextRev.VisibleToAndString,
+    //     TextColor: Color.Blue
+    // );
+
+
+}
+
+# Returns string in human-readible format describing Portal object. Reevaluation supported 
+String Stringify(Portal portal): 
+    $"<Portal {portal}>\nPos: {portal.Position}\nLifetime: {portal.SecondsLeft}";
+
+rule: "" {
+    Loop(0.3, () => {
+        String portals = "";
+        foreach (Portal portal in existingPortals) {
+            portals = portals + Stringify(portal) + "\n";
+        }
+        portalposesstring = portals;
+    });
+}
+
+globalvar String portalposesstring;
+globalvar Vector[] portalposes = [];
+rule: "add portal pos to debug array" {
+    Subscribe(OnPortalSpawnedEvent, portal => {
+        portalposes.ModAppend(portal.Position);
+    });
+}
+
+// playervar String killstring;
+// rule: "strign"
+// Event.OngoingPlayer {
+//     Loop(0.5, () => {
+//         EventPlayer.killstring = Stringify(EventPlayer.killTimestampsInLastLongPeriod);
+//     });
+// }
+
+globalvar Boolean debugMode = false;
+rule: "Turn off/on debug actions by pressing R + F + Shift"
+Event.OngoingPlayer 
+if (EventPlayer == HostPlayer)
+if (IsButtonHeld(EventPlayer, Button.Interact))
+if (IsButtonHeld(EventPlayer, Button.Reload))
+if (IsButtonHeld(EventPlayer, Button.Ability1)) 
+{
+    debugMode = !debugMode;
+
+    if (!debugMode) {
+        DestroyAllDummyBots();
+        ResetPlayerPhysicsSettings(EventPlayer);
+    }
+}
+
+rule: "Debug mode hud" {
+    
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer == HostPlayer && debugMode),
+        Text: "Debug actions are turned on",
+        TextColor: Color.Rose,
+        Reevaluation: HudTextRev.VisibleTo,
+        Location: Location.Top,
+        SortOrder: 1
+    );
+}
+
+
+rule: "Spawn bot by pressing CTRL + F"
+Event.OngoingPlayer
+if (EventPlayer == HostPlayer)
+if (IsButtonHeld(EventPlayer, Button.Crouch))
+if (IsButtonHeld(EventPlayer, Button.Interact))
+if (debugMode)
+{
+
+    Vector pos = RayCastHitPosition(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, All, HostPlayer, true) + RayCastHitNormal(EyePosition(HostPlayer), EyePosition(HostPlayer) + FacingDirectionOf(HostPlayer) * 100, All, HostPlayer, true) * 2;
+    Player bot = CreateDummyBot(Hero.Ana, Team.All, -1, pos, Vector(0, 0, 0));
+    
+    // CreateHudText(
+    //     VisibleTo: HostPlayer, 
+    //     Text: 
+    //     Reevaluation: HudTextRev.VisibleToAndString
+    // );
+    
+}
+
+rule: "bot does repeated action"
+Event.OngoingPlayer
+if(IsDummyBot(EventPlayer))
+if (debugMode) 
+{
+    StartHoldingButton(EventPlayer, Button.SecondaryFire);
+    Loop(1, () => {
+        //SetFacing(EventPlayer, FacingDirectionOf(EventPlayer) + (Up() * RandomReal(-0.1, 0.1)) + (Right() * RandomReal(-0.1, 0.1)));
+        PressButton(EventPlayer, Button.PrimaryFire);
+    });
+}
+
+rule: "Go to welcome screen by pressing CTRL + R"
+Event.OngoingPlayer
+if (EventPlayer == HostPlayer)
+if (IsButtonHeld(EventPlayer, Button.Reload))
+if (IsButtonHeld(EventPlayer, Button.Crouch))
+if (debugMode)
+{
+    Wait(1, WaitBehavior.IgnoreCondition);
+    MakePlayerInactive(EventPlayer);
+}
+
+
+rule: "Fly by holding Space + F"
+Event.OngoingPlayer
+if (debugMode)
+if (EventPlayer == HostPlayer)
+if (IsButtonHeld(EventPlayer, Button.Interact))
+if (IsButtonHeld(EventPlayer, Button.Jump))
+{
+    SetGravity(EventPlayer, 0);
+    
+    Teleport(EventPlayer, PositionOf(EventPlayer) + FacingDirectionOf(EventPlayer));
+    CancelAllPlayerMotion(EventPlayer);
+    
+    Wait(0.1, WaitBehavior.IgnoreCondition);
+    LoopIfConditionIsTrue();
+}
+
+rule: "Spawn new portal at player position by pressing MouseRight + F"
+Event.OngoingPlayer
+if (debugMode)
+if (EventPlayer == HostPlayer)
+if (IsButtonHeld(EventPlayer, Button.SecondaryFire))
+if (IsButtonHeld(EventPlayer, Button.Interact))
+{
+    SpawnPortal(PositionOf(EventPlayer));
+}
+
+
+rule: "Show current view direction and position"
+Event.OngoingPlayer
+if (EventPlayer == HostPlayer)
+{
+   CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer == HostPlayer && debugMode), 
+        Text: PositionOf(EventPlayer),
+        Reevaluation: HudTextRev.VisibleToAndString,
+        TextColor: Color.Blue
+    );
+
+    CreateHudText(
+        VisibleTo: VisibleIf(LocalPlayer == HostPlayer && debugMode), 
+        Text: FacingDirectionOf(EventPlayer),
+        Reevaluation: HudTextRev.VisibleToAndString,
+        TextColor: Color.Blue
+    );
+}

@@ -1,0 +1,41 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "..\definitions.ostw";
+
+rule: "Add options" {
+
+    Map MAP: Map.Chateau_Guillard;
+
+    AllMapOptions.ModAppend(new MapOptions<PortalsMapOptions>(MAP, "PortalsMapOptions", { 
+        PORTAL_SPAWNPOINTS: [
+            Vector(206.463, 9.904, 66.99), 
+            Vector(195.734, 10.221, 62.788), 
+            Vector(215.587, 15.848, 62.185), 
+            Vector(187.948, 10.003, 55.715), 
+            Vector(199.434, 10.904, 80.96), 
+            Vector(177.053, 8.952, 83.161), 
+            Vector(181.99, 11.046, 95.668), 
+            Vector(185.631, 11.029, 101.903), 
+            Vector(206.086, 17.404, 87.097), 
+            Vector(199.325, 11.084, 110.729), 
+            Vector(219.95, 8.229, 103.38), 
+            Vector(229.647, 8.986, 90.295), 
+            Vector(206.443, 2.228, 78.272), 
+            Vector(205.36, 11.202, 93.692), 
+            Vector(189.021, 3.113, 59.796), 
+            Vector(220.249, 10.173, 78.112), 
+            Vector(218.646, 4.177, 87.18)],
+        MAX_PORTALS_IN_WORLD: 2
+    }));
+
+    AllMapOptions.ModAppend(new MapOptions<EnviromentalSaveMapOptions>(MAP, "EnviromentalSaveMapOptions", { 
+        SAVE_Y_COORDINATE: 0.7,
+        SAVE_UP_IMPULSE: 22
+    }));
+
+    AllMapOptions.ModAppend(new MapOptions<ActivePlayersVisualsMapOptions>(MAP, "ActivePlayersVisualsMapOptions", { 
+        POSITION: Vector(147.403, 25.275, 13.17),
+        VIEW_DIRECTION: Vector(0.6, 0, 0.8)
+    }));
+
+}

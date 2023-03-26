@@ -1,0 +1,58 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Visuals\_Shared\player color\player_color.ostw";
+import "\APQ\Modules\Stats\scores\scores.ostw";
+
+
+rule: "Add and remove hud entry when player spawns and despawns" {
+    Subscribe(OnActivePlayerAddedEvent, AddScoreboardEntryForPlayer);
+    Subscribe(OnActivePlayerRemovedEvent, RemoveScoreboardEntryForPlayer);
+}
+
+playervar Number scoreboardEntryHudId = null;
+
+rule: "Create Leaderboard HUD"
+{
+    WaitUntilOptionsAreLoaded();
+
+    # Leaderboard head
+    CreateHudText(
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        Text: LangString(
+            $"--Average Kills in {playerStatsOptions.AVERAGING_PERIOD} sec--",
+            $"--Средние убийства за {playerStatsOptions.AVERAGING_PERIOD} cек--",     
+        ), 
+        Location: Location.Right, 
+        SortOrder: 0, 
+        Reevaluation: HudTextRev.VisibleToAndString);
+}
+
+void AddScoreboardEntryForPlayer(in Player player) { 
+
+    if (player.scoreboardEntryHudId != null) return;
+
+    Player FrozenEventPlayer: EvaluateOnce(EventPlayer);
+
+    scoreboardEntryHudId = CreateHudText(
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        Subheader: 
+            LocalPlayer != EvaluateOnce(EventPlayer) ? 
+            $"{FrozenEventPlayer.place}: {FrozenEventPlayer} - {FrozenEventPlayer.averageKillsPerPeriod}" : 
+            "", 
+        Text: 
+            LocalPlayer == EvaluateOnce(EventPlayer) ? 
+            $"{FrozenEventPlayer.place}: {FrozenEventPlayer} - {FrozenEventPlayer.averageKillsPerPeriod}" : 
+            "", 
+        Location: Location.Right, 
+        SortOrder: FrozenEventPlayer.place, 
+        SubheaderColor: FrozenEventPlayer.color, 
+        TextColor: Color.White,
+        Reevaluation: HudTextRev.VisibleToSortOrderStringAndColor
+    );
+}
+
+void RemoveScoreboardEntryForPlayer(in Player player) {
+    DestroyHudText(scoreboardEntryHudId);
+    scoreboardEntryHudId = null;
+}

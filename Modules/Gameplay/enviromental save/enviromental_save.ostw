@@ -1,0 +1,13 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Map Options\definitions.ostw";
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+globalvar EnviromentalSaveMapOptions enviromentalSaveMapOptions;
+globalvar EnviromentalSaveOptions enviromentalSaveOptions;
+
+//Events
+globalvar (Player => void)[] OnWaterSaveActivatedEvent;
+globalvar (Player => void)[] OnWaterSaveDeactivatedEvent;  
+
+playervar Number waterSavesLeft = 0;

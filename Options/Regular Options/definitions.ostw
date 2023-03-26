@@ -1,0 +1,80 @@
+import "\APQ\Quartz\quartz.ostw";
+
+
+struct PortalsOptions {
+    public Number PORTAL_LIFETIME;
+    public Number PORTAL_RADIUS;
+    public Number LAND_EXPLOSION_IMPULSE;
+    public Number LAND_EXPLOSION_UPWARD_PULL;
+}
+
+struct PortalsVisualOptions {
+    public Color PORTAL_HIGHTLIGHT_COLOR;
+    public Color PORTAL_ON_COOLDOWN_COLOR;
+    public Color[] IDLE_PORTAL_COLORS_BY_LIFETIME_RATIO;
+}
+
+struct ScopeTimeLimitOptions {
+    public Number MAX_SCOPE_TIME;
+}
+
+struct EnabledAbilitiesOptions {
+    public Boolean SLEEP_ENABLED;
+    public Boolean GRENADE_ENABLED;
+    public Boolean ULTIMATE_ENABLED;
+}
+
+
+struct ImpulseGrenadeOptions {
+    public Number EXPLOSION_IMPULSE;
+    public Number EXPLOSION_UPWARD_PULL;
+}
+
+struct PlayerPhysicsOptions {
+    public Number GRAVITY_SCALAR;
+    public Number MOVE_SPEED_SCALAR;
+    public Number JUMP_VELOCITY_SCALAR;
+}
+
+struct UltimateOptions {
+    public Number KILLS_NEEDED_FOR_ULTIMATE_CHARGE;
+    public Number SLEEP_COOLDOWN;
+    public Number GRENADE_COOLDOWN;
+    public Number MOVE_SPEED_SCALAR;
+    public Number JUMP_VELOCITY_SCALAR;
+    public Number GRAVITY_SCALAR;
+}
+
+struct ProjectilePhysicsOptions {
+    public Number VELOCITY_SCALAR;
+    public Number GRAVITY_SCALAR;
+}
+
+struct EnviromentalSaveOptions {
+    public Number SAVES;
+}
+
+struct PlayerStatsOptions {
+    public Number TIME_PERIOD;
+    public Number AVERAGING_PERIOD;
+}
+
+struct KillStreakOptions {
+    public Number KILLS_FOR_KILLSTREAK_MESSAGE;
+}
+
+struct MatchOptions {
+    public Number MATCH_LENGTH;
+}
+
+struct SensorsOptions {
+    public Number FOV;
+}
+
+struct AfkOptions {
+    public Number PLAYER_SENT_TO_AFK_AFTER_SECONDS;
+}
+
+struct PlayerColorOptions {
+    public Color[] AVAILABLE_PLAYER_COLORS;
+} 

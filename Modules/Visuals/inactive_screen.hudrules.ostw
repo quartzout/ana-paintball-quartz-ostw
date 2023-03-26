@@ -1,0 +1,76 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+import "\APQ\Options\Map Options\definitions.ostw";
+
+globalvar ActivePlayersVisualsMapOptions activePlayersVisualsMapOptions;
+rule: "Fetch options" { 
+    activePlayersVisualsMapOptions = GetMapOptions<ActivePlayersVisualsMapOptions>("ActivePlayersVisualsMapOptions"); 
+}
+
+
+rule: "Instantiating modules" {
+    Subscribe(OnPlayerGoesToWelcomeScreen, PlayerGoesToWelcomeScreen);
+    Subscribe(OnPlayerLeavesWelcomeScreen, PlayerLeavesWelcomeScreen);
+}
+
+
+void PlayerGoesToWelcomeScreen(in Player player) {
+    
+    WaitUntilOptionsAreLoaded();
+
+    DisableHeroHud(player);
+    StartCamera(
+        player, 
+        EyePosition: activePlayersVisualsMapOptions.POSITION, 
+        LookAtPosition: activePlayersVisualsMapOptions.POSITION + activePlayersVisualsMapOptions.VIEW_DIRECTION
+    );
+}
+
+void PlayerLeavesWelcomeScreen(in Player player) {
+    StopCamera(EventPlayer);
+    EnableHeroHud(EventPlayer);
+}
+
+
+rule: "On Player Joined" 
+Event.OnPlayerJoin {
+    DisableGameModeHud(EventPlayer);
+}
+
+
+
+rule: "Create Welcome Screen HUD"
+{
+    WaitUntilOptionsAreLoaded();
+
+    #Player still can rotate camera while in welcome screen, so custom origin and direction must be set
+    #English
+    CreateInWorldText(
+        VisibleTo: NotActive,
+        Header: "JUMP TO START", 
+        Position: LpFloatingHUDPosition(
+            XOffset: 0, 
+            YOffset: 0.5, 
+            Origin: activePlayersVisualsMapOptions.POSITION, 
+            Direction: activePlayersVisualsMapOptions.VIEW_DIRECTION),
+        Scale: 4, 
+        TextColor: Color.Aqua,
+        Clipping: Clipping.DoNotClip,
+        Reevaluation: InworldTextRev.VisibleToAndPosition);
+    
+    #Russian
+    CreateInWorldText(
+        VisibleTo: NotActive,
+        Header: "E - НАЧАТЬ НА РУССКОМ", 
+        Position: LpFloatingHUDPosition(
+            XOffset: 0, 
+            YOffset: 0.6, 
+            Origin: activePlayersVisualsMapOptions.POSITION, 
+            Direction: activePlayersVisualsMapOptions.VIEW_DIRECTION),
+        Scale: 3, 
+        TextColor: Color.SkyBlue,
+        Clipping: Clipping.DoNotClip,
+        Reevaluation: InworldTextRev.VisibleToAndPosition);
+}

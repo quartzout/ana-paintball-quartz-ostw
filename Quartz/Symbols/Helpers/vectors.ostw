@@ -1,0 +1,16 @@
+Boolean IsRayObstructed(
+    in Vector From, 
+    in Vector To, 
+    in Player | Player[] PlayersToInclude = null, 
+    in Player | Player[] PlayersToExclude = null,
+    in Boolean IncludePlayerOwnedObjects = false): 
+    RayCastHitPosition(
+        StartPOS: From,
+        EndPOS: To,
+        PlayersToInclude: PlayersToInclude,
+        PlayersToExclude: PlayersToExclude,
+        IncludePlayerOwnedObjects: IncludePlayerOwnedObjects) 
+    != To;
+
+
+Vector Reverse(in Vector vector): Vector(0, 0, 0) - vector;

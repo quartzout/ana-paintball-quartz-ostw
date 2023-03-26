@@ -1,0 +1,31 @@
+import "\APQ\Quartz\quartz.ostw";
+
+
+void DoImpulseExplosionForPlayer(in Vector blastPosition, in Player player, in Number magnitude, in Number upwardPull = 0, in Player envCredit = null)
+{
+    # direction calculating (1. getting direction from grenade to target adjusted to upward bias, 2. Limiting vector to not point downwards)
+    Vector blastToTarget = VectorTowards(blastPosition, PositionOf(player) + Up() * upwardPull);
+    Vector impulse:  DirectionFromAngles(HorizontalAngleFromDirection(blastToTarget), Min(0, VerticalAngleFromDirection(blastToTarget)));
+    
+    SetEnvironmentCreditPlayer(player, envCredit);
+
+    # Upward impulse
+    ApplyImpulse(player, Up(), 3, Relative.ToWorld, ContraryMotion.Cancel);
+    
+    # Applying impulse
+    ApplyImpulse(player, impulse, magnitude, Relative.ToWorld, ContraryMotion.Cancel);
+
+    if (envCredit != null) SetEnvironmentCreditPlayer(player, envCredit);
+}
+
+void DoImpulseExplosionInRange(in Vector blastPosition, in Number magnitude, in Number upwardPull = 0, in Player immunePlayer = null, in Player envCredit = null)
+{
+    // Get all players in explosion range that are not immunePlayer and
+    Player[] victims: FilteredArray(All, p =>  DistanceBetween(p, blastPosition) <= 4 && p != immunePlayer);
+
+    // Call single-victim explosion procedure for every player in the array
+    foreach (Player player in victims) {
+        DoImpulseExplosionForPlayer(blastPosition, player, magnitude, upwardPull, envCredit);
+    }
+
+}

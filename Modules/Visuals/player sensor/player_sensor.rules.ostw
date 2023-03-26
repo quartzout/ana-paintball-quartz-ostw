@@ -1,0 +1,45 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+import "player_sensor.ostw";
+
+rule: "Updating state of the Closest Player Sensor for player"
+Event.OngoingPlayer
+{
+    WaitUntilOptionsAreLoaded();
+    Loop(0.5, () => {
+
+        # No enemies
+        if (CountOf(activeEnemies) == 0) {
+            closestPlayerSensorState = ClosestPlayerSensorState.No;
+            return;
+        }
+
+        # determining closest player
+        Player closestPlayer = FirstOf(SortedArray(activeEnemies, p => DistanceBetween(p, EventPlayer)));
+
+        # Closest player is closer then 20 units
+        if (DistanceBetween(EyePosition(EventPlayer), EyePosition(closestPlayer)) <= PLAYER_SENSOR_DISTANCE) {
+            closestPlayerSensorState = ClosestPlayerSensorState.Close;
+            return;
+        }
+
+        # Angle difference between Event Player and Closest Player
+        Number angleDif = AngleDifference(
+            HorizontalFacingAngleOf(EventPlayer), 
+            HorizontalAngleFromDirection(DirectionTowards(EventPlayer, closestPlayer))
+        );
+        
+        if (AbsoluteValue(angleDif) <= sensorsOptions.FOV / 2) 
+            closestPlayerSensorState = ClosestPlayerSensorState.Front;
+        else if (angleDif > 0 && angleDif < 180 - sensorsOptions.FOV / 2) 
+            closestPlayerSensorState = ClosestPlayerSensorState.Left;
+        else if (angleDif < 0 && angleDif > -180 + sensorsOptions.FOV / 2)
+            closestPlayerSensorState = ClosestPlayerSensorState.Right;
+        else 
+            closestPlayerSensorState = ClosestPlayerSensorState.Back;
+
+    });
+
+}

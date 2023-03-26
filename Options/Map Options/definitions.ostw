@@ -1,0 +1,17 @@
+import "\APQ\Quartz\quartz.ostw";
+
+
+struct PortalsMapOptions {
+    public Vector[] PORTAL_SPAWNPOINTS;
+    public Number MAX_PORTALS_IN_WORLD;
+}
+
+struct EnviromentalSaveMapOptions {
+    public Number SAVE_Y_COORDINATE;
+    public Number SAVE_UP_IMPULSE;
+}
+
+struct ActivePlayersVisualsMapOptions {
+    public Vector POSITION;
+    public Vector VIEW_DIRECTION;
+}

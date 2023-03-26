@@ -1,0 +1,68 @@
+rule: "To edit options, add map or extend the mode, download this mode's repo: https://github.com/quartzout/ana-paintball-quartz-ostw" -1 {}
+
+// Framework
+import "Quartz\quartz.rules.ostw";
+
+// Lobby settings
+import "settings.lobby";
+
+// Debug
+import "debug.rules.ostw";
+
+// Map options
+import "Options\Map Options\Maps\chateu_guillard.ostw";
+import "Options\Map Options\Maps\kanezaka.ostw";
+import "Options\Map Options\Maps\castillo.ostw";
+
+// Regular Options
+import "Options\Regular Options\options.ostw";
+
+// Gameplay Modules
+import "Modules\Gameplay\_Shared\player physics\player_physics.rules.ostw";
+import "Modules\Gameplay\afk\afk.rules.ostw";
+import "Modules\Gameplay\enviromental save\enviromental_save.rules.ostw";
+import "Modules\Gameplay\portals\portals.rules.ostw";
+import "Modules\Gameplay\scope time limit\scope_time_limit.rules.ostw"; 
+import "Modules\Gameplay\sonic ultimate\sonic_ultimate.rules.ostw";
+import "Modules\Gameplay\combat.rules.ostw";
+import "Modules\Gameplay\impulse_grenade.rules.ostw";
+import "Modules\Gameplay\match time\match_time.rules.ostw";
+import "Modules\Gameplay\_Shared\active players\active_players.rules.ostw";
+import "Modules\Gameplay\_Shared\is player scoped\is_player_scoped.rules.ostw";
+import "Modules\Gameplay\enabled_abilities.rules.ostw";
+
+// Stats Modules
+import "Modules\Stats\_Shared\kills in long period\kills_in_long_period.rules.ostw";
+import "Modules\Stats\killstreak\killstreak.rules.ostw";
+import "Modules\Stats\player stats\player_stats.rules.ostw";
+import "Modules\Stats\scores\scores.rules.ostw";
+
+// Visuals Modules
+import "Modules\Visuals\_Shared\sensors\sensors.rules.ostw";
+import "Modules\Visuals\back sensor\back_sensor.rules.ostw";
+import "Modules\Visuals\back sensor\back_sensor.hudrules.ostw";
+import "Modules\Visuals\player sensor\player_sensor.rules.ostw";
+import "Modules\Visuals\player sensor\player_sensor.hudrules.ostw";
+import "Modules\Visuals\portals\portals.hudrules.ostw";
+import "Modules\Visuals\inactive_screen.hudrules.ostw";
+import "Modules\Visuals\death_explosion.hudrules.ostw";
+import "Modules\Visuals\gamemode_info.hudrules.ostw";
+import "Modules\Visuals\host_server_load.hudrules.ostw";
+import "Modules\Visuals\killstreak.hudrules.ostw";
+import "Modules\Visuals\match_time.hudrules.ostw";
+import "Modules\Visuals\paintballs.hudrules.ostw";
+import "Modules\Visuals\player_stats.hudrules.ostw";
+import "Modules\Visuals\scope_time_limit.hudrules.ostw";
+import "Modules\Visuals\scores.hudrules.ostw";
+import "Modules\Visuals\enviromental_save.hudrules.ostw";
+import "Modules\Visuals\_Shared\player color\player_color.rules.ostw";
+import "Modules\Visuals\player_outlines.hudrules.ostw";
+
+
+
+// FIXME: kills in long period just counts kills
+
+
+
+
+

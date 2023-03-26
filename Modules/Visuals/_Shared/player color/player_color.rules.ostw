@@ -1,0 +1,18 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+import "player_color.ostw";
+
+rule: "fetch options" {
+    playerColorOptions = GetOptions<PlayerColorOptions>("PlayerColorOptions");
+}
+
+rule: "adding color to player when they spawn" {
+    Subscribe(OnActivePlayerAddedEvent, SetPlayerColorByThierNickname);
+}
+
+void SetPlayerColorByThierNickname(in Player player) {
+    WaitUntilOptionsAreLoaded();
+    color = playerColorOptions.AVAILABLE_PLAYER_COLORS[StringLength(<String>player) % CountOf(playerColorOptions.AVAILABLE_PLAYER_COLORS)]; 
+}

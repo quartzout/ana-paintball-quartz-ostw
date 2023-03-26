@@ -1,0 +1,16 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Visuals\_Shared\sensors\sensors.ostw";
+
+enum ClosestPlayerSensorState {
+    Back,
+    Front,
+    Right, 
+    Left, 
+    Close,
+    No
+}
+
+playervar ClosestPlayerSensorState closestPlayerSensorState;
+
+Number PLAYER_SENSOR_DISTANCE: 7;

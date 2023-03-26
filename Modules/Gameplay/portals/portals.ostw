@@ -1,0 +1,26 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "initial.ostw";
+import "can_player_teleport.ostw";
+
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+globalvar PortalsOptions portalOptions;
+
+// Events
+globalvar (Portal => void)[] OnPortalSpawnedEvent = null; 
+globalvar (Player => void)[] OnNoWallMetOnTeleportEvent = null;
+globalvar ((Vector, Vector, Player) => void)[] OnTeleportedEvent = null;
+globalvar (Portal => void)[] OnPortalDespawnedEvent = null;
+globalvar (Portal => void)[] OnPortalCooldownFinished = null;
+
+
+globalvar Portal[] existingPortals = [];
+
+
+void SpawnPortal(in Vector spawnpoint)
+{
+    Portal newPortal = new Portal(position: spawnpoint);
+    existingPortals.ModAppend(newPortal);
+    CallEvent(OnPortalSpawnedEvent, newPortal);
+}

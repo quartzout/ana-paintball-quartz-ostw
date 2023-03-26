@@ -1,0 +1,176 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Gameplay\_Shared\impulse_explosion.ostw";
+import "\APQ\Modules\Gameplay\_Shared\player physics\player_physics.ostw";
+
+import "portals.ostw";
+
+rule: "fetch options" {
+    portalOptions = GetOptions<PortalsOptions>("PortalsOptions");
+}
+
+rule: "Spawn Portals when theres not enough of them in the world"
+if (existingPortals.Length < PORTALS_MAP_OPTIONS.MAX_PORTALS_IN_WORLD)
+{
+    WaitUntilOptionsAreLoaded();
+    
+    // Spawning portals until maximum is reached
+     
+    # Getting a list of all unoccupied positions. IsTrueForAll doesnt work inside FilteredArray. 
+    while(existingPortals.Length < PORTALS_MAP_OPTIONS.MAX_PORTALS_IN_WORLD) {
+    
+        // this is terribly inefficient and needs a Wait in between iterations to not crash the server, but it is called almost never so its fine for now 
+        Wait(2);
+
+        Vector[] unoccupiedPortalPositions = [];
+        foreach (Vector availablePos in PORTALS_MAP_OPTIONS.PORTAL_SPAWNPOINTS) {
+            if (
+                existingPortals.Length == 0 ||
+                IsTrueForAll(
+                    existingPortals, 
+                    existingPortal => existingPortal.Position != availablePos
+                ) 
+            ) {
+                unoccupiedPortalPositions.ModAppend(availablePos);
+            }
+
+        }
+
+        # Safety check
+        if (unoccupiedPortalPositions.Length == 0)
+        {
+            SmallMessage(HostPlayer, "Cant spawn a portal, all predetermined places are occupied with other portals");
+            return;
+        }
+
+        # Spawning a portal
+        SpawnPortal(unoccupiedPortalPositions.Random());
+    }
+
+}
+
+
+rule: "Player pressed Interact"
+Event.OngoingPlayer
+if (IsButtonHeld(EventPlayer, Button.Interact))
+if (EventPlayer.isActive)
+{
+
+    foreach (Portal portal in existingPortals) {
+        
+        if (CanPlayerTeleport(EventPlayer, portal)) {
+            TryTeleportPlayerToWhereTheyLook(EventPlayer);
+            break;
+        }
+
+    }
+    
+}
+
+
+void DespawnPortal(in Portal portal)
+{
+    existingPortals.ModRemoveByValue(portal);
+    CallEvent(OnPortalDespawnedEvent, portal);
+}
+
+
+Boolean TryTeleportPlayerToWhereTheyLook(in Player player)
+{
+    WaitUntilOptionsAreLoaded();
+
+    # Maximum position for the raycasts
+    Vector EndPosition = FacingDirectionOf(player) * 100 + EyePosition(player);
+    
+    # Position thats been hit by raycast
+    Vector wallHitPosition = RayCastHitPosition(
+        StartPOS: EyePosition(player), 
+        EndPOS: EndPosition, 
+        PlayersToInclude: All, 
+        PlayersToExclude: player);
+   
+    # Normal to hit surface
+    Vector wallHitNormal = RayCastHitNormal(
+        StartPOS: EyePosition(player), 
+        EndPOS: EndPosition, 
+        PlayersToInclude: All, 
+        PlayersToExclude: player);
+    
+    # if no wall met
+    if (EndPosition == wallHitPosition)
+    {
+        CallEvent(OnNoWallMetOnTeleportEvent, player);
+        return false;
+    }
+    
+    # Do Impulse Explosion At Teleportation point
+    DoImpulseExplosionInRange(
+        blastPosition: wallHitPosition + wallHitNormal * 0.05, 
+        magnitude: portalOptions.LAND_EXPLOSION_IMPULSE,
+        upwardPull: portalOptions.LAND_EXPLOSION_UPWARD_PULL,
+        immunePlayer: player,
+        envCredit: player
+    );
+    
+    # Argument for OnTeleportedEvent
+    Vector initialPlayerPos = EyePosition(player);
+    
+    # Cancel motion
+    CancelAllPlayerMotion(player);
+    
+    Boolean isPlayerInWay = RayCastHitPlayer(
+        StartPOS: EyePosition(player), 
+        EndPOS: EndPosition, 
+        PlayersToInclude: All, 
+        PlayersToExclude: player
+    ) != null;
+
+    # If player teleports into another player, just teleport them stright to other player
+    if (isPlayerInWay)
+    {
+        Teleport(player, wallHitPosition);
+    }
+
+    # If player teleports to a perpendicular-ish wall
+    else if (AbsoluteValue(VerticalAngleFromDirection(wallHitNormal)) < 45)
+    {
+        # Teleport player slightly off the wall
+        Teleport(player, wallHitPosition + wallHitNormal);
+
+        # Set facing in the horizontal direction of walls normal
+        SetFacing(player, DirectionFromAngles(HorizontalAngleFromDirection(wallHitNormal), 0), Relative.ToWorld);
+        
+        # Send player a little up and from the wall 
+        ApplyImpulse(player, Up(), 2, Relative.ToWorld, ContraryMotion.Cancel);
+        ApplyImpulse(player, wallHitNormal, 2.5, Relative.ToWorld, ContraryMotion.Cancel);
+    }
+
+    # If player is teleported to horizonal surfaces like floor or ceiling, teleport it even more further from the surface and does not change facing direction
+    else if (VerticalAngleFromDirection(wallHitNormal) >= 45) Teleport(player, wallHitPosition + wallHitNormal * 2);
+
+    # In other potential cases, just teleport player
+    else Teleport(player, wallHitPosition);
+    
+    # Call Event
+    CallEvent(OnTeleportedEvent, initialPlayerPos, wallHitPosition, player);
+
+    return true;
+}
+
+
+rule: "Ticking portals lifetimes" {
+
+    Number Delay: 0.3;
+
+    Loop(Delay, () => {
+        foreach (Portal portal in existingPortals) {
+            if (portal.SecondsLeft > 0) {
+                portal.SecondsLeft = Max(0, portal.SecondsLeft - Delay);
+            }
+            else {
+                DespawnPortal(portal);
+            }
+        }
+    });
+}

@@ -1,0 +1,31 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Map Options\definitions.ostw";
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+globalvar PortalsMapOptions PORTALS_MAP_OPTIONS;
+globalvar PortalsOptions PORTALS_OPTIONS;
+rule: "Fetching Options" { 
+    PORTALS_MAP_OPTIONS = GetMapOptions<PortalsMapOptions>("PortalsMapOptions"); 
+    PORTALS_OPTIONS = GetOptions<PortalsOptions>("PortalsOptions"); 
+}
+
+class Portal {
+    public Vector Position;
+    public Number SecondsLeft = 0; 
+
+    public constructor(Vector position) {
+        Position = position;
+        SecondsLeft = PORTALS_OPTIONS.PORTAL_LIFETIME;
+    }
+} 
+
+
+globalvar Number ANGLE_CONSTANT;
+rule: "Set angle constant" {
+    
+    WaitUntilOptionsAreLoaded();
+
+    ANGLE_CONSTANT = ArctangentInDegrees(PORTALS_OPTIONS.PORTAL_RADIUS / 10, 1);
+}
+

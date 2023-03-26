@@ -1,0 +1,11 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+import ".\player_physics.ostw";
+
+rule: "fetch options"
+Event.OngoingPlayer {
+    playerPhysicsOptions = GetOptions<PlayerPhysicsOptions>("PlayerPhysicsOptions");
+    projectilePhysicsOptions = GetOptions<ProjectilePhysicsOptions>("ProjectilePhysicsOptions");
+}

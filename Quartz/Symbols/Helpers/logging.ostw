@@ -1,0 +1,18 @@
+import "../match_time.ostw";
+
+
+void LogArray<T>(in T[] array, const T => T | Any filter = item => item) {
+    foreach(Any item in array) {
+        LogToInspector(filter(item));
+    }
+}
+
+void Warning(in String message, in String origin) {
+    LogToInspector("[WARNING] " + message + "\n[" + origin + "]");
+}
+
+void FatalError(in String message, in String origin) {
+    LogToInspector("[FATAL ERROR] " + message + "\n[" + origin + "]");
+    WaitUntil(MatchTime > 5, 6);
+    ReturnToLobby();
+}

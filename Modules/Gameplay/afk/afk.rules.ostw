@@ -1,0 +1,51 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+import "afk.ostw";
+
+rule: "fetching options" {
+    afkOptions = GetOptions<AfkOptions>("AfkOptions");
+}
+
+rule: "Start afk timer when player spawns" {
+    Subscribe(OnActivePlayerAddedEvent, StartAfkTimerForPlayer);
+}
+
+void StartAfkTimerForPlayer(Player player) {
+
+    WaitUntilOptionsAreLoaded();
+
+    player.afkTimer = 0;
+    ChaseVariableAtRate(player.afkTimer, afkOptions.PLAYER_SENT_TO_AFK_AFTER_SECONDS, 1, RateChaseReevaluation.None);
+}
+
+rule: "Trigger AFK when players afkTimer exceeded the afkTriggerTime"
+Event.OngoingPlayer
+if (afkTimer >= afkOptions.PLAYER_SENT_TO_AFK_AFTER_SECONDS)
+{
+    MakePlayerInactive(EventPlayer);
+}
+
+rule: "Reset AFK timer when player moved"
+Event.OngoingPlayer
+if (MagnitudeOf(ThrottleOf(EventPlayer)) > 0)
+{
+    afkTimer = 0;
+    Wait(0.25, WaitBehavior.IgnoreCondition);
+    LoopIfConditionIsTrue();
+}
+
+rule: "Reset AFK timer when player shot, meleed or jumped or interacted"
+Event.OngoingPlayer
+if ((IsFiringPrimary(EventPlayer) || IsJumping(EventPlayer) || IsMeleeing(EventPlayer) || IsButtonHeld(EventPlayer, Button.Interact)) == true)
+{
+    afkTimer = 0;
+}
+
+rule: "Reset AFK timer when player used ability"
+Event.OngoingPlayer
+if ((IsUsingAbility1(EventPlayer) || IsUsingAbility2(EventPlayer) || IsUsingUltimate(EventPlayer)) == true)
+{
+    afkTimer = 0;
+}

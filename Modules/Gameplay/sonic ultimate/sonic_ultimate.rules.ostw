@@ -1,0 +1,85 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Gameplay\_Shared\player physics\player_physics.ostw";
+
+import "sonic_ultimate.ostw";
+
+
+rule: "fetch options" {
+    ultimateOptions = GetOptions<UltimateOptions>("SonicUltimateOptions");
+}
+
+
+rule: "Player started using ultimate"
+Event.OngoingPlayer
+if (EventPlayer.isActive)
+if (IsUsingUltimate(EventPlayer))
+{
+    WaitUntilOptionsAreLoaded();
+
+    EventPlayer.killsToUltimate = 0;
+    
+    # Physics
+    SetMoveSpeed(EventPlayer, 100 * ultimateOptions.MOVE_SPEED_SCALAR);
+    SetGravity(EventPlayer, 100 * ultimateOptions.GRAVITY_SCALAR);
+    SetJumpVerticalSpeed(EventPlayer, 100 * ultimateOptions.JUMP_VELOCITY_SCALAR);
+    
+    # Start Compensating Damage Mods (to keep event damage values roughly the same for combat and grenade event triggers)
+    EventPlayer.ultimateGivenDamageModID = StartDamageModification(All, EventPlayer, 66.666, DamageModificationRev.ReceiversAndDamagers);
+    EventPlayer.ultimateRecievedDamageModID = StartDamageModification(EventPlayer, All, 200, DamageModificationRev.ReceiversAndDamagers);
+    
+    # Reset Ability Cooldowns
+    SetAbilityCooldown(EventPlayer, Button.Ability1, 0);
+    SetAbilityCooldown(EventPlayer, Button.Ability2, 0);
+}
+
+rule: "Player stopped using ultimate"
+Event.OngoingPlayer
+if (EventPlayer.isActive)
+if (!IsUsingUltimate(EventPlayer))
+{
+    ResetPlayerPhysicsSettings(EventPlayer);
+    StopDamageModification(EventPlayer.ultimateGivenDamageModID);
+    StopDamageModification(EventPlayer.ultimateRecievedDamageModID);
+}
+
+rule: "Add ultimate charge on player kill"
+Event.OnElimination
+if (EventPlayer.isActive)
+if (!IsUsingUltimate(EventPlayer))
+{
+    WaitUntilOptionsAreLoaded();
+
+    EventPlayer.killsToUltimate += 1;
+    SetUltimateCharge(EventPlayer, killsToUltimate / ultimateOptions.KILLS_NEEDED_FOR_ULTIMATE_CHARGE * 100);
+}
+
+rule: "Reset ultimate charge on player death"
+Event.OnDeath
+if (EventPlayer.isActive)
+{
+    EventPlayer.killsToUltimate = 0;
+}
+
+rule: "Player used Sleep in ultimate"
+Event.OngoingPlayer
+if (EventPlayer.isActive)
+if (IsUsingUltimate(EventPlayer))
+if (IsUsingAbility1(EventPlayer))
+{
+    WaitUntilOptionsAreLoaded();
+    Wait(1, WaitBehavior.IgnoreCondition);
+    SetAbilityCooldown(EventPlayer, Button.Ability1, ultimateOptions.SLEEP_COOLDOWN);
+}
+
+rule: "Player used Grenade in ultimate"
+Event.OngoingPlayer
+if (EventPlayer.isActive)
+if (IsUsingUltimate(EventPlayer))
+if (IsUsingAbility2(EventPlayer))
+{
+    WaitUntilOptionsAreLoaded();
+    Wait(1, WaitBehavior.IgnoreCondition);
+    SetAbilityCooldown(EventPlayer, Button.Ability2, ultimateOptions.GRENADE_COOLDOWN);
+}

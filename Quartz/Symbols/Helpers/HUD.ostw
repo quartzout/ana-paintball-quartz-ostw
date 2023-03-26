@@ -1,0 +1,26 @@
+import "shorteners.ostw";
+
+Vector LpFloatingHUDPosition(
+    in Number XOffset, 
+    in Number YOffset, 
+    in Vector Origin = EyePosition(LocalPlayer), 
+    in Vector Direction = FacingDirectionOf(LocalPlayer)) : 
+
+    UpdateEveryFrame(
+        Origin + 10 * 
+        (Direction + 
+
+        XOffset * DirectionFromAngles(
+            HorizontalAngleFromDirection(Direction) + 90, 
+            VerticalAngleFromDirection(Direction)) +
+
+        YOffset * DirectionFromAngles(
+            HorizontalAngleFromDirection(Direction), 
+            VerticalAngleFromDirection(Direction) + 90)));
+
+Player[] VisibleIf(in Boolean condition):
+    condition ? All : null;
+
+String GetStringByLang<TLangs>(in String[] strings, in TLangs[] langs, in TLangs languageVar):
+    MappedArray(strings, langs[CurrentArrayIndex()] == languageVar).First;
+

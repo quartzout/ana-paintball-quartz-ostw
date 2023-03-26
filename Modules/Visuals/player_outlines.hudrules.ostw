@@ -1,0 +1,25 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Visuals\_Shared\player color\player_color.ostw";
+
+
+rule: "Set Players Outline To Its Color On Spawn" {
+    Subscribe(OnActivePlayerAddedEvent, SetPlayersOutlineToItsColorOnSpawn);
+}
+
+
+void SetPlayersOutlineToItsColorOnSpawn(Player player) {
+    SetPlayersOutline(player, player.color);
+}
+
+void SetPlayersOutline(Player player, Color color) { 
+    # Turning on coloring of this player for everyone else
+    StartForcingPlayerOutlines(player, activePlayers, true, color, OutlineType.Default);
+
+    // Turning on coloring of everyone else for this player
+    foreach (Player activePlayer in activePlayers)
+    {
+        StartForcingPlayerOutlines(activePlayer, player, true, activePlayer.color, OutlineType.Default);
+    }
+}

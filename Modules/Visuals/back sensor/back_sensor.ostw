@@ -1,0 +1,14 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Visuals\_Shared\sensors\sensors.ostw";
+
+enum BackSensorState {
+    Back,
+    Left,
+    Right,
+    Multiple,
+    No
+}
+
+
+playervar BackSensorState backSensorState;

@@ -1,0 +1,55 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Map Options\definitions.ostw";
+
+import "enviromental_save.ostw";
+
+rule: "Fetch options" { 
+    enviromentalSaveMapOptions = GetMapOptions<EnviromentalSaveMapOptions>("EnviromentalSaveMapOptions"); 
+    enviromentalSaveOptions = GetMapOptions<EnviromentalSaveOptions>("EnviromentalSaveOptions"); 
+}
+
+
+rule: "Saving player from falling in water"
+Event.OngoingPlayer
+if (AreOptionsLoaded)
+
+if (PositionOf(EventPlayer).Y <= enviromentalSaveMapOptions.SAVE_Y_COORDINATE)
+if (waterSavesLeft > 0)
+
+# if player is above water, thier altitude is for some reason always bigger then 20
+if (AltitudeOf(EventPlayer) > 10 == true)
+
+{
+    waterSavesLeft -= 1;
+    
+    # Disabling guns
+    SetPrimaryFireEnabled(EventPlayer, false);
+    SetAbility1Enabled(EventPlayer, false);
+    SetAbility2Enabled(EventPlayer, false);
+    
+    # Impulse up
+    ApplyImpulse(EventPlayer, Up(), enviromentalSaveMapOptions.SAVE_UP_IMPULSE, Relative.ToWorld, ContraryMotion.Cancel);
+    
+    CallEvent(OnWaterSaveActivatedEvent, EventPlayer);
+
+    # Waiting for freeze to be over
+    Wait(1, WaitBehavior.IgnoreCondition);
+    
+
+    CallEvent(OnWaterSaveDeactivatedEvent, EventPlayer);
+    
+    # Enabling guns back
+    SetPrimaryFireEnabled(EventPlayer, true);
+    SetAbility1Enabled(EventPlayer, true);
+    SetAbility2Enabled(EventPlayer, true);
+}
+
+
+rule: "Resetting player's WaterSavesLeft when they touch ground"
+Event.OngoingPlayer
+if (IsOnGround(EventPlayer) == true)
+{
+    WaitUntilOptionsAreLoaded();
+    waterSavesLeft = enviromentalSaveOptions.SAVES;
+}

@@ -1,0 +1,16 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "scope_time_limit.ostw";
+
+# Syncronous action that triggers execution of async subroutine with the same name and transforms player arguemnt into EventPlayer context
+void ct_ForcePlayerToExitScopeAsync(Player player) { 
+    call_ForcePlayerToExitScopeAsync = true;
+}
+
+playervar Boolean call_ForcePlayerToExitScopeAsync = false;
+rule: "player var to eventplayer context"
+Event.OngoingPlayer 
+if (call_ForcePlayerToExitScopeAsync) {
+    async ForcePlayerToExitScopeAsync();
+    call_ForcePlayerToExitScopeAsync = false;
+}

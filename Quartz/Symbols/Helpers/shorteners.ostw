@@ -1,0 +1,4 @@
+Player[] All: AllPlayers(Team.All);
+Player EventPlayer: EventPlayer();
+Player LocalPlayer: LocalPlayer();
+Player HostPlayer: HostPlayer();

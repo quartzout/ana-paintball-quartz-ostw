@@ -1,0 +1,27 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Gameplay\scope time limit\scope_time_limit.ostw";
+
+
+rule: "Create Scope Meter HUD"
+{
+    WaitUntilOptionsAreLoaded();
+    
+    # Scope timer meter (wow funky font)
+    CreateInWorldText(
+        VisibleTo: ActiveIf(
+            LocalPlayer.scopeTimer / scopeTimeLimitOptions.MAX_SCOPE_TIME > 0.25 && 
+            LocalPlayer.scopeTimer < scopeTimeLimitOptions.MAX_SCOPE_TIME && 
+            UpdateEveryFrame(IsFiringSecondary(LocalPlayer))
+        ),
+        Header: 
+            LocalPlayer.scopeTimer / scopeTimeLimitOptions.MAX_SCOPE_TIME > 0.5 ? 
+            (LocalPlayer.scopeTimer / scopeTimeLimitOptions.MAX_SCOPE_TIME < 0.75 ? "■■" : "■■■") : 
+            "■", 
+        Position: LpFloatingHUDPosition(0, 0.05),
+        Scale: 1, 
+        Clipping.DoNotClip, 
+        InworldTextRev.VisibleToPositionAndString
+    );
+}

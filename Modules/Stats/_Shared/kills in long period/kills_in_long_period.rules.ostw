@@ -1,0 +1,31 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "kills_in_long_period.ostw";
+
+
+rule: "fetch options" {
+    playerStatsOptions = GetOptions<PlayerStatsOptions>("PlayerStateOptions");
+}
+
+rule: "Add kill to killTimestampsInLastLongPeriod"
+Event.OnElimination
+{   
+    ModifyVariable(EventPlayer.killTimestampsInLastLongPeriod, Operation.AppendToArray, RoundToInteger(MatchTime, Rounding.Down));
+    
+    CallEvent(OnKillTimestampsInLastLongPeriodChanged, EventPlayer);
+
+    // # Calculating stats
+    // UpdatePlayerScore(EventPlayer);
+    // UpdateLocalPlayerStats(EventPlayer);
+}
+
+rule: "Removing old kill from killTimestampsInLastLongPeriod"
+Event.OngoingPlayer
+if (AreOptionsLoaded)
+if (FirstOf(EventPlayer.killTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.AVERAGING_PERIOD)
+{
+    ModifyVariable(EventPlayer.killTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
+    
+    CallEvent(OnKillTimestampsInLastLongPeriodChanged, EventPlayer);
+}
+

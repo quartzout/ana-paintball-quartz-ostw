@@ -1,0 +1,9 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+globalvar UltimateOptions ultimateOptions;
+
+playervar Number killsToUltimate = 0;
+playervar Number ultimateGivenDamageModID;
+playervar Number ultimateRecievedDamageModID;

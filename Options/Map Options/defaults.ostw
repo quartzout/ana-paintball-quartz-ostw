@@ -1,0 +1,22 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "definitions.ostw";
+
+rule: "Add options" {
+
+    AllDefaultMapOptions.ModAppend(new DefaultMapOptions<PortalsMapOptions>("PortalsMapOptions", { 
+        PORTAL_SPAWNPOINTS: [],
+        MAX_PORTALS_IN_WORLD: 0
+    }));
+
+    AllDefaultMapOptions.ModAppend(new DefaultMapOptions<EnviromentalSaveMapOptions>("EnviromentalSaveMapOptions", { 
+        SAVE_Y_COORDINATE: -99,
+        SAVE_UP_IMPULSE: 0
+    }));
+
+    AllDefaultMapOptions.ModAppend(new DefaultMapOptions<ActivePlayersVisualsMapOptions>("ActivePlayersVisualsMapOptions", { 
+        POSITION: Vector(0, 50, 0),
+        VIEW_DIRECTION: Vector(0, -90, 0)
+    }));
+
+}

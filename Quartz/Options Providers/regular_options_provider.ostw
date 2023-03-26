@@ -1,0 +1,39 @@
+import "../Symbols/match_time.ostw";
+import "../Symbols/Helpers/logging.ostw";
+import "../Symbols/Helpers/arrays.ostw";
+
+class Options {
+    public String ClassName;
+}
+
+class Options<T> : Options {
+
+    public T Value;
+
+    public constructor(in String className, in T value)  {
+        ClassName = className;
+        Value = value;
+    }
+}
+
+
+globalvar Options[] AllOptions =  [];
+
+public T GetOptions<T>(in String className) {
+
+    WaitUntil(MatchTime > 1, 10);
+
+    Options options = FirstOrNull(AllOptions, options => options.ClassName == className);
+    
+    if (options == null)  {
+        FatalError("No options for module " + className + " found", "_options_provider/GetOptions");
+    }
+
+    return (<Options<T>>options).Value;
+
+}
+
+
+
+
+

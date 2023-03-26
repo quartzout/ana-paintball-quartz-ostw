@@ -1,0 +1,25 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "scope_time_limit.contexttransfer.ostw";
+import "scope_time_limit.ostw";
+
+rule: "fetch options" {
+    scopeTimeLimitOptions = GetOptions<ScopeTimeLimitOptions>("ScopeTimeLimitOptions");
+}
+
+
+rule: "Leaving scope after a shot"
+Event.OngoingPlayer
+if (IsFiringPrimary(EventPlayer) == true)
+if (IsFiringSecondary(EventPlayer) == true)
+{
+    ct_ForcePlayerToExitScopeAsync(EventPlayer);
+}
+
+rule: "Leaving scope when timer exceeded"
+Event.OngoingPlayer
+if (AreOptionsLoaded)
+if (EventPlayer.scopeTimer >= scopeTimeLimitOptions.MAX_SCOPE_TIME)
+{
+    ct_ForcePlayerToExitScopeAsync(EventPlayer);
+}

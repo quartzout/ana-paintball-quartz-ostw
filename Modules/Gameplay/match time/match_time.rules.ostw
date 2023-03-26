@@ -1,0 +1,43 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "match_time.ostw";
+
+rule: "fetch options" {
+    matchOptions = GetOptions<MatchOptions>("MatchOptions");
+}
+
+
+rule: "On match start"
+Event.OngoingGlobal
+{
+    SetMatchTime(MatchTime() - 25);
+    DisableAnnouncer();
+    DisableCompletion();
+
+    # Pause
+    Wait(1, WaitBehavior.IgnoreCondition);
+    PauseMatchTime();
+}
+
+
+rule: "Resume match timer 1 minute before match is over"
+{
+    WaitUntilOptionsAreLoaded();
+
+    Loop(1, () => {
+        if (MatchTime >= matchOptions.MATCH_LENGTH - 60 && MatchTime() > 60)
+            {
+                EnableAnnouncer();
+                UnpauseMatchTime();
+                SetMatchTime(60);
+            }
+    });
+        
+}
+
+rule: "Restart when match is over"
+if (MatchTime() == 0)
+{
+    EnableCompletion();
+    RestartMatch();
+}

@@ -1,0 +1,21 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "subroutines.ostw";
+import "portals.context.ostw";
+
+
+
+rule: "player var to eventplayer context"
+Event.OngoingPlayer 
+if (call_playTeleportedBeamEffectAsync) {
+    async PlayTeleportedBeamEffectAsync(call_playTeleportedBeamEffectAsync_playerBeforePos, call_playTeleportedBeamEffectAsync_playerAfterPos);
+    call_playTeleportedBeamEffectAsync = false;
+}
+
+
+rule: "player var to eventplayer context"
+Event.OngoingPlayer 
+if (call_PlayTeleportedPovEffectAsync) {
+    async PlayTeleportedPovEffectAsync(call_PlayTeleportedPovEffectAsync_playerBeforePos, call_PlayTeleportedPovEffectAsync_playerAfterPos);
+    call_PlayTeleportedPovEffectAsync = false;
+}

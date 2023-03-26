@@ -1,0 +1,19 @@
+import "\APQ\Quartz\quartz.ostw";
+
+// Kills or deaths marked by their timestamps are saved in the arrays and the oldest ones are deleted once they are older then period or long period.
+
+// playervar Number[] killTimestampsInLastPeriod = [];
+playervar Number[] scopedKillTimestampsInLastLongPeriod = [];
+playervar Number[] unscopedKillTimestampsInLastLongPeriod = [];
+playervar Number[] sleepKillTimestampsInLastLongPeriod = [];
+playervar Number[] deathTimestampsInLastLongPeriod = [];
+
+
+
+playervar Number killDeathRatio = 0;
+
+playervar Number sleepKillsPercent = 0;
+playervar Number scopedKillsPercent = 0;
+playervar Number unscopedKillsPercent = 0;
+
+

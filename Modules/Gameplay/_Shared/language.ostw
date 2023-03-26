@@ -1,0 +1,15 @@
+import "\APQ\Quartz\quartz.ostw";
+
+enum SupportedLanguage {
+    Russian,
+    English
+}
+
+playervar SupportedLanguage language = SupportedLanguage.English;
+
+String LangString(in String en, in String ru): 
+    GetStringByLang(
+        [en, ru], 
+        [SupportedLanguage.English, SupportedLanguage.Russian], 
+        LocalPlayer.language
+    );

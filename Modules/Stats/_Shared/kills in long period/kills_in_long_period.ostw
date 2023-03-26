@@ -1,0 +1,11 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+
+globalvar PlayerStatsOptions playerStatsOptions;
+
+playervar Number[] killTimestampsInLastLongPeriod = [];
+
+
+globalvar (Player => void)[] OnKillTimestampsInLastLongPeriodChanged = null;

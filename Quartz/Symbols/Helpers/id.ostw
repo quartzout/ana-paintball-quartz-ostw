@@ -1,0 +1,4 @@
+import "../match_time.ostw";
+
+# Generates id from 0 to million using timestamp and random
+Number GenerateId(): (MatchTime % 10) * RandomInteger(0, 100000);

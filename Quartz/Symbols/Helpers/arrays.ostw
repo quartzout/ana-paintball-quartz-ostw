@@ -1,0 +1,17 @@
+T[] FilteredArray<T>(in T[] array, const T => Boolean condition):
+    FilteredArray(array, condition(ArrayElement()));
+
+Any[] MappedArray<T>(in T[] array, const T => Any expression):
+    MappedArray(array, expression(ArrayElement()));
+
+Boolean IsTrueForAll<T>(in T[] array, const T => Boolean condition):
+    IsTrueForAll(array, condition(ArrayElement()));
+
+Boolean IsTrueForAny<T>(in T[] array, const T => Boolean condition):
+    IsTrueForAny(array, condition(ArrayElement()));
+
+T[] SortedArray<T>(in T[] array, const T => Number rankLambda):
+    SortedArray(array, rankLambda(ArrayElement()));
+
+T FirstOrNull<T>(in T[] array, const T => Boolean condition):
+    FilteredArray(array, condition(ArrayElement())).First;

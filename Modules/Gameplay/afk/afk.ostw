@@ -1,0 +1,7 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+playervar Number afkTimer = 0;
+
+globalvar AfkOptions afkOptions;

@@ -1,0 +1,20 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Stats\_Shared\kills in long period\kills_in_long_period.ostw";
+
+playervar Number averageKillsPerPeriod = 0; //used for leaderboard score
+playervar Number place = 0;
+
+
+
+void UpdatePlacesForEveryPlayer()
+{
+    # Getting a list of active players sorted by avg. kill per period descending
+    Player[] playersSortedByScore = SortedArray(activePlayers, p => -p.averageKillsPerPeriod);
+    
+    // Updating place of every player
+    foreach (Player player in playersSortedByScore) {
+        player.place = 1 + 1 + IndexOfArrayValue(playersSortedByScore, player);
+    }
+}

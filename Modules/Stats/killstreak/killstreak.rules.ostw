@@ -1,0 +1,25 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "killstreak.ostw";
+
+rule: "fetch options" {
+    killStreakOptions = GetOptions<KillStreakOptions>("KillStreakOptions");
+}
+
+rule: "Increment killstreak counter for player when they kill"
+Event.OnElimination
+{
+    EventPlayer.killstreak += 1;
+}
+
+rule: "Show killstreak message when player dies"
+Event.OnDeath
+{
+    WaitUntilOptionsAreLoaded();
+
+    # if killstreak was more then const, call event
+    if (EventPlayer.killstreak >= killStreakOptions.KILLS_FOR_KILLSTREAK_MESSAGE) CallEvent(OnKillStreakEvent, EventPlayer, EventPlayer.killstreak);
+
+    # Reset killstreaks
+    EventPlayer.killstreak = 0;
+}

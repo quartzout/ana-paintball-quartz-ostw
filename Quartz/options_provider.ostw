@@ -1,0 +1,8 @@
+import "Options Providers/map_options_provider.ostw";
+import "Options Providers/regular_options_provider.ostw";
+import "Symbols/match_time.ostw";
+
+Boolean AreOptionsLoaded: MatchTime > 1;
+void WaitUntilOptionsAreLoaded() {
+    WaitUntil(AreOptionsLoaded, 99);
+}

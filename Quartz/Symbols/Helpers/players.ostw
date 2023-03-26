@@ -1,0 +1,4 @@
+void HealPlayer(in Player player)
+{
+    SetPlayerHealth(player, MaxHealth(player));
+}

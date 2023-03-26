@@ -1,0 +1,30 @@
+String FixedTwoLength(in String nums):
+    nums.Length < 2 ? 
+    "0" + nums :
+    nums;
+
+String TimestampToReadable(in Number seconds):
+    "{0}:{1}".Format([
+        RoundToInteger(seconds / 60, Rounding.Down),
+        FixedTwoLength("{0}".Format([(RoundToInteger(seconds, Rounding.Down) % 60)]))
+    ]);
+     
+
+String Stringify(in Any[] array, in Boolean newLines = true) {
+    String result = "[" + (newLines ? "\n" : "");
+    foreach (Any value in array) {
+        result = result + <String>value + (newLines ? "\n" : "");
+    }
+    return result + $"] ({array.Length})";
+}
+
+String Join(in Any item1, in Any item2, in String sep = " | "): <String>item1 + sep + <String>item2;
+String Join(in Any item1, in Any item2, in Any item3, in String sep = " | "): <String>item1 + sep + <String>item2 + sep + <String>item3;
+String Join(in Any item1, in Any item2, in Any item3, in Any item4, in String sep = " | "): <String>item1 + sep + <String>item2 + sep + <String>item3 + sep + <String>item4;
+String Join(in Any[] items, in String sep = " | ") {
+    String result = "";
+    foreach (Any item in items) {
+        result = result + item + sep;
+    }
+    return result;
+}

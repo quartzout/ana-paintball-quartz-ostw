@@ -1,0 +1,175 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Gameplay\portals\portals.ostw";
+
+import "portals.context.ostw";
+
+
+globalvar PortalsVisualOptions PORTALS_VISUAL_OPTIONS; 
+rule: "Fetching Options" { 
+    PORTALS_VISUAL_OPTIONS = GetOptions<PortalsVisualOptions>("PortalsVisual"); 
+}
+
+
+Color IdleColorOf(in Portal portal): 
+    PORTALS_VISUAL_OPTIONS.IDLE_PORTAL_COLORS_BY_LIFETIME_RATIO[ 
+        RoundToInteger(
+            (portal.SecondsLeft / PORTALS_OPTIONS.PORTAL_LIFETIME - 0.01) * PORTALS_VISUAL_OPTIONS.IDLE_PORTAL_COLORS_BY_LIFETIME_RATIO.Length, 
+            Rounding.Down
+        )
+    ];
+
+# Stores existing portals effect ids
+globalvar Dictionary<Portal, Number> PortalToPortalEffectIds = { Keys: [], Values: [] };
+
+Number AIM_AT_THE_WALL_TOOLTIP_FLASH_DURATION_SEC: 1;
+playervar Number aimAtTheWallTooltipTimer = 0;
+rule: "Create No Wall Met tooltip HUD" {
+    CreateInWorldText(
+        VisibleTo: ActiveIf(LocalPlayer.aimAtTheWallTooltipTimer > 0), 
+        Header: LangString("AIM AT THE WALL", "ЦЕЛЬТЕСЬ В СТЕНУ"), 
+        Position: LpFloatingHUDPosition(0, -0.2),
+        Scale: 2.5, 
+        Clipping: Clipping.DoNotClip, 
+        TextColor: Color.Yellow, 
+        Reevaluation: InworldTextRev.VisibleToPositionAndString, 
+    );
+}
+
+rule: "Initialising portal visual effect events" {
+    Subscribe(OnPortalSpawnedEvent, CreatePortalVisualEffect);
+    Subscribe(OnPortalDespawnedEvent, DestroyPortalEffect);
+
+    // Subscribers should not contain waits, so we call context transfer methods that trigger async subroutine with player context
+    Subscribe(OnTeleportedEvent, ct_PlayTeleportedBeamEffectAsync);
+    Subscribe(OnTeleportedEvent, ct_PlayTeleportedPovEffectAsync);
+    Subscribe(OnTeleportedEvent, PlayTeleportedExplosionEffects);
+    
+    Subscribe(OnNoWallMetOnTeleportEvent, StartFlashingNoWallMetTooltip);
+}
+
+
+
+rule: "Initialising portal sound effect events" {
+        
+    Subscribe(OnPortalSpawnedEvent, portal => 
+        PlayEffect(
+            VisibleTo: All, 
+            Type: PlayEffect.DebuffImpactSound,
+            Position: portal.Position,
+            Radius: 100,
+        )
+    );
+
+    Subscribe(OnTeleportedEvent, (prevPos, afterPos, player)  => {
+    
+        PlayEffect(
+            VisibleTo: All, 
+            Type: PlayEffect.ExplosionSound,
+            Position: afterPos,
+            Radius: 100,
+        );
+
+
+    });
+
+
+    Subscribe(OnPortalCooldownFinished, (portal) => {
+        PlayEffect(
+            VisibleTo: All, 
+            Type: PlayEffect.BuffImpactSound,
+            Position: portal.Position,
+            Radius: 50
+        );
+    });
+
+}
+
+
+rule: "Create 'PRESS F TO TELEPORT' tooltip" {
+    
+    CreateInWorldText(
+        VisibleTo: ActiveIf(
+            IsTrueForAny(existingPortals, portal => CanPlayerTeleport(LocalPlayer, portal))
+        ),
+        Header: LangString("PRESS ", "НАЖМИТЕ ") + InputBindingString(Button.Interact),
+        Position: LpFloatingHUDPosition(0.2, 0),
+        Scale: 2,
+        TextColor: Color.White,
+        Clipping: Clipping.DoNotClip,
+        Reevaluation: InworldTextRev.VisibleToPositionAndString
+    );
+}
+
+void CreatePortalVisualEffect(in Portal portal) {
+    
+    WaitUntilOptionsAreLoaded();
+    
+    // class object are passed by and copied *by reference* (and under the hood, a "reference" to an object is just its numeric index in the global list of all objects). 
+    // This means that when we use EvaluateOnce(portal) inside Reev exspressions we do not freeze _the values_ of object, but just its reference - 
+    // and when "portal" variable changes, such reev expression is still pointing to the original object instead of to a new one, and correctly 
+    // reflecting changes to its members. And since we assign this method to a non-constant delegate event,
+    // whatever is passed to "portal" argument variable when the delegate is called is not imprinted directly into actions - instead, an actual workshop
+    // global variable is set with the value of the argument that we want to pass to the method, and then, when the delegate with this
+    // method assigned to it is called, it gets the argument value from this global variable. Long story short - the "portal" 
+    // is an actual workshop variable that is changing on different method calls, and so we cant directly put "portal.<member>" into reev expression
+    // when we need to read from its members, instead we need to freeze the reference to it with EvaluateOnce(portal).<member>.
+
+    // Using macro instead of local variable because on compilation local variable will turn into a workshop global as well.
+    
+    Portal frozenPortal: EvaluateOnce(portal);
+
+    CreateEffect(
+        VisibleTo: All,
+        Type: Effect.GoodAura, 
+        Color: 
+            (CanPlayerTeleport(LocalPlayer, frozenPortal) ? 
+            PORTALS_VISUAL_OPTIONS.PORTAL_HIGHTLIGHT_COLOR :  
+            IdleColorOf(frozenPortal)), 
+        Position: frozenPortal.Position,
+        Radius: PORTALS_OPTIONS.PORTAL_RADIUS, 
+        Reevaluation: EffectRev.VisibleToPositionRadiusAndColor
+    );
+
+    Dictionary<Portal, Number>.Add(PortalToPortalEffectIds, portal, LastCreatedEntity()); 
+}
+
+void DestroyPortalEffect(in Portal portal) {
+    DestroyEffect(PortalToPortalEffectIds.Get(portal));
+}
+
+
+void PlayTeleportedExplosionEffects(Vector playerBeforePos, Vector playerAfterPos, Player player) {
+    
+    # Explosion effect on origin point
+    PlayEffect(
+        VisibleTo: All, 
+        Type: PlayEffect.GoodExplosion,
+        Position: playerBeforePos, 
+        Radius: 0.2
+    );
+
+    # Explosion effect on impact point
+    PlayEffect(
+        VisibleTo: player.activeEnemies, 
+        Type: PlayEffect.SombraTranslocatorReappearEffect,
+        Position: playerAfterPos, 
+        Radius: 7
+    );
+}
+
+
+void StartFlashingNoWallMetTooltip(Player player) {
+    player.aimAtTheWallTooltipTimer = AIM_AT_THE_WALL_TOOLTIP_FLASH_DURATION_SEC;
+    ChaseVariableAtRate(
+        variable: aimAtTheWallTooltipTimer,
+        destination: 0,
+        rate: 1,
+        reevaluation: RateChaseReevaluation.None
+    );
+}
+
+void StopFlashingNoWallMetTooltip(Player player) {
+    player.aimAtTheWallTooltipTimer = 0;
+}

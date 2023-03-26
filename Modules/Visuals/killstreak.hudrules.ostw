@@ -1,0 +1,30 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Stats\killstreak\killstreak.ostw";
+
+
+rule: "Instantiating score module" {
+    Subscribe(OnKillStreakEvent, MessageOnKillStreak);
+}
+
+
+// bugfest
+void MessageOnKillStreak(in Player streaker, in Number killstreak) {
+
+    // without casting to strings and storing values to separate variables messages show "0" instead of nick and value. i dont know why this works on workshop code level
+    String killstring = <String>killstreak;
+    String name = <String>streaker;
+
+    //using + instead of $ interpolation because interpolation eats spaces for some reason
+    String messageEn = name + " killed " + killstring + " players in one life!";
+    String messageRu = name + " убил " + killstring + " игроков за одну жизнь!";
+
+    // without this delay between composing message and calling bigmessage, bigmessage somehow uses name and killstring values from previous function call. I have no clue
+    Wait(1);
+    
+    BigMessage(
+        VisibleTo: All, 
+        Header: LangString(messageEn, messageRu)
+    );
+}

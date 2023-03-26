@@ -1,0 +1,59 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+Number TELEPORTED_POV_EFFECT_DURATION: 0.5;
+playervar Number teleportPovEffectId;
+void PlayTeleportedPovEffectAsync(Vector playerBeforePos, Vector playerAfterPos) playervar "Play Teleported Pov Effect Async" {
+    
+    DestroyEffect(teleportPovEffectId);
+
+    # FPS effect
+    EventPlayer.teleportPovEffectId = CreateEffect(
+        VisibleTo: EventPlayer, 
+        Type: Effect.CassidyFlashbangStunnedEffect,
+        Position: EventPlayer, 
+        Radius: 1, 
+        Reevaluation: EffectRev.None
+    );
+
+    # Destroying POV effect after delay
+    Wait(TELEPORTED_POV_EFFECT_DURATION);
+    DestroyEffect(EventPlayer.teleportPovEffectId);
+}
+
+
+
+Number BEAM_EFFECT_SHRINKING_DURATION: 0.3;
+playervar Vector beamEffectEndPosition;
+playervar Number teleportBeamEffectId;
+void PlayTeleportedBeamEffectAsync(Vector playerBeforePos, Vector playerAfterPos) playervar "Play Teleported Beam Effect Async" {
+
+    # destroy effects that could been ongoing
+    StopChasingVariable(EventPlayer.beamEffectEndPosition);
+    DestroyEffect(EventPlayer.teleportBeamEffectId);
+
+    # Beam effect
+    EventPlayer.beamEffectEndPosition = playerBeforePos;
+    EventPlayer.teleportBeamEffectId = CreateBeamEffect(
+        VisibleTo: ActiveIf(LocalPlayer != EventPlayer),
+        BeamType: BeamType.TorbjornTurretSightBeam, 
+        StartPosition: playerAfterPos, 
+        EndPosition: beamEffectEndPosition,
+        Reevaluation: EffectRev.VisibleToPositionAndRadius
+    );
+    
+    # Start shrinking the beam after delay
+    Wait(0.3);
+    ChaseVariableOverTime(
+        variable: beamEffectEndPosition, 
+        destination: playerAfterPos, 
+        duration: BEAM_EFFECT_SHRINKING_DURATION, 
+        reevaluation: TimeChaseReevaluation.None
+    );
+    
+    # destroy the beam after delay
+    Wait(BEAM_EFFECT_SHRINKING_DURATION);
+    StopChasingVariable(EventPlayer.beamEffectEndPosition);
+    DestroyEffect(teleportBeamEffectId);
+}

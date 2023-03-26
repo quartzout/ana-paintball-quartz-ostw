@@ -1,0 +1,10 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+globalvar KillStreakOptions killStreakOptions;
+
+playervar Number killstreak = 0;
+
+//Events
+globalvar ((Player, Number) => void)[] OnKillStreakEvent = null;

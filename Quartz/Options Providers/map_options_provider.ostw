@@ -1,0 +1,69 @@
+import "../Symbols/match_time.ostw";
+import "../Symbols/Helpers/logging.ostw";
+import "../Symbols/Helpers/arrays.ostw";
+
+class MapOptions {
+    public String ClassName;
+    public Map _Map;
+}
+
+class MapOptions<T> : MapOptions {
+
+    public T Value;
+
+    public constructor(in Map map, in String className, in T value)  {
+        ClassName = className;
+        _Map = map;
+        Value = value;
+    }
+}
+
+class DefaultMapOptions<T> : MapOptions {
+
+    public T Value;
+
+    public constructor(in String className, in T value)  {
+        ClassName = className;
+        Value = value;
+    }
+}
+
+
+globalvar MapOptions[] AllMapOptions =  [];
+globalvar MapOptions[] AllDefaultMapOptions = [];
+
+public T GetMapOptions<T>(in String className) {
+
+    WaitUntil(MatchTime > 1, 10);
+
+    MapOptions[] allModuleOptions =  FilteredArray(AllMapOptions, options => options.ClassName == className);
+
+    if (allModuleOptions.Length == 0)  {
+        FatalError("No map options for module " + className + " found", "_map_options_provider/GetMapOptions");
+    }
+
+    MapOptions options =  FirstOrNull(allModuleOptions, options => options._Map == CurrentMap());
+    
+    if (options != null)  {
+        return (<MapOptions<T>>options).Value;
+    }
+
+    Warning(
+        "No map options for module " + className + " found for map " + CurrentMap() + " . Using default map options for module.", 
+        "_map_options_provider/GetMapOptions"
+    );
+        
+    MapOptions defaultOptions = FirstOrNull(AllDefaultMapOptions, defaultOptions => defaultOptions.ClassName == className);
+
+    if (defaultOptions == null)  {
+        FatalError("No default map options for module " + className + " found", "_map_options_provider/GetMapOptions");
+    }
+
+    return (<DefaultMapOptions<T>>defaultOptions).Value;
+
+}
+
+
+
+
+

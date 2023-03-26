@@ -1,0 +1,25 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Visuals\_Shared\player color\player_color.ostw";
+
+rule: "Explosion effect on death"
+Event.OnDeath
+{
+    PlayEffect(
+        VisibleTo: EventPlayer.activeEnemies, 
+        Type: PlayEffect.BadExplosion, 
+        Color: EventPlayer.color, 
+        Position: EventPlayer, 
+        Radius: 2
+    );
+
+    PlayEffect(
+        VisibleTo: EventPlayer.activeEnemies, 
+        Type: PlayEffect.RingExplosion, 
+        Color: EventPlayer.color, 
+        Position: PositionOf(EventPlayer) + (Down() * 0.01),
+        Radius: 4
+    );
+    
+}

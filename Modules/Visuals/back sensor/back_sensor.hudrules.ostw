@@ -1,0 +1,33 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\is player scoped\is_player_scoped.ostw";
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+import "back_sensor.ostw";
+
+rule: "Create Back Sensor HUD"
+{
+
+    # We cant have methods inside rules, so we have to create a variable with the name of the method to store method body as lambda (rofl)
+    # And because we dont need to change value of this variable, we can assign it with constant lamba. This way it would be cheaper to call it and it would be able to 
+    # accept constant types as arguments
+    (const (BackSensorState, Icon) => void) CreateBackSensorIcon = (state, icon) => {
+        CreateIcon(
+            VisibleTo: ActiveIf(
+                !IsScoped(LocalPlayer) && 
+                LocalPlayer.backSensorState == state
+            ),
+            Position: LpFloatingHUDPosition(0, 0.25),
+            Icon: icon, 
+            Reevaluation: IconRev.VisibleToAndPosition, 
+            IconColor: Color.Yellow);
+    };
+
+    # Because we cant make Icon value reevaluatable, we need to create 4 different icons that would activate thier own visibility in turns.
+    # This duplication means we cant write visibility logic inside a single action. Instead we have to create a player variable that would 
+    # hold value for current state of the sensor, and update this variable in loop inside separate action.
+    CreateBackSensorIcon(BackSensorState.Back,  Icon.ArrowDown);
+    CreateBackSensorIcon(BackSensorState.Right, Icon.ArrowRight);
+    CreateBackSensorIcon(BackSensorState.Left, Icon.ArrowLeft);
+    CreateBackSensorIcon(BackSensorState.Multiple, Icon.ExclamationMark);
+}

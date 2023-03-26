@@ -1,0 +1,27 @@
+void Loop(in Number delay, const () => void actions) {
+    
+    while(true) {
+        actions();
+        Wait(delay, WaitBehavior.IgnoreCondition);
+    }
+    
+}
+
+T CacheRef<T>(const () => T valueGetter, ref T cacheStore) {
+    
+    if (cacheStore == null) {
+        cacheStore = valueGetter();
+    }
+
+    return cacheStore;
+}
+
+T CacheValue<T>(const () => T valueGetter, ref T cacheStore, T defaultValue) {
+    
+    if (cacheStore == defaultValue) {
+        cacheStore = valueGetter();
+    }
+
+    return cacheStore;
+}
+

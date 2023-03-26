@@ -1,0 +1,36 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "..\definitions.ostw";
+
+rule: "Add options" {
+
+    Map MAP: Map.Kanezaka;
+
+    AllMapOptions.ModAppend(new MapOptions<PortalsMapOptions>(MAP, "PortalsMapOptions", { 
+        PORTAL_SPAWNPOINTS: [
+            Vector(-11.883, 6.793, 3.375), 
+            Vector(-4.417, 12.951, -24.318), 
+            Vector(-18.094, 10.963, -29.114), 
+            Vector(-10.352, 7.153, -38.601), 
+            Vector(-37.016, 10.898, -26.637), 
+            Vector(-30.814, 11.795, -9.857), 
+            Vector(-51.447, 13.128, 9.676), 
+            Vector(-26.836, 11.958, 21.498), 
+            Vector(-27.578, 7.987, 31.381), 
+            Vector(-20.345, 11.722, 0.615), 
+            Vector(-15.902, 11.814, -14.066), 
+            Vector(-40.109, 12.787, -40.737)],
+        MAX_PORTALS_IN_WORLD: 3
+    }));
+
+    AllMapOptions.ModAppend(new MapOptions<EnviromentalSaveMapOptions>(MAP, "EnviromentalSaveMapOptions", { 
+        SAVE_Y_COORDINATE: 0,
+        SAVE_UP_IMPULSE: 18
+    }));
+
+    AllMapOptions.ModAppend(new MapOptions<ActivePlayersVisualsMapOptions>(MAP, "ActivePlayersVisualsMapOptions", { 
+        POSITION: Vector(-22, 19, 25),
+        VIEW_DIRECTION: Vector(-0.41, 0, 0.91)
+    }));
+
+}

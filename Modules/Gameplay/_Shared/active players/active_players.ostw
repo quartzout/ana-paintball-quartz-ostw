@@ -1,0 +1,122 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\player physics\player_physics.ostw";
+
+// Events
+globalvar (Player => void)[] OnActivePlayerAddedEvent = null;
+globalvar (Player => void)[] OnActivePlayerRemovedEvent = null;
+globalvar (Player => void)[] OnPlayerGoesToWelcomeScreen = null;
+globalvar (Player => void)[] OnPlayerLeavesWelcomeScreen = null;
+
+
+
+globalvar Player[] activePlayers = [];
+playervar Player[] activeEnemies = [];
+playervar Boolean isActive = false;
+
+Player[] ActiveIf(in Boolean condition):
+    LocalPlayer.isActive && condition ? All : null;
+
+Player[] Active: LocalPlayer.isActive ? All : null;
+
+Player[] NotActive: !LocalPlayer.isActive ? All : null;
+
+
+void MakePlayerActive(in Player player)
+{
+    # Waiting until player is completely spawned
+    WaitUntil(HasSpawned(player), 99999);
+
+    Wait(0.25, WaitBehavior.IgnoreCondition);
+
+    # Resetting physics
+    ResetPlayerPhysicsSettings(player);
+
+    AddPlayerToActive(player);
+
+    # Reset physics
+    ClearStatus(player, Status.PhasedOut);
+    EnableMovementCollisionWithEnvironment(EventPlayer);
+    SetInvisible(player, InvisibleTo.None);
+
+    # Spawn
+    Respawn(player);
+
+    # Waiting until spawn
+    Wait(0.25, WaitBehavior.IgnoreCondition);
+
+    CallEvent(OnPlayerLeavesWelcomeScreen, player);
+
+    # buttons
+    AllowButton(player, Button.PrimaryFire);
+    AllowButton(player, Button.SecondaryFire);
+    AllowButton(player, Button.Ability1);
+    AllowButton(player, Button.Ability2);
+    AllowButton(player, Button.Ultimate);
+    AllowButton(player, Button.Interact);
+    AllowButton(player, Button.Jump);
+    AllowButton(player, Button.Crouch);
+    AllowButton(player, Button.Melee);
+    AllowButton(player, Button.Reload);
+
+}
+
+void MakePlayerInactive(in Player player)
+{
+    RemovePlayerFromActive(player);
+    
+    DisableMovementCollisionWithEnvironment(player, true);
+    DisableMovementCollisionWithPlayers(player);
+    SetGravity(player, 0);
+    SetInvisible(player, InvisibleTo.All);
+
+    CallEvent(OnPlayerGoesToWelcomeScreen, player);
+
+    # Moving and looking
+    SetMoveSpeed(player, 0);
+
+    # Buttons
+    DisallowButton(player, Button.PrimaryFire);
+    DisallowButton(player, Button.SecondaryFire);
+    DisallowButton(player, Button.Ability1);
+    DisallowButton(player, Button.Ability2);
+    DisallowButton(player, Button.Ultimate);
+    DisallowButton(player, Button.Interact);
+    DisallowButton(player, Button.Jump);
+    DisallowButton(player, Button.Crouch);
+    DisallowButton(player, Button.Melee);
+    DisallowButton(player, Button.Reload);
+}
+
+void AddPlayerToActive(in Player player) 
+{
+    // filling players enemy array
+    player.activeEnemies = activePlayers;
+
+    # Making player active
+    player.isActive = true;
+    activePlayers.ModAppend(player);
+
+    // Updating everyones enemy array
+    foreach (Player activePlayer in activePlayers) {
+        if (activePlayer == player) continue;
+        activePlayer.activeEnemies.ModAppend(player);
+    }
+
+    CallEvent(OnActivePlayerAddedEvent, player);
+}
+
+void RemovePlayerFromActive(in Player player)
+{
+    # Making player inactive
+    player.isActive = false;
+    activePlayers.ModRemoveByValue(player);
+    
+    // Updating everyones enemy array
+    foreach (Player activePlayer in activePlayers) {
+        if (activePlayer == player) continue;
+        ModifyVariable(activePlayer.activeEnemies, Operation.RemoveFromArrayByValue, player);
+    }
+
+    CallEvent(OnActivePlayerRemovedEvent, player);
+}

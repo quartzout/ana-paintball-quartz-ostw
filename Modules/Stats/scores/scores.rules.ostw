@@ -1,0 +1,27 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "scores.ostw";
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+rule: "Update everyones player scores when new player spawns" {
+    Subscribe(OnActivePlayerAddedEvent, _ => UpdatePlacesForEveryPlayer());
+}
+
+
+void UpdatePlayerScore(in Player player)
+{
+    WaitUntilOptionsAreLoaded();
+
+    # Score Metric (avg kill per multiple time periods)
+    player.averageKillsPerPeriod = CountOf(player.killTimestampsInLastLongPeriod) / playerStatsOptions.AVERAGING_PERIOD + 0.001;
+    
+    # Updating everyones places after recalculating player leaderboard score
+    UpdatePlacesForEveryPlayer();
+}
+
+
+
+
+
+
+

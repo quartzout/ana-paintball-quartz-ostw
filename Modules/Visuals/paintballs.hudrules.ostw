@@ -1,0 +1,69 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Visuals\_Shared\player color\player_color.ostw";
+
+Number MAX_PAINTBALLS_IN_WORLD: 30;
+globalvar Number[] paintballEffects = [];
+
+rule: "Paintballs on shots hitting walls"
+Event.OngoingPlayer
+if (UpdateEveryFrame(IsFiringPrimary(EventPlayer)))
+{
+    # End point 
+    Vector raycastEndPoint = EyePosition(EventPlayer) + (FacingDirectionOf(EventPlayer) + Down() * 0.02) * 100;
+    
+    # Hit position
+    Vector wallHitPosition = RayCastHitPosition(
+        StartPOS: EyePosition(EventPlayer), 
+        EndPOS: raycastEndPoint, 
+        PlayersToInclude: null, 
+        PlayersToExclude: EventPlayer
+    );
+    
+    # return if player is hit
+    if (RayCastHitPlayer(
+        StartPOS: EyePosition(EventPlayer), 
+        EndPOS: raycastEndPoint, 
+        PlayersToInclude: All, 
+        PlayersToExclude: EventPlayer
+    ) != null) return;
+    
+    # return if shot doesnt hit any wall
+    if (wallHitPosition == raycastEndPoint) return;
+    
+    # Waiting projectile to hit the wall if shot wasnt scoped
+    if (!IsFiringSecondary(EventPlayer))
+    {
+        Wait(DistanceBetween(EyePosition(EventPlayer), wallHitPosition) / 125);
+    }
+    
+    # Explosion effect
+    PlayEffect(
+        VisibleTo: All, 
+        Type: PlayEffect.BadExplosion, 
+        Position: wallHitPosition, 
+        Color: LocalPlayer == EventPlayer ? Color.White : EventPlayer.color,
+        Radius: 0.2
+    );
+
+    # Destroy the oldest paintball effect if the effect array is full
+    if (paintballEffects.Length == MAX_PAINTBALLS_IN_WORLD)
+    {
+        DestroyEffect(FirstOf(paintballEffects));
+        paintballEffects.ModRemoveByIndex(0);
+    }
+    
+    # Create paintball effect
+    paintballEffects.ModAppend(
+        CreateEffect(
+            VisibleTo: All, 
+            Type: Effect.Sphere, 
+            Color: EvaluateOnce(EventPlayer) == LocalPlayer ? Color.White : color, 
+            Position: wallHitPosition, 
+            Radius: 0.09, 
+            Reevaluation: EffectRev.Color
+        )
+    );
+
+}

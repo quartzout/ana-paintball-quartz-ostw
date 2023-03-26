@@ -1,0 +1,7 @@
+import "\APQ\Quartz\quartz.ostw";
+
+// scopeTimer is used in scope_limit, and isScoped is used in some HUD events to stop showing in-world text while while in scope because camera is zoomed in
+// For this reason scope_timer is in _shared and is managed by scope_timer.ostw  
+playervar Number scopeTimer = 0;
+
+Boolean IsScoped(in Player player): player.scopeTimer > 0;

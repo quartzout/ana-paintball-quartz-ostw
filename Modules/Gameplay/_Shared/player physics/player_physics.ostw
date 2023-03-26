@@ -1,0 +1,29 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Regular Options\definitions.ostw";
+
+globalvar PlayerPhysicsOptions playerPhysicsOptions;
+globalvar ProjectilePhysicsOptions projectilePhysicsOptions;
+
+void ResetPlayerPhysicsSettings(in Player player)
+{
+    WaitUntilOptionsAreLoaded();
+
+    # Physics settings
+    SetMoveSpeed(player, 100 * playerPhysicsOptions.MOVE_SPEED_SCALAR);
+    SetGravity(player, 100 * playerPhysicsOptions.GRAVITY_SCALAR);
+    SetJumpVerticalSpeed(player, 100 * playerPhysicsOptions.JUMP_VELOCITY_SCALAR);
+    SetProjectileSpeed(player, 100 * projectilePhysicsOptions.VELOCITY_SCALAR);
+    SetProjectileGravity(player, 100 * projectilePhysicsOptions.GRAVITY_SCALAR);
+}
+
+void CancelAllPlayerMotion(in Player player)
+{
+    ApplyImpulse(player, Right(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Left(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Up(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Down(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Forward(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+    ApplyImpulse(player, Backward(), 0.001, Relative.ToWorld, ContraryMotion.CancelXYZ);
+}
+

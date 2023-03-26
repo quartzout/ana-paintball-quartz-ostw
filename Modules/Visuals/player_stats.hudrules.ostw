@@ -1,0 +1,41 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\Gameplay\enviromental save\enviromental_save.ostw";
+import "\APQ\Modules\Stats\player stats\player_stats.ostw";
+
+
+rule: "Create Stats HUD"
+{
+
+    CreateHudText(
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        Text: LangString("Kills:", "Убийств:"),
+        Location: Location.Left, 
+        TextColor: Color.Aqua,
+        Reevaluation: HudTextRev.VisibleToStringAndColor
+    );
+
+    CreateHudText(
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        Subheader: LangString(
+            $"Scoped: {LocalPlayer.scopedKillsPercent}%\nUnscoped: {LocalPlayer.unscopedKillsPercent}%\nSleep: {LocalPlayer.sleepKillsPercent}%",
+            $"В прицеле: {LocalPlayer.scopedKillsPercent}%\n От бедра: {LocalPlayer.unscopedKillsPercent}%\nДротиком - {LocalPlayer.sleepKillsPercent}%"
+        ),
+        Location: Location.Left, 
+        Reevaluation: HudTextRev.VisibleToStringAndColor
+    );
+
+
+    CreateHudText(
+        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        Text: LangString(
+            $"KDR: {LocalPlayer.killDeathRatio}",
+            $"У/С: {LocalPlayer.killDeathRatio}",
+        ),
+        TextColor: LocalPlayer.killDeathRatio >= 1 ? Color.Blue : Color.Orange,
+        Location: Location.Left, 
+        Reevaluation: HudTextRev.VisibleToStringAndColor
+    );
+
+}
