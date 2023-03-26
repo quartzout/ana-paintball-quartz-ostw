@@ -20,7 +20,7 @@
     "Deathmatch": {
       "Game Length In Minutes": 15,
       "Score To Win": 50,
-      "Enabled Maps": ["Château Guillard", "Kanezaka"]
+      "Enabled Maps": ["Château Guillard", "Kanezaka", "Castillo", "Black Forest"]
     },
     "Elimination": {
       "Limited Choice Pool": "Team Size",
@@ -47,7 +47,7 @@
     }
   },
   "Description": "--Impulse Grenades—\\r\\n--Portals—\\r\\n--Dynamic Leaderboard—\\r\\n--Endless Match—\\r\\n--English / Russian--\\r\\n--Chataeu Guillard / Kanezaka--\\r\\nAuthor: пупа#21361",
-  "Mode Name": "Ana Paintball Quartz",
+  "Mode Name": "<FGFF0000FF> Ana Paintball Quartz",
   "Workshop": {
     "Grаvity": 1.0,
     "Grаvitу": 2.2,
