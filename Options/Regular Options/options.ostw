@@ -2,85 +2,84 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "definitions.ostw";
 
-rule: "Add options" {
+rule: "Add options" -999 {
 
-    AllOptions.ModAppend(new Options<PortalsOptions>("PortalsOptions", { 
-        PORTAL_LIFETIME: WorkshopSettingInteger("Portals", "Portal lifetime (seconds)", 120, 10, 1200, 12),
-        PORTAL_RADIUS: WorkshopSettingReal("Portals", "Portal radius", 2, 0.5, 4, 11),
-        LAND_EXPLOSION_IMPULSE: 15,
-        LAND_EXPLOSION_UPWARD_PULL: 1
+    AddOptions("PortalsOptions", init(new PortalsOptions(), opt => {
+        opt.PORTAL_LIFETIME = WorkshopSettingInteger("Portals", "Portal lifetime (seconds)", 120, 10, 1200, 12);
+        opt.PORTAL_RADIUS = WorkshopSettingReal("Portals", "Portal radius", 2, 0.5, 4, 11);
+        opt.LAND_EXPLOSION_IMPULSE = 15;
+        opt.LAND_EXPLOSION_UPWARD_PULL = 1;
+    }));
+    
+    AddOptions("PortalsVisualOptions", init(new PortalsVisualOptions(), opt => {
+        opt.PORTAL_HIGHTLIGHT_COLOR = Color.Violet;
+        opt.PORTAL_ON_COOLDOWN_COLOR = Color.Red;
+        opt.IDLE_PORTAL_COLORS_BY_LIFETIME_RATIO = [Color.Green, Color.Turquoise, Color.Aqua, Color.Blue, Color.Purple];
     }));
 
-    AllOptions.ModAppend(new Options<PortalsVisualOptions>("PortalsVisualOptions", { 
-        PORTAL_HIGHTLIGHT_COLOR: Color.Violet,
-        PORTAL_ON_COOLDOWN_COLOR: Color.Red,
-        IDLE_PORTAL_COLORS_BY_LIFETIME_RATIO: [Color.Green, Color.Turquoise, Color.Aqua, Color.Blue, Color.Purple] 
+    AddOptions("ScopeTimeLimitOptions", init(new ScopeTimeLimitOptions(), opt => {
+        opt.MAX_SCOPE_TIME = WorkshopSettingReal("Scope", "Max Time in scope (sec.)", 1, 0.1, 10, -4);
     }));
 
-    AllOptions.ModAppend(new Options<ScopeTimeLimitOptions>("ScopeTimeLimitOptions", { 
-        MAX_SCOPE_TIME: WorkshopSettingReal("Scope", "Max Time in scope (sec.)", 1, 0.1, 10, -4)
+    AddOptions("EnabledAbilitiesOptions", init(new EnabledAbilitiesOptions(), opt => {
+        opt.SLEEP_ENABLED = WorkshopSettingToggle("Abilities", "Sleep dart enabled", true, -3);
+        opt.GRENADE_ENABLED = WorkshopSettingToggle("Abilities", "Grenade enabled", true, -2);
+        opt.ULTIMATE_ENABLED = WorkshopSettingToggle("Ultimate", "Enabled", true, 3);
     }));
 
-    AllOptions.ModAppend(new Options<EnabledAbilitiesOptions>("EnabledAbilitiesOptions", { 
-        SLEEP_ENABLED: WorkshopSettingToggle("Abilities", "Sleep dart enabled", true, -3),
-        GRENADE_ENABLED: WorkshopSettingToggle("Abilities", "Grenade enabled", true, -2),
-        ULTIMATE_ENABLED: WorkshopSettingToggle("Ultimate", "Enabled", true, 3),
-    }));
-
-    AllOptions.ModAppend(new Options<ImpulseGrenadeOptions>("ImpulseGrenadeOptions", { 
-        EXPLOSION_IMPULSE: WorkshopSettingReal("Grenade Physics", "Knocking Impulse", 15, 5, 50, 9),
-        EXPLOSION_UPWARD_PULL: WorkshopSettingReal("Grenade Physics", "Grenade Upward Pull", 1, 0, 10, 10) 
+    AddOptions("ImpulseGrenadeOptions", init(new ImpulseGrenadeOptions(), opt => {
+        opt.EXPLOSION_IMPULSE = WorkshopSettingReal("Grenade Physics", "Knocking Impulse", 15, 5, 50, 9);
+        opt.EXPLOSION_UPWARD_PULL = WorkshopSettingReal("Grenade Physics", "Grenade Upward Pull", 1, 0, 10, 10);
     }));
 
     WorkshopSettingCombo("Abilities", "To change sleep or grenade cooldowns use \"heroes\" tab in match settings", 0, ["."], -1);
 
-    AllOptions.ModAppend(new Options<PlayerPhysicsOptions>("PlayerPhysicsOptions", { 
-        GRAVITY_SCALAR: WorkshopSettingReal("Player Physics", "gravity", 1, 0.5, 2, 0),
-        MOVE_SPEED_SCALAR: WorkshopSettingReal("Player Physics", "Move Speed", 1, 0.5, 2, 1),
-        JUMP_VELOCITY_SCALAR: WorkshopSettingReal("Player Physics", "Jump Speed", 1, 0.5, 2, 2),
+    AddOptions("PlayerPhysicsOptions", init(new PlayerPhysicsOptions(), opt => {
+        opt.GRAVITY_SCALAR = WorkshopSettingReal("Player Physics", "gravity", 1, 0.5, 2, 0);
+        opt.MOVE_SPEED_SCALAR = WorkshopSettingReal("Player Physics", "Move Speed", 1, 0.5, 2, 1);
+        opt.JUMP_VELOCITY_SCALAR = WorkshopSettingReal("Player Physics", "Jump Speed", 1, 0.5, 2, 2);
     }));
 
-    AllOptions.ModAppend(new Options<UltimateOptions>("UltimateOptions", { 
-        KILLS_NEEDED_FOR_ULTIMATE_CHARGE: WorkshopSettingInteger("Ultimate", "Kills to charge", 4, 1, 10, 4),
-        SLEEP_COOLDOWN: WorkshopSettingReal("Ultimate", "Sleep Cooldown", 0, 0, 10, 5),
-        GRENADE_COOLDOWN: WorkshopSettingReal("Ultimate", "Impulse Grenade Cooldown", 1.5, 1, 10, 6),
-        MOVE_SPEED_SCALAR: WorkshopSettingReal("Ultimate Physics", "Мove Speed", 2, 1, 3, 4),
-        JUMP_VELOCITY_SCALAR: WorkshopSettingReal("Ultimate Physics", "Jump Sрeed", 1.7, 1, 3, 5),
-        GRAVITY_SCALAR: WorkshopSettingReal("Ultimate Physics", "Grаvity", 1.5, 1, 3, 6)
+    AddOptions("SonicUltimateOptions", init(new SonicUltimateOptions(), opt => {
+        opt.KILLS_NEEDED_FOR_ULTIMATE_CHARGE = WorkshopSettingInteger("Ultimate", "Kills to charge", 4, 1, 10, 4);
+        opt.SLEEP_COOLDOWN = WorkshopSettingReal("Ultimate", "Sleep Cooldown", 0, 0, 10, 5);
+        opt.GRENADE_COOLDOWN = WorkshopSettingReal("Ultimate", "Impulse Grenade Cooldown", 1.5, 1, 10, 6);
+        opt.MOVE_SPEED_SCALAR = WorkshopSettingReal("Ultimate Physics", "Мove Speed", 2, 1, 3, 4);
+        opt.JUMP_VELOCITY_SCALAR = WorkshopSettingReal("Ultimate Physics", "Jump Sрeed", 1.7, 1, 3, 5);
+        opt.GRAVITY_SCALAR = WorkshopSettingReal("Ultimate Physics", "Grаvity", 1.5, 1, 3, 6);
     }));
 
-    AllOptions.ModAppend(new Options<ProjectilePhysicsOptions>("ProjectilePhysicsOptions", { 
-        VELOCITY_SCALAR: WorkshopSettingReal("Projectile Physics", "Velocity", 1, 0.1, 10, 7),
-        GRAVITY_SCALAR: WorkshopSettingReal("Projectile Physics", "Grаvitу", 2.2, 0.1, 10, 8)
+    AddOptions("ProjectilePhysicsOptions", init(new ProjectilePhysicsOptions(), opt => {
+        opt.VELOCITY_SCALAR = WorkshopSettingReal("Projectile Physics", "Velocity", 1, 0.1, 10, 7);
     }));
 
-    AllOptions.ModAppend(new Options<EnviromentalSaveOptions>("EnviromentalSavesOptions", { 
-        SAVES: WorkshopSettingInteger("Save player from falling in water", "Number of bounces player has before they die", 2, 0, 4, 11)
+    AddOptions("EnviromentalSaveOptions", init(new EnviromentalSaveOptions(), opt => { 
+        opt.SAVES = WorkshopSettingInteger("Save player from falling in water", "Number of bounces player has before they die", 2, 0, 4, 11);
     }));
 
-    AllOptions.ModAppend(new Options<PlayerStatsOptions>("KillsInLongPeriodOptions", { 
-        TIME_PERIOD: WorkshopSettingReal("Tracking player statistics", "Time period for tracking kills (sec.)", 180, 30, 3600, 16),
-        AVERAGING_PERIOD: WorkshopSettingReal("Tracking player statistics", "Time period for tracking kills (sec.)", 60, 5, 600, 15)
+    AddOptions("PlayerStatsOptions", init(new PlayerStatsOptions(), opt => { 
+        opt.TIME_PERIOD = WorkshopSettingReal("Tracking player statistics", "Time period for tracking kills (sec.)", 180, 30, 3600, 16);
+        opt.AVERAGING_PERIOD = WorkshopSettingReal("Tracking player statistics", "Time period for averaged statictics (sec.)", 60, 5, 600, 15);
     }));
 
-    AllOptions.ModAppend(new Options<KillStreakOptions>("KillStreakOptions", { 
-        KILLS_FOR_KILLSTREAK_MESSAGE: 5
+    AddOptions("KillStreakOptions", init(new KillStreakOptions(), opt => { 
+        opt.KILLS_FOR_KILLSTREAK_MESSAGE = 5;
     }));
 
-    AllOptions.ModAppend(new Options<MatchOptions>("MatchOptions", { 
-        MATCH_LENGTH: 60 * WorkshopSettingInteger("Match", "Map switches every (minutes)", 20, 2, 240, 0)
+    AddOptions("MatchOptions", init(new MatchOptions(), opt => { 
+        opt.MATCH_LENGTH = 60 * WorkshopSettingInteger("Match", "Map switches every (minutes)", 20, 2, 240, 0);
     }));
 
-    AllOptions.ModAppend(new Options<SensorsOptions>("SensorsOptions", { 
-        FOV: 103
+    AddOptions("SensorsOptions", init(new SensorsOptions(), opt => { 
+        opt.FOV = 103;
     }));
 
-    AllOptions.ModAppend(new Options<AfkOptions>("AfkOptions", { 
-        PLAYER_SENT_TO_AFK_AFTER_SECONDS: 60
+    AddOptions("AfkOptions", init(new AfkOptions(), opt => { 
+        opt.PLAYER_SENT_TO_AFK_AFTER_SECONDS = 60;
     }));
 
-    AllOptions.ModAppend(new Options<PlayerColorOptions>("PlayerColorOptions", { 
-        AVAILABLE_PLAYER_COLORS: [
+    AddOptions("PlayerColorOptions", init(new PlayerColorOptions(), opt => { 
+        opt.AVAILABLE_PLAYER_COLORS = [
             Color.Yellow, 
             Color.Green, 
             Color.Red, 
@@ -91,10 +90,7 @@ rule: "Add options" {
             Color.Turquoise, 
             Color.LimeGreen, 
             Color.Rose
-        ]
+        ];
     }));
-
-
-    
 
 }

@@ -1,3 +1,5 @@
+import "../../match time/match_time.ostw";
+
 void Loop(in Number delay, const () => void actions) {
     
     while(true) {
@@ -5,6 +7,15 @@ void Loop(in Number delay, const () => void actions) {
         Wait(delay, WaitBehavior.IgnoreCondition);
     }
     
+}
+
+# Restarts the game immediately when match could be restarted, otherwise waits until match coluld be restarted and then restarts.
+# Subroutine, and should be called asynchronously.
+void RestartWhenPossible() "Restart when possible" {
+    MinWait(); //for some reason waitUntil doesnt work without some wait before it ¯\_(ツ)_/¯ ¯\_(ツ)_/¯ ¯\_(ツ)_/¯ (╯°□°）╯︵ ┻━┻
+    WaitUntil(MatchTime > 5, 9999);
+    LogToInspector("Restarting");
+    RestartMatch();
 }
 
 T CacheRef<T>(const () => T valueGetter, ref T cacheStore) {

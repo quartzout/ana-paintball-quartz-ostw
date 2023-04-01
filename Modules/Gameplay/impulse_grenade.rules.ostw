@@ -6,12 +6,7 @@ import "\APQ\Modules\Gameplay\_Shared\player physics\player_physics.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar ImpulseGrenadeOptions grenadeOptions;
-
-rule: "fetch options" {
-    grenadeOptions = GetOptions<ImpulseGrenadeOptions>("GrenadeOptions");
-}
-
+globalvar ImpulseGrenadeOptions impulseGrnadeOptions = GetOptions<ImpulseGrenadeOptions>("ImpulseGrenadeOptions");
 
 playervar Boolean isThrowingGrenade = false;
 playervar Number isThrowingGrenadeTimer = 0;
@@ -31,8 +26,7 @@ rule: "Start simulating grenade when player threw it"
 Event.OngoingPlayer
 if (IsUsingAbility2(EventPlayer) == true)
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     # Setup
     EventPlayer.isThrowingGrenade = true;
     EventPlayer.delayedGrenadeSimulationPoint = EyePosition(EventPlayer);
@@ -99,8 +93,7 @@ if (EventPlayer.isThrowingGrenadeTimer >= GRENADE_TIMER_MAX_SECONDS) {
 
 void FinishGrenadeThrow(in Player owner)
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     if (!owner.isThrowingGrenade) return;
 
     owner.isThrowingGrenade = false;
@@ -110,9 +103,9 @@ void FinishGrenadeThrow(in Player owner)
 
     DoImpulseExplosionInRange(
         blastPosition: owner.delayedGrenadeSimulationPoint, 
-        magnitude: grenadeOptions.EXPLOSION_IMPULSE,
+        magnitude: impulseGrnadeOptions.EXPLOSION_IMPULSE,
         immunePlayer: null, 
-        upwardPull: grenadeOptions.EXPLOSION_UPWARD_PULL,
+        upwardPull: impulseGrnadeOptions.EXPLOSION_UPWARD_PULL,
         envCredit: owner);
 
     HealPlayer(owner);

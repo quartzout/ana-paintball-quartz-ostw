@@ -33,7 +33,7 @@ Boolean IsPlayerLookingInsidePortal(in Player player, in Portal portal):
     PlayerViewToPortalAngleDeviation(player, portal) <= MaxAllowedViewAngleDeviation(player, portal);
 
 
-Boolean IsLocalPlayerViewToPortalObstructed(in Player player, in Portal portal): 
+Boolean IsPlayerViewToPortalObstructed(in Player player, in Portal portal): 
     IsRayObstructed(
         From: UpdateEveryFrame(EyePosition(player)), 
         To: (
@@ -50,4 +50,4 @@ Boolean IsLocalPlayerViewToPortalObstructed(in Player player, in Portal portal):
 # (means portal is not on cooldown and player is looking into in without obstructions on the way)
 Boolean CanPlayerTeleport(in Player player, in Portal portal):
     IsPlayerLookingInsidePortal(player, portal) && 
-    !IsLocalPlayerViewToPortalObstructed(player, portal);
+    !IsPlayerViewToPortalObstructed(player, portal);

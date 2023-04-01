@@ -22,5 +22,5 @@ Player[] VisibleIf(in Boolean condition):
     condition ? All : null;
 
 String GetStringByLang<TLangs>(in String[] strings, in TLangs[] langs, in TLangs languageVar):
-    MappedArray(strings, langs[CurrentArrayIndex()] == languageVar).First;
+    FilteredArray(strings, langs[CurrentArrayIndex()] == languageVar).First;
 

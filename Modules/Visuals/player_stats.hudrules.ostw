@@ -1,7 +1,10 @@
 import "\APQ\Quartz\quartz.ostw";
 
+import "\APQ\Modules\_Shared\language.ostw";
+
 import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 import "\APQ\Modules\Gameplay\enviromental save\enviromental_save.ostw";
+
 import "\APQ\Modules\Stats\player stats\player_stats.ostw";
 
 

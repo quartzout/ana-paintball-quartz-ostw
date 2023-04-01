@@ -6,15 +6,10 @@ import "\APQ\Modules\Gameplay\_Shared\player physics\player_physics.ostw";
 
 import "portals.ostw";
 
-rule: "fetch options" {
-    portalOptions = GetOptions<PortalsOptions>("PortalsOptions");
-}
 
 rule: "Spawn Portals when theres not enough of them in the world"
 if (existingPortals.Length < PORTALS_MAP_OPTIONS.MAX_PORTALS_IN_WORLD)
 {
-    WaitUntilOptionsAreLoaded();
-    
     // Spawning portals until maximum is reached
      
     # Getting a list of all unoccupied positions. IsTrueForAll doesnt work inside FilteredArray. 
@@ -71,15 +66,16 @@ if (EventPlayer.isActive)
 
 void DespawnPortal(in Portal portal)
 {
-    existingPortals.ModRemoveByValue(portal);
     CallEvent(OnPortalDespawnedEvent, portal);
+    existingPortals.ModRemoveByValue(portal);
 }
 
 
+// void Test(const Number => Boolean exp): exp();
+
 Boolean TryTeleportPlayerToWhereTheyLook(in Player player)
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     # Maximum position for the raycasts
     Vector EndPosition = FacingDirectionOf(player) * 100 + EyePosition(player);
     

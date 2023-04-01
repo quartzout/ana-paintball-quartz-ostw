@@ -2,7 +2,6 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar PlayerColorOptions playerColorOptions;
+globalvar PlayerColorOptions playerColorOptions = GetOptions<PlayerColorOptions>("PlayerColorOptions");
  
-
 playervar Color color = Color.White;

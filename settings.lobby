@@ -20,7 +20,7 @@
     "Deathmatch": {
       "Game Length In Minutes": 15,
       "Score To Win": 50,
-      "Enabled Maps": ["Château Guillard", "Kanezaka", "Castillo", "Black Forest"]
+      "Enabled Maps": ["Castillo"]
     },
     "Elimination": {
       "Limited Choice Pool": "Team Size",

@@ -1,13 +1,13 @@
 import "\APQ\Quartz\quartz.ostw";
 
-import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+import "\APQ\Modules\_Shared\language.ostw";
 
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 import "\APQ\Modules\Gameplay\match time\match_time.ostw";
 
 rule: "Create Match Time HUD"
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     CreateHudText(
         VisibleTo: Active, 
         Text: LangString("Map switches in ", "Карта поменяется через ") + TimestampToReadable(matchOptions.MATCH_LENGTH - MatchTime),

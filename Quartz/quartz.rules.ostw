@@ -1,2 +1,2 @@
-import "Rules/starting_match_time.ostw";
-import "Rules/workshop_info.ostw";
+import "match time/match_time.rules.ostw";
+import "workshop_info.rules.ostw";

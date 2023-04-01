@@ -8,12 +8,15 @@ import "Symbols/Helpers/shorteners.ostw";
 import "Symbols/Helpers/strings.ostw";
 import "Symbols/Helpers/vectors.ostw";
 import "Symbols/Helpers/workshop_events.ostw";
+import "Symbols/Helpers/classes.ostw";
+
 
 // Symbols
 import "Symbols/dictionary.ostw";
 import "Symbols/events.ostw";
-import "Symbols/match_time.ostw";
+import "match time/match_time.ostw";
 
 //Options
-import "options_provider.ostw";
+import "options providers/regular_options_provider.ostw";
+import "options providers/map_options_provider.ostw";
 

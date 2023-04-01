@@ -28,3 +28,5 @@ String Join(in Any[] items, in String sep = " | ") {
     }
     return result;
 }
+
+String Label(in String label, in Any object): label + ": " + <String>object;

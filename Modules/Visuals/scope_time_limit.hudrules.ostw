@@ -6,8 +6,7 @@ import "\APQ\Modules\Gameplay\scope time limit\scope_time_limit.ostw";
 
 rule: "Create Scope Meter HUD"
 {
-    WaitUntilOptionsAreLoaded();
-    
+        
     # Scope timer meter (wow funky font)
     CreateInWorldText(
         VisibleTo: ActiveIf(

@@ -2,7 +2,7 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar KillStreakOptions killStreakOptions;
+globalvar KillStreakOptions killStreakOptions = GetOptions<KillStreakOptions>("KillStreakOptions");
 
 playervar Number killstreak = 0;
 

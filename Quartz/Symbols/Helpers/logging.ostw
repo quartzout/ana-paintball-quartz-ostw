@@ -1,11 +1,50 @@
-import "../match_time.ostw";
+import "workshop_events.ostw";
+import "strings.ostw";
+import "arrays.ostw";
+import "shorteners.ostw";
 
 
-void LogArray<T>(in T[] array, const T => T | Any filter = item => item) {
+void DebugLogArray<T>(in T[] array, const T => T | Any filter = item => item, String sep = " | ") {
+    LogToInspector(Join(FilteredArray(array, filter), sep: sep));
+}
+
+void DebugLogArrayByLines<T>(in T[] array, const T => T | Any filter = item => item) {
     foreach(Any item in array) {
         LogToInspector(filter(item));
     }
 }
+
+void DebugHudBase(const () => Any getMessage) {
+    CreateHudText(
+        VisibleTo: HostPlayer,
+        Header: "Debug",
+        Location: Location.Left,
+        SortOrder: -999
+    );
+    CreateHudText(
+        VisibleTo: HostPlayer,
+        Text: getMessage(),
+        Location: Location.Left,
+        SortOrder: -998
+    );
+    CreateHudText(
+        VisibleTo: HostPlayer,
+        Header: "/Debug",
+        Location: Location.Left,
+        SortOrder: -997
+    );
+}
+
+void DebugHud(in Any object) {  DebugHudBase(() => object); }
+void DebugHud(in Any object1, in Any object2, String sep = "|") {  DebugHudBase(() => Join(object1, object2, sep: sep)); }
+void DebugHud(in Any object1, in Any object2, in Any object3, String sep = "|") {  DebugHudBase(() => Join(object1, object2, object3, sep: sep)); }
+void DebugHud(in Any object1, in Any object2, in Any object3, in Any object4, String sep = "|") { DebugHudBase(() => Join(object1, object2, object3, object4, sep: sep)); }
+
+
+void DebugLog(in Any object) { LogToInspector(object); }
+void DebugLog(in Any object1, Any object2, String sep = " | ") { LogToInspector(Join(object1, object2, sep: sep)); }
+void DebugLog(in Any object1, Any object2, Any object3, String sep = " | ") { LogToInspector(Join(object1, object2, object3, sep: sep)); }
+void DebugLog(in Any object1, Any object2, Any object3, Any object4, String sep = " | ") { LogToInspector(Join(object1, object2, object3, object4, sep: sep)); }
 
 void Warning(in String message, in String origin) {
     LogToInspector("[WARNING] " + message + "\n[" + origin + "]");
@@ -13,6 +52,5 @@ void Warning(in String message, in String origin) {
 
 void FatalError(in String message, in String origin) {
     LogToInspector("[FATAL ERROR] " + message + "\n[" + origin + "]");
-    WaitUntil(MatchTime > 5, 6);
-    ReturnToLobby();
+    async! RestartWhenPossible();
 }

@@ -1,4 +1,3 @@
-import "../Symbols/match_time.ostw";
 import "../Symbols/Helpers/logging.ostw";
 import "../Symbols/Helpers/arrays.ostw";
 
@@ -28,21 +27,29 @@ class DefaultMapOptions<T> : MapOptions {
     }
 }
 
+public void AddMapOptions<TMapOptions>(in Map map, in String className, in TMapOptions options) {
+    if (AllMapOptions == 0) AllMapOptions = [];
+    AllMapOptions.ModAppend(new MapOptions<TMapOptions>(map, className, options));
+}
 
-globalvar MapOptions[] AllMapOptions =  [];
-globalvar MapOptions[] AllDefaultMapOptions = [];
+public void AddDefaultMapOptions<TMapOptions>(in String className, in TMapOptions options) {
+    if (AllDefaultMapOptions == 0) AllDefaultMapOptions = [];
+    AllDefaultMapOptions.ModAppend(new DefaultMapOptions<TMapOptions>(className, options));
+}
+
+
+globalvar MapOptions[] AllMapOptions;
+globalvar MapOptions[] AllDefaultMapOptions;
 
 public T GetMapOptions<T>(in String className) {
 
-    WaitUntil(MatchTime > 1, 10);
-
-    MapOptions[] allModuleOptions =  FilteredArray(AllMapOptions, options => options.ClassName == className);
+    MapOptions[] allModuleOptions! =  FilteredArray(AllMapOptions, options => options.ClassName == className);
 
     if (allModuleOptions.Length == 0)  {
         FatalError("No map options for module " + className + " found", "_map_options_provider/GetMapOptions");
     }
 
-    MapOptions options =  FirstOrNull(allModuleOptions, options => options._Map == CurrentMap());
+    MapOptions options! =  FirstOrNull(allModuleOptions, options => options._Map == CurrentMap());
     
     if (options != null)  {
         return (<MapOptions<T>>options).Value;
@@ -53,7 +60,7 @@ public T GetMapOptions<T>(in String className) {
         "_map_options_provider/GetMapOptions"
     );
         
-    MapOptions defaultOptions = FirstOrNull(AllDefaultMapOptions, defaultOptions => defaultOptions.ClassName == className);
+    MapOptions defaultOptions! = FirstOrNull(AllDefaultMapOptions, defaultOptions => defaultOptions.ClassName == className);
 
     if (defaultOptions == null)  {
         FatalError("No default map options for module " + className + " found", "_map_options_provider/GetMapOptions");

@@ -7,8 +7,7 @@ import "player_sensor.ostw";
 rule: "Updating state of the Closest Player Sensor for player"
 Event.OngoingPlayer
 {
-    WaitUntilOptionsAreLoaded();
-    Loop(0.5, () => {
+        Loop(0.5, () => {
 
         # No enemies
         if (CountOf(activeEnemies) == 0) {

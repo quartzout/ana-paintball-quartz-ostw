@@ -7,8 +7,7 @@ import "back_sensor.ostw";
 rule: "Updating back sensor state for player"
 Event.OngoingPlayer
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     Loop(0.2, () => {
 
         backSensorState = BackSensorState.No;

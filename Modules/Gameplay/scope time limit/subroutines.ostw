@@ -1,0 +1,8 @@
+import "\APQ\Quartz\quartz.ostw";
+
+void ForcePlayerToExitScopeAsync() "Force Event Player To Exit Scope"
+{
+    SetSecondaryFireEnabled(EventPlayer, false);
+    Wait(0.5, WaitBehavior.IgnoreCondition);
+    SetSecondaryFireEnabled(EventPlayer, true);
+}

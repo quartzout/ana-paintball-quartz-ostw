@@ -1,12 +1,7 @@
 import "\APQ\Quartz\quartz.ostw";
 
-import "scope_time_limit.contexttransfer.ostw";
+import "scope_time_limit.context.ostw";
 import "scope_time_limit.ostw";
-
-rule: "fetch options" {
-    scopeTimeLimitOptions = GetOptions<ScopeTimeLimitOptions>("ScopeTimeLimitOptions");
-}
-
 
 rule: "Leaving scope after a shot"
 Event.OngoingPlayer
@@ -18,8 +13,10 @@ if (IsFiringSecondary(EventPlayer) == true)
 
 rule: "Leaving scope when timer exceeded"
 Event.OngoingPlayer
-if (AreOptionsLoaded)
-if (EventPlayer.scopeTimer >= scopeTimeLimitOptions.MAX_SCOPE_TIME)
 {
-    ct_ForcePlayerToExitScopeAsync(EventPlayer);
+    # بعد, شما فقط می خواهید برای رفتن به خارج, گرفتن برخی از هوای تازه و کشتن چند نفر
+    Loop(0.2, () => {
+        if (EventPlayer.scopeTimer >= scopeTimeLimitOptions.MAX_SCOPE_TIME - 0.1) 
+        ct_ForcePlayerToExitScopeAsync(EventPlayer);
+    });    
 }

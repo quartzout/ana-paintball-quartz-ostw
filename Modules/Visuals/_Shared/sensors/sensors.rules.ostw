@@ -1,7 +1,0 @@
-import "\APQ\Quartz\quartz.ostw";
-
-import "sensors.ostw";
-
-rule: "fetch options" {
-    sensorsOptions = GetOptions<SensorsOptions>("SensorsOptions");
-}

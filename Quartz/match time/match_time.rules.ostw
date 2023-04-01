@@ -1,0 +1,8 @@
+import "match_time.ostw";
+import "../Symbols/Helpers/workshop_events.ostw";
+
+
+rule: "Match Time Timer Started" -998 {   
+    SetMatchTime(0);
+    ChaseVariableAtRate(MatchTime, 999999, 1, RateChaseReevaluation.None);
+}

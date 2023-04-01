@@ -2,21 +2,21 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "definitions.ostw";
 
-rule: "Add options" {
+rule: "Add options" -999 {
 
-    AllDefaultMapOptions.ModAppend(new DefaultMapOptions<PortalsMapOptions>("PortalsMapOptions", { 
-        PORTAL_SPAWNPOINTS: [],
-        MAX_PORTALS_IN_WORLD: 0
+    AddDefaultMapOptions("PortalsMapOptions", init(new PortalsMapOptions(), opt => { 
+        opt.PORTAL_SPAWNPOINTS = [];
+        opt.MAX_PORTALS_IN_WORLD = 0;
     }));
 
-    AllDefaultMapOptions.ModAppend(new DefaultMapOptions<EnviromentalSaveMapOptions>("EnviromentalSaveMapOptions", { 
-        SAVE_Y_COORDINATE: -99,
-        SAVE_UP_IMPULSE: 0
+    AddDefaultMapOptions("EnviromentalSaveMapOptions", init(new EnviromentalSaveMapOptions(), opt => { 
+        opt.SAVE_Y_COORDINATE = -99;
+        opt.SAVE_UP_IMPULSE = 0;
     }));
 
-    AllDefaultMapOptions.ModAppend(new DefaultMapOptions<ActivePlayersVisualsMapOptions>("ActivePlayersVisualsMapOptions", { 
-        POSITION: Vector(0, 50, 0),
-        VIEW_DIRECTION: Vector(0, -90, 0)
+    AddDefaultMapOptions("ActivePlayersVisualsMapOptions", init(new ActivePlayersVisualsMapOptions(), opt => {         
+        opt.POSITION = Vector(0, 50, 0);
+        opt.VIEW_DIRECTION = Vector(0, -90, 0);
     }));
 
 }

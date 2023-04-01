@@ -4,15 +4,9 @@ import "\APQ\Options\Map Options\definitions.ostw";
 
 import "enviromental_save.ostw";
 
-rule: "Fetch options" { 
-    enviromentalSaveMapOptions = GetMapOptions<EnviromentalSaveMapOptions>("EnviromentalSaveMapOptions"); 
-    enviromentalSaveOptions = GetMapOptions<EnviromentalSaveOptions>("EnviromentalSaveOptions"); 
-}
-
 
 rule: "Saving player from falling in water"
 Event.OngoingPlayer
-if (AreOptionsLoaded)
 
 if (PositionOf(EventPlayer).Y <= enviromentalSaveMapOptions.SAVE_Y_COORDINATE)
 if (waterSavesLeft > 0)
@@ -50,6 +44,5 @@ rule: "Resetting player's WaterSavesLeft when they touch ground"
 Event.OngoingPlayer
 if (IsOnGround(EventPlayer) == true)
 {
-    WaitUntilOptionsAreLoaded();
-    waterSavesLeft = enviromentalSaveOptions.SAVES;
+        waterSavesLeft = enviromentalSaveOptions.SAVES;
 }

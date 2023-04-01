@@ -6,18 +6,12 @@ import "\APQ\Modules\Gameplay\_Shared\player physics\player_physics.ostw";
 import "sonic_ultimate.ostw";
 
 
-rule: "fetch options" {
-    ultimateOptions = GetOptions<UltimateOptions>("SonicUltimateOptions");
-}
-
-
 rule: "Player started using ultimate"
 Event.OngoingPlayer
 if (EventPlayer.isActive)
 if (IsUsingUltimate(EventPlayer))
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     EventPlayer.killsToUltimate = 0;
     
     # Physics
@@ -49,8 +43,7 @@ Event.OnElimination
 if (EventPlayer.isActive)
 if (!IsUsingUltimate(EventPlayer))
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     EventPlayer.killsToUltimate += 1;
     SetUltimateCharge(EventPlayer, killsToUltimate / ultimateOptions.KILLS_NEEDED_FOR_ULTIMATE_CHARGE * 100);
 }
@@ -68,8 +61,7 @@ if (EventPlayer.isActive)
 if (IsUsingUltimate(EventPlayer))
 if (IsUsingAbility1(EventPlayer))
 {
-    WaitUntilOptionsAreLoaded();
-    Wait(1, WaitBehavior.IgnoreCondition);
+        Wait(1, WaitBehavior.IgnoreCondition);
     SetAbilityCooldown(EventPlayer, Button.Ability1, ultimateOptions.SLEEP_COOLDOWN);
 }
 
@@ -79,7 +71,6 @@ if (EventPlayer.isActive)
 if (IsUsingUltimate(EventPlayer))
 if (IsUsingAbility2(EventPlayer))
 {
-    WaitUntilOptionsAreLoaded();
-    Wait(1, WaitBehavior.IgnoreCondition);
+        Wait(1, WaitBehavior.IgnoreCondition);
     SetAbilityCooldown(EventPlayer, Button.Ability2, ultimateOptions.GRENADE_COOLDOWN);
 }

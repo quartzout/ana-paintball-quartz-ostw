@@ -1,6 +1,0 @@
-import "../Symbols/match_time.ostw";
-
-rule: "Match Time Timer Started" {
-    ChaseVariableAtRate(MatchTime, 999999, 1, RateChaseReevaluation.None);
-}
-

@@ -14,11 +14,14 @@ import "Options\Map Options\Maps\chateu_guillard.ostw";
 import "Options\Map Options\Maps\kanezaka.ostw";
 import "Options\Map Options\Maps\castillo.ostw";
 
+// Default map options
+import "Options\Map Options\defaults.ostw";
+
+
 // Regular Options
 import "Options\Regular Options\options.ostw";
 
 // Gameplay Modules
-import "Modules\Gameplay\_Shared\player physics\player_physics.rules.ostw";
 import "Modules\Gameplay\afk\afk.rules.ostw";
 import "Modules\Gameplay\enviromental save\enviromental_save.rules.ostw";
 import "Modules\Gameplay\portals\portals.rules.ostw";
@@ -38,7 +41,6 @@ import "Modules\Stats\player stats\player_stats.rules.ostw";
 import "Modules\Stats\scores\scores.rules.ostw";
 
 // Visuals Modules
-import "Modules\Visuals\_Shared\sensors\sensors.rules.ostw";
 import "Modules\Visuals\back sensor\back_sensor.rules.ostw";
 import "Modules\Visuals\back sensor\back_sensor.hudrules.ostw";
 import "Modules\Visuals\player sensor\player_sensor.rules.ostw";
@@ -58,7 +60,9 @@ import "Modules\Visuals\enviromental_save.hudrules.ostw";
 import "Modules\Visuals\_Shared\player color\player_color.rules.ostw";
 import "Modules\Visuals\player_outlines.hudrules.ostw";
 
-
+// Context transfer rules
+import "Modules\Visuals\portals\portals.context.rules.ostw";
+import "Modules\Gameplay\scope time limit\scope_time_limit.context.rules.ostw";
 
 // FIXME: kills in long period just counts kills
 

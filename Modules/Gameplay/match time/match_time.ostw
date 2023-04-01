@@ -2,4 +2,4 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar MatchOptions matchOptions;
+globalvar MatchOptions matchOptions  = GetOptions<MatchOptions>("MatchOptions");

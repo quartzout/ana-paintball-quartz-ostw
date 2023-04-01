@@ -4,12 +4,4 @@ import "\APQ\Modules\Gameplay\_Shared\is player scoped\is_player_scoped.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar ScopeTimeLimitOptions scopeTimeLimitOptions;
-
-
-void ForcePlayerToExitScopeAsync() "--process-- Force Event Player To Exit Scope"
-{
-    SetSecondaryFireEnabled(EventPlayer, false);
-    Wait(0.5, WaitBehavior.IgnoreCondition);
-    SetSecondaryFireEnabled(EventPlayer, true);
-}
+globalvar ScopeTimeLimitOptions scopeTimeLimitOptions = GetOptions<ScopeTimeLimitOptions>("ScopeTimeLimitOptions");

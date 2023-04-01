@@ -2,13 +2,12 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar PlayerPhysicsOptions playerPhysicsOptions;
-globalvar ProjectilePhysicsOptions projectilePhysicsOptions;
+globalvar PlayerPhysicsOptions playerPhysicsOptions = GetOptions<PlayerPhysicsOptions>("PlayerPhysicsOptions");
+globalvar ProjectilePhysicsOptions projectilePhysicsOptions = GetOptions<ProjectilePhysicsOptions>("ProjectilePhysicsOptions");
 
 void ResetPlayerPhysicsSettings(in Player player)
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     # Physics settings
     SetMoveSpeed(player, 100 * playerPhysicsOptions.MOVE_SPEED_SCALAR);
     SetGravity(player, 100 * playerPhysicsOptions.GRAVITY_SCALAR);

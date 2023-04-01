@@ -3,7 +3,7 @@ import "\APQ\Quartz\quartz.ostw";
 import "\APQ\Options\Regular Options\definitions.ostw";
 
 
-globalvar PlayerStatsOptions playerStatsOptions;
+globalvar PlayerStatsOptions playerStatsOptions = GetOptions<PlayerStatsOptions>("PlayerStatsOptions");
 
 playervar Number[] killTimestampsInLastLongPeriod = [];
 

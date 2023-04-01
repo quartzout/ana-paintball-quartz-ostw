@@ -2,7 +2,7 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar UltimateOptions ultimateOptions;
+globalvar SonicUltimateOptions ultimateOptions = GetOptions<SonicUltimateOptions>("SonicUltimateOptions");
 
 playervar Number killsToUltimate = 0;
 playervar Number ultimateGivenDamageModID;

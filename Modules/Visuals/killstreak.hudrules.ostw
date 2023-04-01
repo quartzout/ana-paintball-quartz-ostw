@@ -2,6 +2,8 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 import "\APQ\Modules\Stats\killstreak\killstreak.ostw";
+import "\APQ\Modules\_Shared\language.ostw";
+
 
 
 rule: "Instantiating score module" {

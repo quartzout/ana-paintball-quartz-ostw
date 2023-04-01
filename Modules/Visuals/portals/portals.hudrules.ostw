@@ -1,5 +1,7 @@
 import "\APQ\Quartz\quartz.ostw";
 
+import "\APQ\Modules\_Shared\language.ostw";
+
 import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 import "\APQ\Modules\Gameplay\portals\portals.ostw";
 
@@ -8,7 +10,7 @@ import "portals.context.ostw";
 
 globalvar PortalsVisualOptions PORTALS_VISUAL_OPTIONS; 
 rule: "Fetching Options" { 
-    PORTALS_VISUAL_OPTIONS = GetOptions<PortalsVisualOptions>("PortalsVisual"); 
+    PORTALS_VISUAL_OPTIONS = GetOptions<PortalsVisualOptions>("PortalsVisualOptions"); 
 }
 
 
@@ -104,8 +106,7 @@ rule: "Create 'PRESS F TO TELEPORT' tooltip" {
 
 void CreatePortalVisualEffect(in Portal portal) {
     
-    WaitUntilOptionsAreLoaded();
-    
+        
     // class object are passed by and copied *by reference* (and under the hood, a "reference" to an object is just its numeric index in the global list of all objects). 
     // This means that when we use EvaluateOnce(portal) inside Reev exspressions we do not freeze _the values_ of object, but just its reference - 
     // and when "portal" variable changes, such reev expression is still pointing to the original object instead of to a new one, and correctly 
@@ -137,6 +138,7 @@ void CreatePortalVisualEffect(in Portal portal) {
 
 void DestroyPortalEffect(in Portal portal) {
     DestroyEffect(PortalToPortalEffectIds.Get(portal));
+    Dictionary<Portal, Number>.Remove(PortalToPortalEffectIds, portal); 
 }
 
 

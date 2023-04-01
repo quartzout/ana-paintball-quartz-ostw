@@ -1,4 +1,3 @@
-import "../Symbols/match_time.ostw";
 import "../Symbols/Helpers/logging.ostw";
 import "../Symbols/Helpers/arrays.ostw";
 
@@ -17,13 +16,16 @@ class Options<T> : Options {
 }
 
 
-globalvar Options[] AllOptions =  [];
+globalvar Options[] AllOptions;
+
+public void AddOptions<TOptions>(in String className, in TOptions options) {
+    if (AllOptions == 0) AllOptions = [];
+    AllOptions.ModAppend(new Options<TOptions>(className, options));
+}
 
 public T GetOptions<T>(in String className) {
 
-    WaitUntil(MatchTime > 1, 10);
-
-    Options options = FirstOrNull(AllOptions, options => options.ClassName == className);
+    Options options! = FirstOrNull(AllOptions, options => options.ClassName == className);
     
     if (options == null)  {
         FatalError("No options for module " + className + " found", "_options_provider/GetOptions");

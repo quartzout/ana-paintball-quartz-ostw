@@ -2,12 +2,12 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "..\definitions.ostw";
 
-rule: "Add options" {
+rule: "Add options" -999 {
 
     Map MAP: Map.Kanezaka;
 
-    AllMapOptions.ModAppend(new MapOptions<PortalsMapOptions>(MAP, "PortalsMapOptions", { 
-        PORTAL_SPAWNPOINTS: [
+    AddMapOptions(MAP, "PortalsMapOptions", init(new PortalsMapOptions(), opt => { 
+        opt.PORTAL_SPAWNPOINTS = [
             Vector(-11.883, 6.793, 3.375), 
             Vector(-4.417, 12.951, -24.318), 
             Vector(-18.094, 10.963, -29.114), 
@@ -19,18 +19,18 @@ rule: "Add options" {
             Vector(-27.578, 7.987, 31.381), 
             Vector(-20.345, 11.722, 0.615), 
             Vector(-15.902, 11.814, -14.066), 
-            Vector(-40.109, 12.787, -40.737)],
-        MAX_PORTALS_IN_WORLD: 3
+            Vector(-40.109, 12.787, -40.737)];
+        opt.MAX_PORTALS_IN_WORLD = 3;
     }));
 
-    AllMapOptions.ModAppend(new MapOptions<EnviromentalSaveMapOptions>(MAP, "EnviromentalSaveMapOptions", { 
-        SAVE_Y_COORDINATE: 0,
-        SAVE_UP_IMPULSE: 18
+    AddMapOptions(MAP, "EnviromentalSaveMapOptions", init(new EnviromentalSaveMapOptions(), opt => { 
+        opt.SAVE_Y_COORDINATE = 0;
+        opt.SAVE_UP_IMPULSE = 18;
     }));
 
-    AllMapOptions.ModAppend(new MapOptions<ActivePlayersVisualsMapOptions>(MAP, "ActivePlayersVisualsMapOptions", { 
-        POSITION: Vector(-22, 19, 25),
-        VIEW_DIRECTION: Vector(-0.41, 0, 0.91)
+    AddMapOptions(MAP, "ActivePlayersVisualsMapOptions", init(new ActivePlayersVisualsMapOptions(), opt => { 
+        opt.POSITION = Vector(-22, 19, 25);
+        opt.VIEW_DIRECTION = Vector(-0.41, 0, 0.91);
     }));
 
 }

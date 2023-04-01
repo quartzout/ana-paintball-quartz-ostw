@@ -1,0 +1,14 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "scope_time_limit.ostw";
+
+import "scope_time_limit.context.ostw";
+import "subroutines.ostw";
+
+
+rule: "player var to eventplayer context"
+Event.OngoingPlayer 
+if (call_ForcePlayerToExitScopeAsync) {
+    async ForcePlayerToExitScopeAsync();
+    call_ForcePlayerToExitScopeAsync = false;
+}

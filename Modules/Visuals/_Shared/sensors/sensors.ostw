@@ -2,4 +2,4 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar SensorsOptions sensorsOptions;
+globalvar SensorsOptions sensorsOptions = GetOptions<SensorsOptions>("SensorsOptions");

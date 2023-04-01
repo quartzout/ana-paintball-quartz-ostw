@@ -2,17 +2,12 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar EnabledAbilitiesOptions enabledAbilitiesOptions;
-
-rule: "fetch options" {
-    enabledAbilitiesOptions = GetOptions<EnabledAbilitiesOptions>("EnabledAbilitiesOptions");
-}
+globalvar EnabledAbilitiesOptions enabledAbilitiesOptions = GetOptions<EnabledAbilitiesOptions>("EnabledAbilitiesOptions");
 
 rule: "Disable abilities on join"
 Event.OnPlayerJoin
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     # Disabling abilities
     if (!enabledAbilitiesOptions.SLEEP_ENABLED) SetAbility1Enabled(EventPlayer, false);
     if (!enabledAbilitiesOptions.GRENADE_ENABLED) SetAbility2Enabled(EventPlayer, false);

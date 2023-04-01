@@ -1,0 +1,4 @@
+T init<T>(in T instance, const T => void initializer) {
+    initializer(instance);
+    return instance;
+} 

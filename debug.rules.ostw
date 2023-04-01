@@ -6,13 +6,10 @@ import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 
 rule: "Debug hud" {
 
-    // CreateHudText(
-    //     VisibleTo: HostPlayer, 
-    //     Text: 
-    //     Reevaluation: HudTextRev.VisibleToAndString,
-    //     TextColor: Color.Blue
-    // );
 
+    // DebugHud(
+    //     // sep:"\n"
+    // );
 
 }
 
@@ -20,23 +17,23 @@ rule: "Debug hud" {
 String Stringify(Portal portal): 
     $"<Portal {portal}>\nPos: {portal.Position}\nLifetime: {portal.SecondsLeft}";
 
-rule: "" {
-    Loop(0.3, () => {
-        String portals = "";
-        foreach (Portal portal in existingPortals) {
-            portals = portals + Stringify(portal) + "\n";
-        }
-        portalposesstring = portals;
-    });
-}
+// rule: "" {
+//     Loop(0.3, () => {
+//         String portals = "";
+//         foreach (Portal portal in existingPortals) {
+//             portals = portals + Stringify(portal) + "\n";
+//         }
+//         portalposesstring = portals;
+//     });
+// }
 
-globalvar String portalposesstring;
-globalvar Vector[] portalposes = [];
-rule: "add portal pos to debug array" {
-    Subscribe(OnPortalSpawnedEvent, portal => {
-        portalposes.ModAppend(portal.Position);
-    });
-}
+// globalvar String portalposesstring;
+// globalvar Vector[] portalposes = [];
+// rule: "add portal pos to debug array" {
+//     Subscribe(OnPortalSpawnedEvent, portal => {
+//         portalposes.ModAppend(portal.Position);
+//     });
+// }
 
 // playervar String killstring;
 // rule: "strign"

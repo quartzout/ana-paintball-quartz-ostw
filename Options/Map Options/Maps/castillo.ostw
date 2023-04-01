@@ -2,28 +2,30 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "..\definitions.ostw";
 
-rule: "Add options" {
+
+rule: "Add options" -999 {
 
     Map MAP: Map.Castillo;
-
-    AllMapOptions.ModAppend(new MapOptions<PortalsMapOptions>(MAP, "PortalsOptions", { 
-        PORTAL_SPAWNPOINTS: [
+    
+    AddMapOptions(MAP, "PortalsMapOptions", init(new PortalsMapOptions(), opt => { 
+        opt.PORTAL_SPAWNPOINTS = [
             Vector(-102.61, 40.84, 58.49),
             Vector(-109.22, 35.46, 59.89),
             Vector(-96.17, 34.45, 78.07),
-            Vector(-90.58, 39.54, 56.03)
-        ],
-        MAX_PORTALS_IN_WORLD: 1
+            Vector(-90.58, 39.54, 56.03) 
+            ];
+        opt.MAX_PORTALS_IN_WORLD = 1;
     }));
 
-    AllMapOptions.ModAppend(new MapOptions<EnviromentalSaveMapOptions>(MAP, "EnviromentalSaveOptions", { 
-        SAVE_Y_COORDINATE: 27,
-        SAVE_UP_IMPULSE: 18
+    AddMapOptions(MAP, "EnviromentalSaveMapOptions", init(new EnviromentalSaveMapOptions(), opt => {        
+        opt.SAVE_Y_COORDINATE = 27;
+        opt.SAVE_UP_IMPULSE = 18;
     }));
 
-    AllMapOptions.ModAppend(new MapOptions<ActivePlayersVisualsMapOptions>(MAP, "ActivePlayersVisualsMapOptions", { 
-        POSITION: Vector(-131.66, 69.01, 61.17),
-        VIEW_DIRECTION: Vector(-1, 0.09, 0.01)
+    AddMapOptions(MAP, "ActivePlayersVisualsMapOptions", init(new ActivePlayersVisualsMapOptions(), opt => {        
+        opt.POSITION = Vector(-131.66, 69.01, 61.17);
+        opt.VIEW_DIRECTION = Vector(-1, 0.09, 0.01);
     }));
+    
 
 }

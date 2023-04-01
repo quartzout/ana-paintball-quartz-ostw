@@ -14,8 +14,7 @@ rule: "Start afk timer when player spawns" {
 
 void StartAfkTimerForPlayer(Player player) {
 
-    WaitUntilOptionsAreLoaded();
-
+    
     player.afkTimer = 0;
     ChaseVariableAtRate(player.afkTimer, afkOptions.PLAYER_SENT_TO_AFK_AFTER_SECONDS, 1, RateChaseReevaluation.None);
 }

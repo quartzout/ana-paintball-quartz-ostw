@@ -4,11 +4,7 @@ import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 
 import "\APQ\Options\Map Options\definitions.ostw";
 
-globalvar ActivePlayersVisualsMapOptions activePlayersVisualsMapOptions;
-rule: "Fetch options" { 
-    activePlayersVisualsMapOptions = GetMapOptions<ActivePlayersVisualsMapOptions>("ActivePlayersVisualsMapOptions"); 
-}
-
+globalvar ActivePlayersVisualsMapOptions activePlayersVisualsMapOptions = GetMapOptions<ActivePlayersVisualsMapOptions>("ActivePlayersVisualsMapOptions"); 
 
 rule: "Instantiating modules" {
     Subscribe(OnPlayerGoesToWelcomeScreen, PlayerGoesToWelcomeScreen);
@@ -18,8 +14,7 @@ rule: "Instantiating modules" {
 
 void PlayerGoesToWelcomeScreen(in Player player) {
     
-    WaitUntilOptionsAreLoaded();
-
+    
     DisableHeroHud(player);
     StartCamera(
         player, 
@@ -43,8 +38,7 @@ Event.OnPlayerJoin {
 
 rule: "Create Welcome Screen HUD"
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     #Player still can rotate camera while in welcome screen, so custom origin and direction must be set
     #English
     CreateInWorldText(
@@ -63,7 +57,7 @@ rule: "Create Welcome Screen HUD"
     #Russian
     CreateInWorldText(
         VisibleTo: NotActive,
-        Header: "E - НАЧАТЬ НА РУССКОМ", 
+        Header: "E - НАЧАТЬ", 
         Position: LpFloatingHUDPosition(
             XOffset: 0, 
             YOffset: 0.6, 

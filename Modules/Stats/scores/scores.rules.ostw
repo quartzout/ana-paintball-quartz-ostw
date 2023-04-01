@@ -10,8 +10,7 @@ rule: "Update everyones player scores when new player spawns" {
 
 void UpdatePlayerScore(in Player player)
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     # Score Metric (avg kill per multiple time periods)
     player.averageKillsPerPeriod = CountOf(player.killTimestampsInLastLongPeriod) / playerStatsOptions.AVERAGING_PERIOD + 0.001;
     

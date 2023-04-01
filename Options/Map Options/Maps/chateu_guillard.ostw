@@ -2,12 +2,12 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "..\definitions.ostw";
 
-rule: "Add options" {
+rule: "Add options" -999 {
 
     Map MAP: Map.Chateau_Guillard;
 
-    AllMapOptions.ModAppend(new MapOptions<PortalsMapOptions>(MAP, "PortalsMapOptions", { 
-        PORTAL_SPAWNPOINTS: [
+    AddMapOptions(MAP, "PortalsMapOptions", init(new PortalsMapOptions(), opt => { 
+        opt.PORTAL_SPAWNPOINTS = [
             Vector(206.463, 9.904, 66.99), 
             Vector(195.734, 10.221, 62.788), 
             Vector(215.587, 15.848, 62.185), 
@@ -24,18 +24,18 @@ rule: "Add options" {
             Vector(205.36, 11.202, 93.692), 
             Vector(189.021, 3.113, 59.796), 
             Vector(220.249, 10.173, 78.112), 
-            Vector(218.646, 4.177, 87.18)],
-        MAX_PORTALS_IN_WORLD: 2
+            Vector(218.646, 4.177, 87.18)];
+        opt.MAX_PORTALS_IN_WORLD = 2;
     }));
 
-    AllMapOptions.ModAppend(new MapOptions<EnviromentalSaveMapOptions>(MAP, "EnviromentalSaveMapOptions", { 
-        SAVE_Y_COORDINATE: 0.7,
-        SAVE_UP_IMPULSE: 22
+    AddMapOptions(MAP, "EnviromentalSaveMapOptions", init(new EnviromentalSaveMapOptions(), opt => {         
+        opt.SAVE_Y_COORDINATE = 0.7;
+        opt.SAVE_UP_IMPULSE = 22;
     }));
 
-    AllMapOptions.ModAppend(new MapOptions<ActivePlayersVisualsMapOptions>(MAP, "ActivePlayersVisualsMapOptions", { 
-        POSITION: Vector(147.403, 25.275, 13.17),
-        VIEW_DIRECTION: Vector(0.6, 0, 0.8)
+    AddMapOptions(MAP, "ActivePlayersVisualsMapOptions", init(new ActivePlayersVisualsMapOptions(), opt => {         
+        opt.POSITION = Vector(147.403, 25.275, 13.17);
+        opt.VIEW_DIRECTION = Vector(0.6, 0, 0.8);
     }));
 
 }

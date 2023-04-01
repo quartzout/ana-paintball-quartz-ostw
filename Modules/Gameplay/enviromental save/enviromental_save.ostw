@@ -3,8 +3,8 @@ import "\APQ\Quartz\quartz.ostw";
 import "\APQ\Options\Map Options\definitions.ostw";
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar EnviromentalSaveMapOptions enviromentalSaveMapOptions;
-globalvar EnviromentalSaveOptions enviromentalSaveOptions;
+globalvar EnviromentalSaveMapOptions enviromentalSaveMapOptions = GetMapOptions<EnviromentalSaveMapOptions>("EnviromentalSaveMapOptions"); 
+globalvar EnviromentalSaveOptions enviromentalSaveOptions = GetOptions<EnviromentalSaveOptions>("EnviromentalSaveOptions"); 
 
 //Events
 globalvar (Player => void)[] OnWaterSaveActivatedEvent;

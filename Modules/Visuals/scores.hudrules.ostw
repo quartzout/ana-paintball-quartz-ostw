@@ -1,7 +1,10 @@
 import "\APQ\Quartz\quartz.ostw";
 
+import "\APQ\Modules\_Shared\language.ostw";
+
 import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 import "\APQ\Modules\Visuals\_Shared\player color\player_color.ostw";
+
 import "\APQ\Modules\Stats\scores\scores.ostw";
 
 
@@ -14,8 +17,7 @@ playervar Number scoreboardEntryHudId = null;
 
 rule: "Create Leaderboard HUD"
 {
-    WaitUntilOptionsAreLoaded();
-
+    
     # Leaderboard head
     CreateHudText(
         VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
