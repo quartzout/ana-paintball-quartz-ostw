@@ -20,7 +20,7 @@ rule: "Create Leaderboard HUD"
     
     # Leaderboard head
     CreateHudText(
-        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        VisibleTo: NotBotAndActiveIf(CountOf(activePlayers) >= 2), 
         Text: LangString(
             $"--Average Kills in {playerStatsOptions.AVERAGING_PERIOD} sec--",
             $"--Средние убийства за {playerStatsOptions.AVERAGING_PERIOD} cек--",     
@@ -37,7 +37,7 @@ void AddScoreboardEntryForPlayer(in Player player) {
     Player FrozenEventPlayer: EvaluateOnce(EventPlayer);
 
     scoreboardEntryHudId = CreateHudText(
-        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        VisibleTo: NotBotAndActiveIf(CountOf(activePlayers) >= 2), 
         Subheader: 
             LocalPlayer != EvaluateOnce(EventPlayer) ? 
             $"{FrozenEventPlayer.place}: {FrozenEventPlayer} - {FrozenEventPlayer.averageKillsPerPeriod}" : 

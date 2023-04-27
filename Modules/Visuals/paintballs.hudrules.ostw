@@ -40,7 +40,7 @@ if (UpdateEveryFrame(IsFiringPrimary(EventPlayer)))
     
     # Explosion effect
     PlayEffect(
-        VisibleTo: All, 
+        VisibleTo: NotBot, 
         Type: PlayEffect.BadExplosion, 
         Position: wallHitPosition, 
         Color: LocalPlayer == EventPlayer ? Color.White : EventPlayer.color,
@@ -57,7 +57,7 @@ if (UpdateEveryFrame(IsFiringPrimary(EventPlayer)))
     # Create paintball effect
     paintballEffects.ModAppend(
         CreateEffect(
-            VisibleTo: All, 
+            VisibleTo: NotBot, 
             Type: Effect.Sphere, 
             Color: EvaluateOnce(EventPlayer) == LocalPlayer ? Color.White : color, 
             Position: wallHitPosition, 

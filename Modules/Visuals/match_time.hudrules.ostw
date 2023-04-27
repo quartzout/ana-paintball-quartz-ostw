@@ -9,7 +9,7 @@ rule: "Create Match Time HUD"
 {
     
     CreateHudText(
-        VisibleTo: Active, 
+        VisibleTo: NotBotAndActive, 
         Text: LangString("Map switches in ", "Карта поменяется через ") + TimestampToReadable(matchOptions.MATCH_LENGTH - MatchTime),
         Location: Location.Top, 
         SortOrder: 1, 

@@ -5,7 +5,7 @@ import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 rule: "Create Gamemode Info HUD"
 {
     CreateHudText(
-        VisibleTo: Active,
+        VisibleTo: NotBotAndActive,
         Subheader: LangString(
             ru: "workshop.codes/958QE  |  код режима: 958QE  |  Автор: пупа#21361  |  vk.com/quartzout",
             en: "workshop.codes/958QE  |  gamemode code: 958QE  |  Author: пупа#21361  |  vk.com/quartzout"),

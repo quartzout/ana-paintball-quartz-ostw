@@ -12,7 +12,7 @@ rule: "Create Stats HUD"
 {
 
     CreateHudText(
-        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        VisibleTo: NotBotAndActiveIf(CountOf(activePlayers) >= 2), 
         Text: LangString("Kills:", "Убийств:"),
         Location: Location.Left, 
         TextColor: Color.Aqua,
@@ -20,7 +20,7 @@ rule: "Create Stats HUD"
     );
 
     CreateHudText(
-        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        VisibleTo: NotBotAndActiveIf(CountOf(activePlayers) >= 2), 
         Subheader: LangString(
             $"Scoped: {LocalPlayer.scopedKillsPercent}%\nUnscoped: {LocalPlayer.unscopedKillsPercent}%\nSleep: {LocalPlayer.sleepKillsPercent}%",
             $"В прицеле: {LocalPlayer.scopedKillsPercent}%\n От бедра: {LocalPlayer.unscopedKillsPercent}%\nДротиком - {LocalPlayer.sleepKillsPercent}%"
@@ -31,7 +31,7 @@ rule: "Create Stats HUD"
 
 
     CreateHudText(
-        VisibleTo: ActiveIf(CountOf(activePlayers) >= 2), 
+        VisibleTo: NotBotAndActiveIf(CountOf(activePlayers) >= 2), 
         Text: LangString(
             $"KDR: {LocalPlayer.killDeathRatio}",
             $"У/С: {LocalPlayer.killDeathRatio}",

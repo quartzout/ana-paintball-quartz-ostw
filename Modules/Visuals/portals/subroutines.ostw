@@ -36,7 +36,7 @@ void PlayTeleportedBeamEffectAsync(Vector playerBeforePos, Vector playerAfterPos
     # Beam effect
     EventPlayer.beamEffectEndPosition = playerBeforePos;
     EventPlayer.teleportBeamEffectId = CreateBeamEffect(
-        VisibleTo: ActiveIf(LocalPlayer != EventPlayer),
+        VisibleTo: NotBotAndActiveIf(LocalPlayer != EventPlayer),
         BeamType: BeamType.TorbjornTurretSightBeam, 
         StartPosition: playerAfterPos, 
         EndPosition: beamEffectEndPosition,

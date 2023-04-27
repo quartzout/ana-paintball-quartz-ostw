@@ -42,7 +42,7 @@ rule: "Create Welcome Screen HUD"
     #Player still can rotate camera while in welcome screen, so custom origin and direction must be set
     #English
     CreateInWorldText(
-        VisibleTo: NotActive,
+        VisibleTo: NotBotAndNotActive,
         Header: "JUMP TO START", 
         Position: LpFloatingHUDPosition(
             XOffset: 0, 
@@ -56,7 +56,7 @@ rule: "Create Welcome Screen HUD"
     
     #Russian
     CreateInWorldText(
-        VisibleTo: NotActive,
+        VisibleTo: NotBotAndNotActive,
         Header: "E - НАЧАТЬ", 
         Position: LpFloatingHUDPosition(
             XOffset: 0, 

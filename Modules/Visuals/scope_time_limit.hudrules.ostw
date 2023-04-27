@@ -9,7 +9,7 @@ rule: "Create Scope Meter HUD"
         
     # Scope timer meter (wow funky font)
     CreateInWorldText(
-        VisibleTo: ActiveIf(
+        VisibleTo: NotBotAndActiveIf(
             LocalPlayer.scopeTimer / scopeTimeLimitOptions.MAX_SCOPE_TIME > 0.25 && 
             LocalPlayer.scopeTimer < scopeTimeLimitOptions.MAX_SCOPE_TIME && 
             UpdateEveryFrame(IsFiringSecondary(LocalPlayer))

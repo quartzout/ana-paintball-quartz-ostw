@@ -14,12 +14,13 @@ globalvar Player[] activePlayers = [];
 playervar Player[] activeEnemies = [];
 playervar Boolean isActive = false;
 
-Player[] ActiveIf(in Boolean condition):
-    LocalPlayer.isActive && condition ? All : null;
+Player[] NotBotAndActiveIf(in Boolean condition):
+    NotBotIf(LocalPlayer.isActive && condition);
 
-Player[] Active: LocalPlayer.isActive ? All : null;
+Player[] NotBotAndActive: 
+    NotBotIf(LocalPlayer.isActive);
 
-Player[] NotActive: !LocalPlayer.isActive ? All : null;
+Player[] NotBotAndNotActive: NotBotIf(!LocalPlayer.isActive);
 
 
 void MakePlayerActive(in Player player)
@@ -36,7 +37,7 @@ void MakePlayerActive(in Player player)
 
     # Reset physics
     ClearStatus(player, Status.PhasedOut);
-    EnableMovementCollisionWithEnvironment(EventPlayer);
+    EnableMovementCollisionWithEnvironment(player);
     SetInvisible(player, InvisibleTo.None);
 
     # Spawn
@@ -93,15 +94,14 @@ void AddPlayerToActive(in Player player)
     // filling players enemy array
     player.activeEnemies = activePlayers;
 
+    // Updating everyones enemy array
+    foreach (Player activePlayer in activePlayers) {
+        activePlayer.activeEnemies.ModAppend(player);
+    }
+
     # Making player active
     player.isActive = true;
     activePlayers.ModAppend(player);
-
-    // Updating everyones enemy array
-    foreach (Player activePlayer in activePlayers) {
-        if (activePlayer == player) continue;
-        activePlayer.activeEnemies.ModAppend(player);
-    }
 
     CallEvent(OnActivePlayerAddedEvent, player);
 }

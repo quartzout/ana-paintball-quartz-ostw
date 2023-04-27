@@ -8,7 +8,7 @@ rule: "Initiating visual effect events" {
     
     Subscribe(OnWaterSaveActivatedEvent, player => {
         player.waterSaveEffectId = CreateEffect(
-            VisibleTo: All, 
+            VisibleTo: NotBot, 
             Type: Effect.MeiFrozenEffect, 
             Position: EventPlayer, 
             Radius: 1, 
@@ -26,7 +26,7 @@ rule: "Initiating sound effect events" {
 
     Subscribe(OnWaterSaveActivatedEvent, player => {
         PlayEffect(
-            VisibleTo: All, 
+            VisibleTo: NotBot, 
             Type: PlayEffect.BuffExplosionSound, 
             Position: EventPlayer, 
             Radius: 100

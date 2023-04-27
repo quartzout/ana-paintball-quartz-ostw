@@ -17,7 +17,7 @@ rule: "Fetching Options" {
 Color IdleColorOf(in Portal portal): 
     PORTALS_VISUAL_OPTIONS.IDLE_PORTAL_COLORS_BY_LIFETIME_RATIO[ 
         RoundToInteger(
-            (portal.SecondsLeft / PORTALS_OPTIONS.PORTAL_LIFETIME - 0.01) * PORTALS_VISUAL_OPTIONS.IDLE_PORTAL_COLORS_BY_LIFETIME_RATIO.Length, 
+            (1 - ((MatchTime - portal.CreatedAt) / PORTALS_OPTIONS.PORTAL_LIFETIME - 0.01)) * PORTALS_VISUAL_OPTIONS.IDLE_PORTAL_COLORS_BY_LIFETIME_RATIO.Length, 
             Rounding.Down
         )
     ];
@@ -29,7 +29,7 @@ Number AIM_AT_THE_WALL_TOOLTIP_FLASH_DURATION_SEC: 1;
 playervar Number aimAtTheWallTooltipTimer = 0;
 rule: "Create No Wall Met tooltip HUD" {
     CreateInWorldText(
-        VisibleTo: ActiveIf(LocalPlayer.aimAtTheWallTooltipTimer > 0), 
+        VisibleTo: NotBotAndActiveIf(LocalPlayer.aimAtTheWallTooltipTimer > 0), 
         Header: LangString("AIM AT THE WALL", "ЦЕЛЬТЕСЬ В СТЕНУ"), 
         Position: LpFloatingHUDPosition(0, -0.2),
         Scale: 2.5, 
@@ -57,7 +57,7 @@ rule: "Initialising portal sound effect events" {
         
     Subscribe(OnPortalSpawnedEvent, portal => 
         PlayEffect(
-            VisibleTo: All, 
+            VisibleTo: NotBot, 
             Type: PlayEffect.DebuffImpactSound,
             Position: portal.Position,
             Radius: 100,
@@ -67,7 +67,7 @@ rule: "Initialising portal sound effect events" {
     Subscribe(OnTeleportedEvent, (prevPos, afterPos, player)  => {
     
         PlayEffect(
-            VisibleTo: All, 
+            VisibleTo: NotBot, 
             Type: PlayEffect.ExplosionSound,
             Position: afterPos,
             Radius: 100,
@@ -79,7 +79,7 @@ rule: "Initialising portal sound effect events" {
 
     Subscribe(OnPortalCooldownFinished, (portal) => {
         PlayEffect(
-            VisibleTo: All, 
+            VisibleTo: NotBot, 
             Type: PlayEffect.BuffImpactSound,
             Position: portal.Position,
             Radius: 50
@@ -92,7 +92,7 @@ rule: "Initialising portal sound effect events" {
 rule: "Create 'PRESS F TO TELEPORT' tooltip" {
     
     CreateInWorldText(
-        VisibleTo: ActiveIf(
+        VisibleTo: NotBotAndActiveIf(
             IsTrueForAny(existingPortals, portal => CanPlayerTeleport(LocalPlayer, portal))
         ),
         Header: LangString("PRESS ", "НАЖМИТЕ ") + InputBindingString(Button.Interact),
@@ -122,7 +122,7 @@ void CreatePortalVisualEffect(in Portal portal) {
     Portal frozenPortal: EvaluateOnce(portal);
 
     CreateEffect(
-        VisibleTo: All,
+        VisibleTo: NotBot,
         Type: Effect.GoodAura, 
         Color: 
             (CanPlayerTeleport(LocalPlayer, frozenPortal) ? 
@@ -142,11 +142,11 @@ void DestroyPortalEffect(in Portal portal) {
 }
 
 
-void PlayTeleportedExplosionEffects(Vector playerBeforePos, Vector playerAfterPos, Player player) {
+void PlayTeleportedExplosionEffects(in Vector playerBeforePos, in Vector playerAfterPos, in Player player) {
     
     # Explosion effect on origin point
     PlayEffect(
-        VisibleTo: All, 
+        VisibleTo: NotBot, 
         Type: PlayEffect.GoodExplosion,
         Position: playerBeforePos, 
         Radius: 0.2
@@ -162,7 +162,7 @@ void PlayTeleportedExplosionEffects(Vector playerBeforePos, Vector playerAfterPo
 }
 
 
-void StartFlashingNoWallMetTooltip(Player player) {
+void StartFlashingNoWallMetTooltip(in Player player) {
     player.aimAtTheWallTooltipTimer = AIM_AT_THE_WALL_TOOLTIP_FLASH_DURATION_SEC;
     ChaseVariableAtRate(
         variable: aimAtTheWallTooltipTimer,
@@ -172,6 +172,6 @@ void StartFlashingNoWallMetTooltip(Player player) {
     );
 }
 
-void StopFlashingNoWallMetTooltip(Player player) {
+void StopFlashingNoWallMetTooltip(in Player player) {
     player.aimAtTheWallTooltipTimer = 0;
 }
