@@ -1,0 +1,8 @@
+import "../options providers/system_options.ostw";
+
+import "_Shared/system_options.ostw";
+
+rule: "disable inspector on start" {
+    if (systemOptions.ENABLE_INSPECTOR) return;
+    DisableInspectorRecording();
+}

@@ -15,3 +15,9 @@ T[] SortedArray<T>(in T[] array, const T => Number rankLambda):
 
 T FirstOrNull<T>(in T[] array, const T => Boolean condition):
     FilteredArray(array, condition(ArrayElement())).First;
+
+void Foreach<T>(in T[] array, const T => void action) {
+    foreach (T t! in array) {
+        action(t);
+    }
+}

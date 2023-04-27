@@ -1,0 +1,7 @@
+playervar Boolean isInitialPlayerExecuted = true;
+
+void WaitUntilPlayerInitialized() {
+    WaitUntil(isInitialPlayerExecuted == true, 1);
+}
+
+Boolean IsPlayerInitialized: isInitialPlayerExecuted == true;

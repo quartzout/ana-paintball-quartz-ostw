@@ -1,0 +1,46 @@
+import "../wait.ostw";
+import "../logging.ostw";
+
+playervar Boolean isThrottling = false;
+void WhileThrottling(
+    in Player player, 
+    in Vector direction, 
+    in Number magnitude,
+    Relative relative = Relative.ToWorld, 
+    ThrottleBehavior behavior = ThrottleBehavior.ReplaceExistingThrottle, 
+    ThrottleRev throttleRev = ThrottleRev.None,
+    in Number timeout = 5,
+    const () => void actionOnTimeout = () => { 
+        Warning(
+            "StartThrottleInDirectionSafe timed out while waiting for throttle to unlock", 
+            "using/StartThrottleInDirectionSafe"); },
+    const () => void actions = () => {}) 
+{
+    StartThrottleInDirectionSafe(player, direction, magnitude, relative,  behavior, throttleRev, timeout, actionOnTimeout);
+    actions();
+    StopThrottleInDirectionSafe(player);
+}
+
+# Waiting until any active throttle is over and then starting new, saving in a variable that throttle is in process
+void StartThrottleInDirectionSafe(
+    in Player | Player[] player,
+    in Player | Vector direction,
+    in Number magnitude,
+    Relative relative = Relative.ToWorld,
+    ThrottleBehavior behavior = ThrottleBehavior.ReplaceExistingThrottle,
+    ThrottleRev reevaluation = ThrottleRev.None,
+    in Number timeout = 5,
+    const () => void actionOnTimeout = () => { 
+        Warning(
+            "StartThrottleInDirectionSafe timed out while waiting for throttle to unlock", 
+            "using/StartThrottleInDirectionSafe"); }) {
+
+    WaitUntilWithActions(!isThrottling, timeout, actionOnTimeout);
+    isThrottling = true;
+    StartThrottleInDirection(player, direction, magnitude, relative, behavior, reevaluation);
+}
+
+void StopThrottleInDirectionSafe(in Player | Player[] player) {
+    StopThrottleInDirection(player);
+    isThrottling = false;
+}

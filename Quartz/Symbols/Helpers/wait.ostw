@@ -1,0 +1,15 @@
+import "../../Modules/match time/match_time.ostw";
+import "math.ostw";
+
+Number DifferenceThreshold: 0.1;
+void WaitUntilWithActions(
+    in Boolean conditionReev, 
+    in Number timeout,
+    const () => void actionOnTimeout = () => {}, 
+    const () => void actionOnSuccess = () => {}) 
+{
+    Number matchTimeOnStart! = MatchTime;
+    WaitUntil(conditionReev, timeout);
+    if (ApproxEquals(MatchTime, matchTimeOnStart + timeout, DifferenceThreshold)) actionOnTimeout();
+    else actionOnSuccess();
+}

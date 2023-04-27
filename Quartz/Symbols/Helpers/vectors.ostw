@@ -14,3 +14,23 @@ Boolean IsRayObstructed(
 
 
 Vector Reverse(in Vector vector): Vector(0, 0, 0) - vector;
+
+Vector FlatRotatedBy90DegreesRight(in Vector vector): Vector(vector.Z, 0, -vector.X);
+Vector FlatRotatedBy90DegreesLeft(in Vector vector): Vector(-vector.Z, 0, vector.X);
+
+Vector Rotate(in Vector vector, in Number verticalAngle = 0, in Number horizontalAngle = 0):
+    DirectionFromAngles(
+        HorizontalAngle:
+            HorizontalAngleFromDirection(vector)
+            + horizontalAngle,
+        VerticalAngle:
+            VerticalAngleFromDirection(vector)
+            + verticalAngle) 
+    * MagnitudeOf(vector);
+
+Vector Replace(in Vector vector, in Number newVerticalAngle):
+    DirectionFromAngles(
+        HorizontalAngle: HorizontalAngleFromDirection(vector),
+        VerticalAngle: 0) * MagnitudeOf(vector);
+    
+

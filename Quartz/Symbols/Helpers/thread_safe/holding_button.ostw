@@ -1,0 +1,8 @@
+import "../wait.ostw";
+import "../logging.ostw";
+
+void WhileHoldingButton(in Player player, Button button, const () => void actions) {
+    StartHoldingButton(player, button);
+    actions();
+    StopHoldingButton(player, button);
+}

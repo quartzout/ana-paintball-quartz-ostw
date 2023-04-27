@@ -1,0 +1,8 @@
+import "../../options providers/system_options.ostw";
+import "../../options providers/regular_options_provider.ostw";
+
+globalvar SystemOptions systemOptions;
+
+rule: "Get system options" {
+    systemOptions = GetOptions<SystemOptions>("SystemOptions");
+}

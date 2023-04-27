@@ -1,0 +1,46 @@
+import "../wait.ostw";
+import "../logging.ostw";
+
+
+# Waiting until any active facing is over and then starting new, saving in a variable that facing is in process
+playervar Boolean isFacing = false;
+void StartFacingSafe(
+    in Player | Player[] player,
+    in Player | Vector direction,
+    in Number turnRate,
+    Relative relative = Relative.ToWorld,
+    FacingRev reevaluation = FacingRev.None,
+    in Number timeout = 5,
+    const () => void actionOnTimeout = () => { 
+        Warning(
+            "StartFacingSafe timed out while waiting for facing to unlock", 
+            "using/StartFacingSafe"); })
+{
+    WaitUntilWithActions(!isFacing, timeout, actionOnTimeout);
+    isFacing = true;
+    StartFacing(player, direction, turnRate, relative, reevaluation);
+}
+
+void StopFacingSafe(Player | Player[] player) {
+    isFacing = false;
+    StopFacing(player);
+}
+
+
+void WhileFacing(
+    in Player | Player[] player,
+    in Player | Vector direction,
+    in Number turnRate,
+    Relative relative = Relative.ToWorld,
+    FacingRev reevaluation = FacingRev.None,
+    in Number timeout = 5,
+    const () => void actionOnTimeout = () => { 
+        Warning(
+            "StartFacingSafe timed out while waiting for facing to unlock", 
+            "using/StartFacingSafe"); },
+    const () => void actions = () => {})
+{
+    StartFacingSafe(player, direction, turnRate, relative, reevaluation, timeout, actionOnTimeout);
+    actions();
+    StopFacingSafe(player);
+}

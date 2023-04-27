@@ -2,3 +2,8 @@ T init<T>(in T instance, const T => void initializer) {
     initializer(instance);
     return instance;
 } 
+
+# For when argument is required by function signature but is not used anywhere 
+class None { }
+
+None Empty: new None();

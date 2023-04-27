@@ -4,6 +4,10 @@ import "definitions.ostw";
 
 rule: "Add options" -999 {
 
+    AddOptions("SystemOptions", init(new SystemOptions(), opt => {
+        opt.ENABLE_INSPECTOR = true;
+    }));
+
     AddOptions("PortalsOptions", init(new PortalsOptions(), opt => {
         opt.PORTAL_LIFETIME = WorkshopSettingInteger("Portals", "Portal lifetime (seconds)", 120, 10, 1200, 12);
         opt.PORTAL_RADIUS = WorkshopSettingReal("Portals", "Portal radius", 2, 0.5, 4, 11);
@@ -78,6 +82,22 @@ rule: "Add options" -999 {
         opt.PLAYER_SENT_TO_AFK_AFTER_SECONDS = 60;
     }));
 
+    AddOptions("BotAiOptions", init(new BotAiOptions(), opt => { 
+        opt.VIEW_ANGLE = 100;
+        opt.TURN_RATE = 360;
+        opt.RANDOM_GRENADE_DELAY_RANGE = new Range(2, 7);
+        opt.RANDOM_SLEEP_DELAY_RANGE = new Range(0, 1);
+        opt.QUEUED_ACTION_TIMEOUT = 10;
+        opt.SCOPED_SHOT_CHANCE_PERCENT = 30;
+        opt.SCOPED_SHOT_RANDOM_TRIGGER_DELAY_RANGE = new Range(0, 0.15);
+        opt.TARGET_REAPPEAR_AWAIT_TIMEOUT = 1;
+        opt.JUMPING_RANDOM_DELAY_RANGE = new Range(0.5, 1.5);
+        opt.COLLISION_DETECTION_DISTANCE = 4;
+        opt.RANDOM_STRAFE_DURATION_RANGE = new Range(0.2, 0.7);
+        opt.IGNORE_OTHER_BOTS = false;
+        opt.DEBUG_IGNORE_HOST = true;
+    }));
+
     AddOptions("PlayerColorOptions", init(new PlayerColorOptions(), opt => { 
         opt.AVAILABLE_PLAYER_COLORS = [
             Color.Yellow, 
@@ -92,5 +112,7 @@ rule: "Add options" -999 {
             Color.Rose
         ];
     }));
+
+
 
 }

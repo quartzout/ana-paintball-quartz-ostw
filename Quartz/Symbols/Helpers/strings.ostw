@@ -12,7 +12,7 @@ String TimestampToReadable(in Number seconds):
 
 String Stringify(in Any[] array, in Boolean newLines = true) {
     String result = "[" + (newLines ? "\n" : "");
-    foreach (Any value in array) {
+    foreach (Any value! in array) {
         result = result + <String>value + (newLines ? "\n" : "");
     }
     return result + $"] ({array.Length})";
@@ -23,7 +23,7 @@ String Join(in Any item1, in Any item2, in Any item3, in String sep = " | "): <S
 String Join(in Any item1, in Any item2, in Any item3, in Any item4, in String sep = " | "): <String>item1 + sep + <String>item2 + sep + <String>item3 + sep + <String>item4;
 String Join(in Any[] items, in String sep = " | ") {
     String result = "";
-    foreach (Any item in items) {
+    foreach (Any item! in items) {
         result = result + item + sep;
     }
     return result;

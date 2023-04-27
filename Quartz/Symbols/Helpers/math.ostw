@@ -1,0 +1,5 @@
+Boolean ApproxEquals(Number operand1, Number operand2, Number threshold): AbsoluteValue(operand1 - operand2) < threshold;
+
+Boolean Implication(Boolean operand1, Boolean operand2): !operand1 || operand2;
+
+Boolean RandomBool(): RandomInteger(0, 1) == 0;

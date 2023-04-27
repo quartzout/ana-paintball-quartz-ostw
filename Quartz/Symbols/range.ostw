@@ -1,0 +1,11 @@
+class Range {
+    public Number From;
+    public Number To;
+    public constructor(Number from, Number to) {
+        From = from;
+        To = to;
+    }
+}
+
+Number RandomRealInRange(Range range): RandomReal(range.From, range.To);
+Number RandomIntegerInRange(Range range): RandomInteger(range.From, range.To);

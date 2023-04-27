@@ -2,3 +2,13 @@ Player[] All: AllPlayers(Team.All);
 Player EventPlayer: EventPlayer();
 Player LocalPlayer: LocalPlayer();
 Player HostPlayer: HostPlayer();
+Boolean IsHostPlayer: EventPlayer == HostPlayer;
+
+Player[] NotBotIf(in Boolean condition):
+    (!LocalPlayer.IsDummy()
+    && condition)
+        ? All 
+        : null;
+
+Player[] NotBot:
+    !LocalPlayer.IsDummy() ? All : null;

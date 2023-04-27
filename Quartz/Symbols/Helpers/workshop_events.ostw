@@ -1,12 +1,25 @@
-import "../../match time/match_time.ostw";
+import "../../Modules/match time/match_time.ostw";
+import "logging.ostw";
 
-void Loop(in Number delay, const () => void actions) {
+void Loop(
+    in Number delay, 
+    const () => void actions, 
+    const () => Boolean condition = () => true, 
+    const () => Boolean stoppingCondition = () => false) {
     
-    while(true) {
-        actions();
+    while(!stoppingCondition()) {
+        if (condition()) actions();
         Wait(delay, WaitBehavior.IgnoreCondition);
     }
-    
+}
+
+void LoopWhileConditionIsTrue(
+    in Number delay, 
+    const () => void actions) 
+{
+    actions();
+    Wait(delay, WaitBehavior.IgnoreCondition);
+    LoopIfConditionIsTrue();
 }
 
 # Restarts the game immediately when match could be restarted, otherwise waits until match coluld be restarted and then restarts.
@@ -14,7 +27,7 @@ void Loop(in Number delay, const () => void actions) {
 void RestartWhenPossible() "Restart when possible" {
     MinWait(); //for some reason waitUntil doesnt work without some wait before it ¯\_(ツ)_/¯ ¯\_(ツ)_/¯ ¯\_(ツ)_/¯ (╯°□°）╯︵ ┻━┻
     WaitUntil(MatchTime > 5, 9999);
-    LogToInspector("Restarting");
+    EnableInspectorAndLog("Restarting");
     RestartMatch();
 }
 
