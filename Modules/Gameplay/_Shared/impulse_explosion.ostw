@@ -24,7 +24,7 @@ void DoImpulseExplosionInRange(in Vector blastPosition, in Number magnitude, in 
     Player[] victims: FilteredArray(All, p =>  DistanceBetween(p, blastPosition) <= 4 && p != immunePlayer);
 
     // Call single-victim explosion procedure for every player in the array
-    foreach (Player player in victims) {
+    foreach (Player player! in victims) {
         DoImpulseExplosionForPlayer(blastPosition, player, magnitude, upwardPull, envCredit);
     }
 

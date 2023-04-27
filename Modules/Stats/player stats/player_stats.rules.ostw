@@ -11,7 +11,7 @@ void UpdateLocalPlayerStats(in Player player)
     player.killDeathRatio = CountOf(player.killTimestampsInLastLongPeriod) / Max(1, CountOf(player.deathTimestampsInLastLongPeriod)) + 0.001;
     
     # Saving overall number of kills with any method
-    Number totalKillsInLastLongPeriod = 
+    Number totalKillsInLastLongPeriod! = 
         CountOf(player.sleepKillTimestampsInLastLongPeriod) + 
         CountOf(player.scopedKillTimestampsInLastLongPeriod) + 
         CountOf(player.unscopedKillTimestampsInLastLongPeriod);
@@ -57,7 +57,7 @@ if (IsFiringSecondary(EventPlayer))
 
 rule: "Removing kill from ScopeKillTracking"
 Event.OngoingPlayer
-if (FirstOf(EventPlayer.scopedKillTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.AVERAGING_PERIOD)
+if (FirstOf(EventPlayer.scopedKillTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.TIME_PERIOD)
 {
     ModifyVariable(EventPlayer.scopedKillTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
     UpdateLocalPlayerStats(EventPlayer);
@@ -77,7 +77,7 @@ if (RoundToInteger(EventDamage(), Rounding.Down) == 5)
 
 rule: "Removing old kill entries from sleepKillTimestampsInLastLongPeriod"
 Event.OngoingPlayer
-if (FirstOf(EventPlayer.sleepKillTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.AVERAGING_PERIOD)
+if (FirstOf(EventPlayer.sleepKillTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.TIME_PERIOD)
 {
     ModifyVariable(EventPlayer.sleepKillTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
     UpdateLocalPlayerStats(EventPlayer);
@@ -98,7 +98,7 @@ if (RoundToInteger(EventDamage(), Rounding.Down) == 2)
 
 rule: "Removing kill from unscopedKillTimestampsInLastLongPeriod"
 Event.OngoingPlayer
-if (FirstOf(EventPlayer.unscopedKillTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.AVERAGING_PERIOD)
+if (FirstOf(EventPlayer.unscopedKillTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.TIME_PERIOD)
 {
     ModifyVariable(EventPlayer.unscopedKillTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
     UpdateLocalPlayerStats(EventPlayer);
@@ -117,7 +117,7 @@ Event.OnDeath
 
 rule: "Removing death from deathTimestampsInLastLongPeriod"
 Event.OngoingPlayer
-if (FirstOf(EventPlayer.deathTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.AVERAGING_PERIOD)
+if (FirstOf(EventPlayer.deathTimestampsInLastLongPeriod) == RoundToInteger(MatchTime, Rounding.Down) - playerStatsOptions.TIME_PERIOD)
 {
     ModifyVariable(EventPlayer.deathTimestampsInLastLongPeriod, Operation.RemoveFromArrayByIndex, 0);
     UpdateLocalPlayerStats(EventPlayer);

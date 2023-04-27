@@ -14,7 +14,7 @@ void UpdatePlacesForEveryPlayer()
     Player[] playersSortedByScore = SortedArray(activePlayers, p => -p.averageKillsPerPeriod);
     
     // Updating place of every player
-    foreach (Player player in playersSortedByScore) {
+    foreach (Player player! in playersSortedByScore) {
         player.place = 1 + 1 + IndexOfArrayValue(playersSortedByScore, player);
     }
 }

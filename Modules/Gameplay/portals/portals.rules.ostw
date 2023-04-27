@@ -19,7 +19,7 @@ if (existingPortals.Length < PORTALS_MAP_OPTIONS.MAX_PORTALS_IN_WORLD)
         Wait(2);
 
         Vector[] unoccupiedPortalPositions = [];
-        foreach (Vector availablePos in PORTALS_MAP_OPTIONS.PORTAL_SPAWNPOINTS) {
+        foreach (Vector availablePos! in PORTALS_MAP_OPTIONS.PORTAL_SPAWNPOINTS) {
             if (
                 existingPortals.Length == 0 ||
                 IsTrueForAll(
@@ -52,7 +52,7 @@ if (IsButtonHeld(EventPlayer, Button.Interact))
 if (EventPlayer.isActive)
 {
 
-    foreach (Portal portal in existingPortals) {
+    foreach (Portal portal! in existingPortals) {
         
         if (CanPlayerTeleport(EventPlayer, portal)) {
             TryTeleportPlayerToWhereTheyLook(EventPlayer);
@@ -103,8 +103,8 @@ Boolean TryTeleportPlayerToWhereTheyLook(in Player player)
     # Do Impulse Explosion At Teleportation point
     DoImpulseExplosionInRange(
         blastPosition: wallHitPosition + wallHitNormal * 0.05, 
-        magnitude: portalOptions.LAND_EXPLOSION_IMPULSE,
-        upwardPull: portalOptions.LAND_EXPLOSION_UPWARD_PULL,
+        magnitude: PORTALS_OPTIONS.LAND_EXPLOSION_IMPULSE,
+        upwardPull: PORTALS_OPTIONS.LAND_EXPLOSION_UPWARD_PULL,
         immunePlayer: player,
         envCredit: player
     );
@@ -155,18 +155,10 @@ Boolean TryTeleportPlayerToWhereTheyLook(in Player player)
 }
 
 
-rule: "Ticking portals lifetimes" {
-
-    Number Delay: 0.3;
-
-    Loop(Delay, () => {
-        foreach (Portal portal in existingPortals) {
-            if (portal.SecondsLeft > 0) {
-                portal.SecondsLeft = Max(0, portal.SecondsLeft - Delay);
-            }
-            else {
-                DespawnPortal(portal);
-            }
-        }
-    });
+Boolean IsPortalLifetimeEnded(in Portal portal): MatchTime - portal.CreatedAt >= PORTALS_OPTIONS.PORTAL_LIFETIME;
+rule: "Destroying portal when its lifetime ended"
+if (IsTrueForAny(existingPortals, IsPortalLifetimeEnded)) {
+    Foreach(
+        FilteredArray(existingPortals, IsPortalLifetimeEnded), 
+        DespawnPortal);
 }
