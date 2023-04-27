@@ -5,14 +5,17 @@ import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 
 rule: "Update everyones player scores when new player spawns" {
     Subscribe(OnActivePlayerAddedEvent, _ => UpdatePlacesForEveryPlayer());
+    Subscribe(OnKillTimestampsInLastLongPeriodChanged, UpdatePlayerScore);
 }
 
 
 void UpdatePlayerScore(in Player player)
 {
-    
+
+    Number averagingFactor = playerStatsOptions.TIME_PERIOD / playerStatsOptions.AVERAGING_PERIOD  + 0.001;
+
     # Score Metric (avg kill per multiple time periods)
-    player.averageKillsPerPeriod = CountOf(player.killTimestampsInLastLongPeriod) / playerStatsOptions.AVERAGING_PERIOD + 0.001;
+    player.averageKillsPerPeriod = CountOf(player.killTimestampsInLastLongPeriod) / averagingFactor;
     
     # Updating everyones places after recalculating player leaderboard score
     UpdatePlacesForEveryPlayer();

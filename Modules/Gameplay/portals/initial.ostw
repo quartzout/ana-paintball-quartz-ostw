@@ -9,10 +9,14 @@ globalvar Number ANGLE_CONSTANT = ArctangentInDegrees(PORTALS_OPTIONS.PORTAL_RAD
 
 class Portal {
     public Vector Position;
-    public Number SecondsLeft = 0; 
+    public Number CreatedAt = 0; 
 
     public constructor(Vector position) {
         Position = position;
-        SecondsLeft = PORTALS_OPTIONS.PORTAL_LIFETIME;
+        CreatedAt = MatchTime;
     }
 } 
+
+# Returns string in human-readible format describing Portal object. Reevaluation supported 
+String Stringify(Portal portal): 
+    $"<Portal {portal}>\nPos: {portal.Position}\nLifetime: {portal.CreatedAt}";

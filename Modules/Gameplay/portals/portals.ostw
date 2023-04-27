@@ -5,8 +5,6 @@ import "can_player_teleport.ostw";
 
 import "\APQ\Options\Regular Options\definitions.ostw";
 
-globalvar PortalsOptions portalOptions;
-
 // Events
 globalvar (Portal => void)[] OnPortalSpawnedEvent = null; 
 globalvar (Player => void)[] OnNoWallMetOnTeleportEvent = null;

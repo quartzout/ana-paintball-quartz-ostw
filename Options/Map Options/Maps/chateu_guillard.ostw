@@ -31,6 +31,7 @@ rule: "Add options" -999 {
     AddMapOptions(MAP, "EnviromentalSaveMapOptions", init(new EnviromentalSaveMapOptions(), opt => {         
         opt.SAVE_Y_COORDINATE = 0.7;
         opt.SAVE_UP_IMPULSE = 22;
+        opt.DO_ABOVE_WATER_CHECK = true;
     }));
 
     AddMapOptions(MAP, "ActivePlayersVisualsMapOptions", init(new ActivePlayersVisualsMapOptions(), opt => {         

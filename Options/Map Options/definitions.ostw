@@ -9,6 +9,7 @@ class PortalsMapOptions {
 class EnviromentalSaveMapOptions {
     public Number SAVE_Y_COORDINATE;
     public Number SAVE_UP_IMPULSE;
+    public Boolean DO_ABOVE_WATER_CHECK;
 }
 
 class ActivePlayersVisualsMapOptions {

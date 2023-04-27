@@ -5,13 +5,23 @@ import "\APQ\Modules\_Shared\language.ostw";
 import "active_players.ostw";
 
 
-rule: "Send to inactive state on join"
+rule: "Send player to inactive state on join"
 Event.OnPlayerJoin
+if (!EventPlayer.IsDummy())
 {
-    # Entering Welcome screen (or just making active if its a bot)
-    if (EventPlayer.IsDummy()) AddPlayerToActive(EventPlayer);
-    else MakePlayerInactive(EventPlayer); 
+    // This event could be triggered before InitialPlayer, so this wait is required to prevent race condition
+    WaitUntilPlayerInitialized();
+    MakePlayerInactive(EventPlayer); 
 }
+
+rule: "Add bot as active player on join"
+Event.OnPlayerJoin
+if (EventPlayer.IsDummy())
+{
+    WaitUntilPlayerInitialized();    
+    AddPlayerToActive(EventPlayer);
+}
+
 
 rule: "Remove player from active players when they leave"
 Event.OnPlayerLeave

@@ -12,8 +12,7 @@ if (PositionOf(EventPlayer).Y <= enviromentalSaveMapOptions.SAVE_Y_COORDINATE)
 if (waterSavesLeft > 0)
 
 # if player is above water, thier altitude is for some reason always bigger then 20
-if (AltitudeOf(EventPlayer) > 10 == true)
-
+if (!enviromentalSaveMapOptions.DO_ABOVE_WATER_CHECK || AltitudeOf(EventPlayer) > 10)
 {
     waterSavesLeft -= 1;
     
@@ -42,7 +41,7 @@ if (AltitudeOf(EventPlayer) > 10 == true)
 
 rule: "Resetting player's WaterSavesLeft when they touch ground"
 Event.OngoingPlayer
-if (IsOnGround(EventPlayer) == true)
+if (IsOnGround(EventPlayer))
 {
-        waterSavesLeft = enviromentalSaveOptions.SAVES;
+    waterSavesLeft = enviromentalSaveOptions.SAVES;
 }
