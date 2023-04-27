@@ -2,6 +2,8 @@ import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Modules\Visuals\_Shared\sensors\sensors.ostw";
 
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
 enum ClosestPlayerSensorState {
     Back,
     Front,
@@ -14,3 +16,31 @@ enum ClosestPlayerSensorState {
 playervar ClosestPlayerSensorState closestPlayerSensorState;
 
 Number PLAYER_SENSOR_DISTANCE: 7;
+
+
+Player ClosestPlayer(in Player player): FirstOf(SortedArray(player.activeEnemies, p => DistanceBetween(p, player))); 
+
+Boolean IsClosestPlayerInImmediateProximity(in Player player): 
+    DistanceBetween(
+        EyePosition(player), 
+        EyePosition(ClosestPlayer(player))) 
+    <= PLAYER_SENSOR_DISTANCE;
+
+Number AngleDifferenceToClosestPlayer(in Player player): 
+    AngleDifference(
+        HorizontalFacingAngleOf(player), 
+        HorizontalAngleFromDirection(
+            DirectionTowards(
+                player, 
+                ClosestPlayer(player))));
+
+String ClosestPlayerSensorIcon(in Player player): 
+    IsClosestPlayerInImmediateProximity(LocalPlayer) 
+    ? IconString(Icon.Bolt) 
+    : (AbsoluteValue(AngleDifferenceToClosestPlayer(player)) <= sensorsOptions.FOV / 2) 
+        ? IconString(Icon.ArrowUp)
+        : (AngleDifferenceToClosestPlayer(player) > 0 && AngleDifferenceToClosestPlayer(player) < 180 - sensorsOptions.FOV / 2) 
+            ? IconString(Icon.ArrowLeft)
+            : (AngleDifferenceToClosestPlayer(player) < 0 && AngleDifferenceToClosestPlayer(player) > -180 + sensorsOptions.FOV / 2) 
+                ? IconString(Icon.ArrowRight)
+                : IconString(Icon.ArrowDown);

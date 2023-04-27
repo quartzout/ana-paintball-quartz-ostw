@@ -1,6 +1,8 @@
 import "\APQ\Quartz\quartz.ostw";
 
 import "\APQ\Modules\Visuals\_Shared\sensors\sensors.ostw";
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
 
 enum BackSensorState {
     Back,
@@ -12,3 +14,32 @@ enum BackSensorState {
 
 
 playervar BackSensorState backSensorState;
+
+Number ViewAngleDiffWithPlayer(in Player player1, in Player player2): 
+    AngleDifference(
+        HorizontalFacingAngleOf(player1), 
+        HorizontalAngleFromDirection(VectorTowards(player1, player2)));
+
+Boolean IsBackSensorIconVisible(in Player player, in BackSensorState state):
+    IsTrueForAny(
+        player.activeEnemies,
+        enemy => 
+            
+            enemy.IsAlive()
+            && IsInViewAngle(enemy, EyePosition(player), sensorsOptions.FOV / 2)
+            && !(IsRayObstructed(
+                From: EyePosition(enemy), 
+                To: EyePosition(player)))
+            && !IsInViewAngle(player, EyePosition(enemy), sensorsOptions.FOV / 2)
+            
+            && Implication(state == BackSensorState.Left,
+                operand2:
+                    (ViewAngleDiffWithPlayer(player, enemy) > 0 
+                    && ViewAngleDiffWithPlayer(player, enemy) < 180 - sensorsOptions.FOV / 2))
+            
+            && Implication(state == BackSensorState.Right,
+                operand2: 
+                    (ViewAngleDiffWithPlayer(player, enemy) < 0 
+                    && ViewAngleDiffWithPlayer(player, enemy) > -180 + sensorsOptions.FOV / 2))
+
+            && (state == BackSensorState.Back));

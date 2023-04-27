@@ -1,64 +1,64 @@
-import "\APQ\Quartz\quartz.ostw";
+// import "\APQ\Quartz\quartz.ostw";
 
-import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+// import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 
-import "back_sensor.ostw";
+// import "back_sensor.ostw";
 
-rule: "Updating back sensor state for player"
-Event.OngoingPlayer
-{
+// rule: "Updating back sensor state for player"
+// Event.OngoingPlayer
+// {
     
-    Loop(0.2, () => {
+//     Loop(0.2, () => {
 
-        backSensorState = BackSensorState.No;
-        Number enemiesSeeingPlayerFromBehind = 0;
+//         backSensorState = BackSensorState.No;
+//         Number enemiesSeeingPlayerFromBehind = 0;
 
-        // For every enemy
-        foreach (Player enemy in EventPlayer.activeEnemies)
-        {
+//         // For every enemy
+//         foreach (Player enemy! in EventPlayer.activeEnemies)
+//         {
 
-            # Alive check
-            if (IsDead(enemy)) continue;
+//             # Alive check
+//             if (IsDead(enemy)) continue;
 
-            # Line of sight check
-            if (!IsInViewAngle(enemy, EyePosition(EventPlayer), sensorsOptions.FOV / 2)) continue;
+//             # Line of sight check
+//             if (!IsInViewAngle(enemy, EyePosition(EventPlayer), sensorsOptions.FOV / 2)) continue;
 
-            # View obstruction check
-            if (IsRayObstructed(
-                From: EyePosition(enemy), 
-                To: EyePosition(EventPlayer))
-            ) continue;
+//             # View obstruction check
+//             if (IsRayObstructed(
+//                 From: EyePosition(enemy), 
+//                 To: EyePosition(EventPlayer))
+//             ) continue;
 
-            # Is in Events player viev check
-            if (IsInViewAngle(EventPlayer, EyePosition(enemy), sensorsOptions.FOV / 2)) continue;
+//             # Is in Events player viev check
+//             if (IsInViewAngle(EventPlayer, EyePosition(enemy), sensorsOptions.FOV / 2)) continue;
 
-            # If there is enemy that is already looking at player from behind, set state to multiple
-            if (enemiesSeeingPlayerFromBehind == 1) {
-                backSensorState = BackSensorState.Multiple;
-                break;
-            }
+//             # If there is enemy that is already looking at player from behind, set state to multiple
+//             if (enemiesSeeingPlayerFromBehind == 1) {
+//                 backSensorState = BackSensorState.Multiple;
+//                 break;
+//             }
 
-            # If there wasnt, set so it now is 
-            enemiesSeeingPlayerFromBehind = 1;
+//             # If there wasnt, set so it now is 
+//             enemiesSeeingPlayerFromBehind = 1;
 
-            # Calculate horizontal angle difference between player view direction and enemies
-            Number angleDifferenceWithPlayer = 
-                AngleDifference(
-                    HorizontalFacingAngleOf(EventPlayer), 
-                    HorizontalAngleFromDirection(VectorTowards(EventPlayer, enemy))
-                );
+//             # Calculate horizontal angle difference between player view direction and enemies
+//             Number angleDifferenceWithPlayer = 
+//                 AngleDifference(
+//                     HorizontalFacingAngleOf(EventPlayer), 
+//                     HorizontalAngleFromDirection(VectorTowards(EventPlayer, enemy))
+//                 );
 
-            # Set sensor state based on this angle
-            if (angleDifferenceWithPlayer > 0 && angleDifferenceWithPlayer < 180 - sensorsOptions.FOV / 2) 
-                backSensorState = BackSensorState.Left;
-            else if (angleDifferenceWithPlayer < 0 && angleDifferenceWithPlayer > -180 + sensorsOptions.FOV / 2) 
-                backSensorState = BackSensorState.Right;
-            else 
-                backSensorState = BackSensorState.Back;
-        }
+//             # Set sensor state based on this angle
+//             if (angleDifferenceWithPlayer > 0 && angleDifferenceWithPlayer < 180 - sensorsOptions.FOV / 2) 
+//                 backSensorState = BackSensorState.Left;
+//             else if (angleDifferenceWithPlayer < 0 && angleDifferenceWithPlayer > -180 + sensorsOptions.FOV / 2) 
+//                 backSensorState = BackSensorState.Right;
+//             else 
+//                 backSensorState = BackSensorState.Back;
+//         }
             
 
-    });
+//     });
 
 
-}
+// }

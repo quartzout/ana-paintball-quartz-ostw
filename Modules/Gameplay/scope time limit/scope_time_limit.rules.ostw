@@ -13,10 +13,9 @@ if (IsFiringSecondary(EventPlayer) == true)
 
 rule: "Leaving scope when timer exceeded"
 Event.OngoingPlayer
+if (
+    IsFiringSecondary(EventPlayer) //without this the condition doesnt fire for some reason
+    && EventPlayer.scopeTimer > scopeTimeLimitOptions.MAX_SCOPE_TIME - 0.1)
 {
-    # بعد, شما فقط می خواهید برای رفتن به خارج, گرفتن برخی از هوای تازه و کشتن چند نفر
-    Loop(0.2, () => {
-        if (EventPlayer.scopeTimer >= scopeTimeLimitOptions.MAX_SCOPE_TIME - 0.1) 
-        ct_ForcePlayerToExitScopeAsync(EventPlayer);
-    });    
+    ct_ForcePlayerToExitScopeAsync(EventPlayer);
 }
