@@ -6,7 +6,7 @@ playervar Vector call_playTeleportedBeamEffectAsync_playerAfterPos;
 
 
 # Syncronous action that triggers execution of async subroutine with the same name and transforms player arguemnt into EventPlayer context
-void ct_PlayTeleportedBeamEffectAsync(Vector playerBeforePos, Vector playerAfterPos, Player player) { 
+void ct_PlayTeleportedBeamEffectAsync(in Vector playerBeforePos, in Vector playerAfterPos, in Player player) { 
     call_playTeleportedBeamEffectAsync_playerBeforePos = playerBeforePos;
     call_playTeleportedBeamEffectAsync_playerAfterPos = playerAfterPos;
     call_playTeleportedBeamEffectAsync = true;
@@ -15,7 +15,7 @@ void ct_PlayTeleportedBeamEffectAsync(Vector playerBeforePos, Vector playerAfter
 
 
 # Syncronous action that triggers execution of async subroutine with the same name and transforms player arguemnt into EventPlayer context
-void ct_PlayTeleportedPovEffectAsync(Vector playerBeforePos, Vector playerAfterPos, Player player) { 
+void ct_PlayTeleportedPovEffectAsync(in Vector playerBeforePos, in Vector playerAfterPos, in Player player) { 
     call_PlayTeleportedPovEffectAsync_playerBeforePos = playerBeforePos;
     call_PlayTeleportedPovEffectAsync_playerAfterPos = playerAfterPos;
     call_PlayTeleportedPovEffectAsync = true;

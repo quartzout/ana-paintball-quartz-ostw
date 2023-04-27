@@ -12,7 +12,7 @@ rule: "Start afk timer when player spawns" {
     Subscribe(OnActivePlayerAddedEvent, StartAfkTimerForPlayer);
 }
 
-void StartAfkTimerForPlayer(Player player) {
+void StartAfkTimerForPlayer(in Player player) {
 
     
     player.afkTimer = 0;

@@ -9,16 +9,16 @@ rule: "Set Players Outline To Its Color On Spawn" {
 }
 
 
-void SetPlayersOutlineToItsColorOnSpawn(Player player) {
+void SetPlayersOutlineToItsColorOnSpawn(in Player player) {
     SetPlayersOutline(player, player.color);
 }
 
-void SetPlayersOutline(Player player, Color color) { 
+void SetPlayersOutline(in Player player, in Color color) { 
     # Turning on coloring of this player for everyone else
     StartForcingPlayerOutlines(player, activePlayers, true, color, OutlineType.Default);
 
     // Turning on coloring of everyone else for this player
-    foreach (Player activePlayer in activePlayers)
+    foreach (Player activePlayer! in activePlayers)
     {
         StartForcingPlayerOutlines(activePlayer, player, true, activePlayer.color, OutlineType.Default);
     }

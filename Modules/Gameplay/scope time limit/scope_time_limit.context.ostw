@@ -4,6 +4,6 @@ import "scope_time_limit.ostw";
 
 playervar Boolean call_ForcePlayerToExitScopeAsync = false;
 # Syncronous action that triggers execution of async subroutine with the same name and transforms player arguemnt into EventPlayer context
-void ct_ForcePlayerToExitScopeAsync(Player player) { 
+void ct_ForcePlayerToExitScopeAsync(in Player player) { 
     call_ForcePlayerToExitScopeAsync = true;
 }
