@@ -1,0 +1,39 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "../../bot_ai.ostw";
+import "../../helpers/player_in_sight.ostw";
+
+import "fight_state.ostw";
+
+playervar Number lostTargetTimer = 0;
+rule: "Starting the lost player timer when target player not in sight"
+Event.OngoingPlayer
+if (IsFightStateActive(EventPlayer))
+if (!IsPlayerInSightOfBot(EventPlayer, aiFightTarget))
+{
+    EventPlayer.lostTargetTimer = 0;
+    ChaseVariableAtRate(
+        EventPlayer.lostTargetTimer, 
+        botAiOptions.TARGET_REAPPEAR_AWAIT_TIMEOUT, 
+        rate: 1, 
+        RateChaseReevaluation.None);
+}
+
+rule: "Resetting the lost player timer when target player is in sight again"
+Event.OngoingPlayer 
+if (IsFightStateActive(EventPlayer))
+if (IsPlayerInSightOfBot(EventPlayer, aiFightTarget))
+if (EventPlayer.lostTargetTimer > 0)
+{
+    EventPlayer.lostTargetTimer = 0;
+    StopChasingVariable(EventPlayer.lostTargetTimer);
+}
+
+rule: "On lost player timer reached the limit"
+Event.OngoingPlayer
+if (EventPlayer.lostTargetTimer == botAiOptions.TARGET_REAPPEAR_AWAIT_TIMEOUT) 
+if (IsFightStateActive(EventPlayer)) 
+{
+    ExitFightState(EventPlayer);
+    CallEvent(OnTargetPlayerLostFromSightTerminalEvent, EventPlayer);
+}

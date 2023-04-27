@@ -78,3 +78,19 @@ class AfkOptions {
 class PlayerColorOptions {
     public Color[] AVAILABLE_PLAYER_COLORS;
 } 
+
+class BotAiOptions {
+    public Number VIEW_ANGLE; //radius of a vision circle centered at eye position
+    public Number TURN_RATE; // degrees per second
+    public Range RANDOM_SLEEP_DELAY_RANGE;
+    public Range RANDOM_GRENADE_DELAY_RANGE;
+    public Number QUEUED_ACTION_TIMEOUT;
+    public Number SCOPED_SHOT_CHANCE_PERCENT;
+    public Range SCOPED_SHOT_RANDOM_TRIGGER_DELAY_RANGE;
+    public Number TARGET_REAPPEAR_AWAIT_TIMEOUT;
+    public Range JUMPING_RANDOM_DELAY_RANGE;
+    public Number COLLISION_DETECTION_DISTANCE;
+    public Boolean IGNORE_OTHER_BOTS;
+    public Boolean DEBUG_IGNORE_HOST;
+    public Range RANDOM_STRAFE_DURATION_RANGE;
+}

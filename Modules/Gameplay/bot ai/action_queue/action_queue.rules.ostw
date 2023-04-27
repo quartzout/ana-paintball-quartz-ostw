@@ -1,0 +1,24 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "../bot_ai.ostw";
+import "action_queue.ostw";
+
+
+rule: "Invoking on action queue empty event on start" 
+Event.OngoingPlayer {
+    CallEvent(OnActionQueueEmptiedEvent, EventPlayer);
+}
+
+rule: "Consuming action queue"
+Event.OngoingPlayer
+if (EventPlayer.isBotControlledByAi)
+if (EventPlayer.actionQueue.Length > 0)
+{
+    QueuedAction action! = EventPlayer.actionQueue.First;
+    Number recovery! = action.action(EventPlayer, EventPlayer.actionQueue.First.target);
+    actionQueue.ModRemoveByIndex(0);
+    Wait(recovery);
+    LoopIfConditionIsTrue();
+
+    CallEvent(OnActionQueueEmptiedEvent, EventPlayer);
+}

@@ -1,0 +1,39 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "../../bot_ai.ostw";
+import "../../helpers/facing.ostw";
+import "../../action_queue/action_queue.ostw";
+
+playervar Boolean isInFightState = false;
+playervar Player aiFightTarget = null;
+
+globalvar (Player => void)[] OnTargetPlayerLostFromSightTerminalEvent;
+
+Boolean IsFightStateActive(in Player player):
+    (EventPlayer.isBotControlledByAi) &&
+    (EventPlayer.isInFightState);
+
+void EnterFightState(in Player bot, in Player target) {
+    QueueAction(bot, WarningShotAction, target, group: "fight", name: "warning shot");
+    bot.isInFightState = true;
+    bot.aiFightTarget = target; 
+}
+
+void ExitFightState(in Player bot) {
+    ClearActionsWithGroup(bot, "fight");
+    bot.isInFightState = false;
+    bot.aiFightTarget = null;
+}
+
+Number WarningShotAction(in Player executor, in Player targetPlayer) {
+    WhileHoldingButton(executor, Button.SecondaryFire, () => {
+        Wait(0.3);
+        Vector executorToTarget: VectorTowards(executor.EyePosition(), targetPlayer.EyePosition());
+        Vector rightShiftDirection: Normalize(FlatRotatedBy90DegreesRight(executorToTarget));
+        Vector facingPoint: targetPlayer.EyePosition() + Down() * 0.2 + rightShiftDirection * 2;
+        Vector facingDirection! = DirectionTowards(executor.EyePosition(), facingPoint);
+        FaceDirectionWithTimeoutEvent(executor, facingDirection);
+        PressButton(executor, Button.PrimaryFire);
+    });
+    return 1.2;
+}

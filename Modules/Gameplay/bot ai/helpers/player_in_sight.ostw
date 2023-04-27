@@ -1,0 +1,21 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "../bot_ai.ostw";
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+Boolean IsPlayerInSightOfBot(in Player bot, in Player player): 
+    IsInViewAngle(bot, player, botAiOptions.VIEW_ANGLE) &&
+    !IsRayObstructed(bot.EyePosition(), player.EyePosition(), PlayersToExclude: bot);
+
+Player[] TargetableEnemiesInSight(in Player bot):
+    FilteredArray(
+            array: EventPlayer.activeEnemies, 
+            condition: enemy => 
+                    (!botAiOptions.IGNORE_OTHER_BOTS ||
+                    !enemy.isBotControlledByAi) 
+                &&
+                    (!botAiOptions.DEBUG_IGNORE_HOST ||
+                    !enemy.IsHost())
+                &&  
+                    IsPlayerInSightOfBot(bot, enemy));

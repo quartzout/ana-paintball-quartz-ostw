@@ -1,0 +1,17 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Options\Regular Options\definitions.ostw";
+import "helpers/facing.ostw"; //turn bot around on fall depends on it
+
+globalvar BotAiOptions botAiOptions = GetOptions<BotAiOptions>("BotAiOptions"); 
+
+playervar Boolean isBotControlledByAi = false;
+
+globalvar (Player => void)[] OnQueuedActionTimeoutedEvent = []; 
+globalvar (Player => void)[] OnEnemyFoundEvent = []; 
+globalvar (Player => void)[] OnEnemySwitchedEvent = []; 
+globalvar (Player => void)[] OnEnemyLostEvent = []; 
+
+
+
+

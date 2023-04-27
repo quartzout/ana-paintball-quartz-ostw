@@ -1,0 +1,23 @@
+import "\APQ\Quartz\quartz.ostw";
+
+
+import "../../bot_ai.ostw";
+import "../../action_queue/action_queue.ostw";
+
+
+Number ThrowGrenadeUnderFeetAction(in Player executor, in Any _) {
+    Vector throwDirection = Down() + Right() * RandomReal(-0.7, 0.7) + Forward() * RandomReal(-0.7, 0.7);
+    FaceDirectionWithTimeoutEvent(executor, throwDirection);
+    PressButton(executor, Button.Ability2);
+    return 0.5;
+}
+
+
+rule: "Fire granade beneath self with a randomized delay when its cooldown is over" 
+Event.OngoingPlayer
+if (isBotControlledByAi)
+if (!IsActionWithNameInQueue(EventPlayer, "grenade")) //in case of grenade action getting cleared from the queue, this condition would refire and requeue the throw
+if (AbilityCooldown(EventPlayer, Button.Ability2) == 0){
+    Wait(RandomRealInRange(botAiOptions.RANDOM_GRENADE_DELAY_RANGE));
+    QueueAction(EventPlayer, ThrowGrenadeUnderFeetAction, null, group: "global", name: "grenade");
+}

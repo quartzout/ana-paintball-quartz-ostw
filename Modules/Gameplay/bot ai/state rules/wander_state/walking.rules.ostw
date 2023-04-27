@@ -1,0 +1,17 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "../../bot_ai.ostw";
+import "../../helpers/facing.ostw";
+import "../../action_queue/action_queue.ostw";
+
+rule: "Start walking when no other actions in queue" 
+Event.OngoingPlayer
+{
+    Subscribe(OnActionQueueEmptiedEvent, bot => {
+        Wait(1);
+        StartThrottleInDirectionSafe(bot, Forward(), 1, Relative.ToPlayer);
+    });
+    Subscribe(OnActionQueueNoLongerEmptyEvent, bot => StopThrottleInDirectionSafe(bot));
+}
+
+

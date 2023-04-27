@@ -1,0 +1,40 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "fight_state.ostw";
+
+import "../../bot_ai.ostw";
+import "../../action_queue/action_queue.ostw";
+
+Number ShootScopedAction(in Player executor, in Player targetPlayer) {
+    FacePlayerWithTimeoutEvent(executor, targetPlayer);
+    WhileHoldingButton(executor, Button.SecondaryFire, () => {
+        Wait(0.3);
+        FacePlayerWithTimeoutEvent(executor, targetPlayer);
+        Wait(RandomRealInRange(botAiOptions.SCOPED_SHOT_RANDOM_TRIGGER_DELAY_RANGE)); // giving player change to dodge
+        PressButton(executor, Button.PrimaryFire);
+    });
+    return 1.2;
+}
+
+Number ShootUnscopedAction(in Player executor, in Player targetPlayer) {
+    FacePlayerWithTimeoutEvent(executor, targetPlayer);
+    PressButton(executor, Button.PrimaryFire);
+    return 0.8;
+}
+
+
+
+rule: "Queue shooting action when none is queued" 
+Event.OngoingPlayer
+if (IsFightStateActive(EventPlayer))
+if (!IsActionWithNameInQueue(EventPlayer, "shoot_unscoped"))
+if (!IsActionWithNameInQueue(EventPlayer, "shoot_scoped"))
+{   
+    # Randomly choose between scoped and unscoped based on probability in options
+    if (RandomInteger(1, 100) <= botAiOptions.SCOPED_SHOT_CHANCE_PERCENT)
+        QueueAction(EventPlayer, ShootScopedAction, EventPlayer.aiFightTarget, group: "fight", name: "shoot_scoped");
+    else 
+        QueueAction(EventPlayer, ShootUnscopedAction, EventPlayer.aiFightTarget, group: "fight", name: "shoot_unscoped");
+}
+
+

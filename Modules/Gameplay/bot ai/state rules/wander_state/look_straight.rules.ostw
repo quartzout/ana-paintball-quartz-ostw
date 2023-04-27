@@ -1,0 +1,29 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "wander_state.ostw";
+
+import "../../bot_ai.ostw";
+import "../../helpers/facing.ostw";
+import "../../action_queue/action_queue.ostw";
+
+
+playervar Boolean isLookingVerticalCheckActive! = false; 
+rule: "Look vertical when no actions in queue" {
+    Subscribe(OnActionQueueEmptiedEvent, executor => executor.isLookingVerticalCheckActive = true);
+    Subscribe(OnActionQueueNoLongerEmptyEvent, executor => executor.isLookingVerticalCheckActive = false);
+}
+
+rule: "Look vertically straight if not"
+Event.OngoingPlayer
+if (IsWanderStateActive(EventPlayer))
+if (!ApproxEquals(VerticalFacingAngleOf(EventPlayer), 0, 1))
+if (isLookingVerticalCheckActive) {
+
+    Vector newDirection! = Replace(
+        FacingDirectionOf(EventPlayer), 
+        newVerticalAngle: 0);
+
+    FaceDirection(
+        EventPlayer, 
+        newDirection);
+}

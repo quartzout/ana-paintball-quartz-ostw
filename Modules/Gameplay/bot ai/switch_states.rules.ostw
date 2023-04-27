@@ -1,0 +1,72 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "bot_ai.ostw";
+import "state rules/fight_state/fight_state.ostw";
+import "state rules/wander_state/wander_state.ostw";
+import "helpers/player_in_sight.ostw";
+
+rule: "Start wander when added as active" {
+    Subscribe(OnActivePlayerAddedEvent, player => {
+        if (player.isBotControlledByAi && player.botAiState != AiState.Wander) SwitchToWander(player);
+    });
+}
+
+rule: "Switch to Wander when fight state exited with target lost" {
+    Subscribe(OnTargetPlayerLostFromSightTerminalEvent, bot => OnTargetLost(bot));
+}
+
+rule: "Start wander once isBotControllerByAi is set"
+Event.OngoingPlayer
+if (EventPlayer.isBotControlledByAi)
+{
+    if (EventPlayer.botAiState == AiState.Wander) return;
+    SwitchToWander(EventPlayer);
+}
+
+enum AiState {
+    Wander,
+    Fight,
+    None
+} 
+
+playervar AiState botAiState = AiState.None;
+
+
+rule: "Switch to Fight state when player is in sight"
+Event.OngoingPlayer
+if (EventPlayer.isBotControlledByAi)
+if (EventPlayer.botAiState == AiState.Wander)
+if (TargetableEnemiesInSight(EventPlayer).Length > 0)
+{
+    ExitWanderState(EventPlayer);
+    StartFightWithAnyEnemyInSight(EventPlayer);
+    CallEvent(OnEnemyFoundEvent, EventPlayer);
+}
+
+# Find another target or switch to Wander on target lost
+void OnTargetLost(in Player bot) {
+    if (TargetableEnemiesInSight(bot).Length > 0) {
+        StartFightWithAnyEnemyInSight(bot);
+        CallEvent(OnEnemySwitchedEvent, bot);
+    }
+    else {
+        SwitchToWander(bot);
+        CallEvent(OnEnemyLostEvent, bot);
+    }
+
+}
+
+void StartFightWithAnyEnemyInSight(in Player bot) {
+    Player target = TargetableEnemiesInSight(bot).First;
+    SwitchToFight(EventPlayer, target);
+}
+
+void SwitchToFight(in Player bot, in Player target) {
+    bot.botAiState = AiState.Fight;
+    EnterFightState(bot, target);
+}
+
+void SwitchToWander(in Player bot) {
+    bot.botAiState = AiState.Wander;
+    EnterWanderState(bot);
+}

@@ -1,0 +1,13 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "../../bot_ai.ostw";
+import "../../action_queue/action_queue.ostw";
+
+rule: "Jumping when on ground with randomized delay" 
+Event.OngoingPlayer
+if (isBotControlledByAi)
+if (EventPlayer.IsOnGround())
+{
+    Wait(RandomRealInRange(botAiOptions.JUMPING_RANDOM_DELAY_RANGE));
+    PressButton(EventPlayer, Button.Jump);
+}

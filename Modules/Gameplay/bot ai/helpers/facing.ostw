@@ -1,0 +1,38 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "../bot_ai.ostw";
+
+globalvar Number AIMING_ANGLE_THRESHOLD:  1;
+void FaceDirection(in Player executor, in Vector directionReev, const () => void actionOnTimeout = () => {}) {
+    
+    Boolean IsBotFacingCorrectDirection: 
+        AngleBetweenVectors(
+            FacingDirectionOf(executor), 
+            directionReev)
+        < AIMING_ANGLE_THRESHOLD;
+
+    WhileFacing(executor, directionReev, botAiOptions.TURN_RATE, Relative.ToWorld, FacingRev.DirectionAndTurnRate, actions: () => { 
+        WaitUntilWithActions(
+            conditionReev: IsBotFacingCorrectDirection, 
+            timeout: 10,
+            actionOnTimeout: actionOnTimeout);
+        });
+
+}
+
+Vector TargetFacingPoint(in Player target): target.EyePosition() + Down() * 0.2;
+Vector FacePlayerDirection(in Player executor, in Player target): VectorTowards(executor.EyePosition(), TargetFacingPoint(target));
+
+void FacePlayer(in Player executor, in Player target, const () => void actionOnTimeout = () => {}) {
+    
+    FaceDirection(executor, FacePlayerDirection(executor, target), actionOnTimeout);
+}
+
+
+void FacePlayerWithTimeoutEvent(in Player executor, in Player targetPlayer) {
+    FacePlayer(executor, targetPlayer, () => CallEvent(OnQueuedActionTimeoutedEvent, executor));
+}
+
+void FaceDirectionWithTimeoutEvent(in Player executor, in Vector direction) {
+    FaceDirection(executor, direction, () => CallEvent(OnQueuedActionTimeoutedEvent, executor));
+}

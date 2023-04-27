@@ -1,0 +1,22 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "fight_state.ostw";
+
+import "../../bot_ai.ostw";
+import "../../action_queue/action_queue.ostw";
+
+Number FireSleepAction(in Player executor, in Player targetPlayer) {
+    FacePlayer(executor, targetPlayer, () => CallEvent(OnQueuedActionTimeoutedEvent, executor));
+    PressButton(executor, Button.Ability1);
+    return 1;
+}
+
+rule: "Fire a sleep with a randomized delay when its cooldown is over" 
+Event.OngoingPlayer
+if (IsFightStateActive(EventPlayer))
+if (!IsActionWithNameInQueue(EventPlayer, "sleep")) 
+if (AbilityCooldown(EventPlayer, Button.Ability1) == 0)
+{
+    Wait(RandomRealInRange(botAiOptions.RANDOM_SLEEP_DELAY_RANGE));    
+    QueueAction(EventPlayer, FireSleepAction, EventPlayer.aiFightTarget, group: "fight", name: "sleep");
+}

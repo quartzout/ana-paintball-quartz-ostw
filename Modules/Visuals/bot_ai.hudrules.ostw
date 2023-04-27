@@ -1,0 +1,11 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\bot ai\bot_ai.ostw";
+
+rule: "Subscribing to bot_ai events" {
+    Subscribe(OnQueuedActionTimeoutedEvent, player => Communicate(player, Communication.FallBack));
+    Subscribe(OnEnemyFoundEvent, player => Communicate(player, Communication.Hello));
+    Subscribe(OnEnemyLostEvent, player => Communicate(player, Communication.Goodbye));
+    Subscribe(OnEnemySwitchedEvent, player => Communicate(player, Communication.Incoming));
+
+}

@@ -1,0 +1,11 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "\APQ\Modules\Gameplay\bot ai\bot_ai.ostw";
+import "\APQ\Modules\Gameplay\enviromental save\enviromental_save.ostw";
+
+rule: "Respawn bot on fall" {
+    Subscribe(OnWaterSaveActivatedEvent, player => {
+        if (!player.isBotControlledByAi) return;
+        Respawn(player);
+    });
+}

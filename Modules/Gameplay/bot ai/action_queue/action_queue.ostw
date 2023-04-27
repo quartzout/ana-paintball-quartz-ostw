@@ -1,0 +1,32 @@
+import "\APQ\Quartz\quartz.ostw";
+
+class QueuedAction {
+    public String name;
+    public String group;
+    public (Player, Player) => Number action;
+    public Player target;
+}
+
+globalvar (Player => void)[] OnActionQueueEmptiedEvent = [];
+globalvar (Player => void)[] OnActionQueueNoLongerEmptyEvent = [];
+
+playervar QueuedAction[] actionQueue = [];
+
+void QueueAction(in Player executor, in (Player, Player) => Number action, in Player target, in String group, in String name = "unnamed") {
+    executor.actionQueue.ModAppend(init(new QueuedAction(), instance => {
+        instance.action = action;
+        instance.target = target;
+        instance.name = name;
+        instance.group = group;
+    }));
+    CallEvent(OnActionQueueNoLongerEmptyEvent, executor);
+}
+
+Boolean IsActionWithNameInQueue(in Player executor, in String name): FilteredArray(executor.actionQueue, action => action.name == name).Length > 0;
+
+void ClearActionsWithGroup(in Player executor, in String group) {
+    executor.actionQueue = FilteredArray(executor.actionQueue, action => action.group != group);
+    if (executor.actionQueue.Length == 0) {
+        CallEvent(OnActionQueueEmptiedEvent, executor);
+    }
+}

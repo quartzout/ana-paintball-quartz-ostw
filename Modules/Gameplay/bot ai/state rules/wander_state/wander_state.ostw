@@ -1,0 +1,17 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "../../bot_ai.ostw";
+
+playervar Boolean isInWanderState = false;
+
+Boolean IsWanderStateActive(in Player player):
+    (player.isBotControlledByAi) &&
+    (player.isInWanderState);
+
+void EnterWanderState(in Player bot) {
+    bot.isInWanderState = true;
+}
+
+void ExitWanderState(in Player bot) {
+    bot.isInWanderState = false;  
+}

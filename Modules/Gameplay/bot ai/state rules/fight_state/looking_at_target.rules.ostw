@@ -1,0 +1,28 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "fight_state.ostw";
+
+import "../../bot_ai.ostw";
+import "../../action_queue/action_queue.ostw";
+
+rule: "Looking at target when no actions enqueued" {
+    
+    Subscribe(OnActionQueueEmptiedEvent, executor => {
+        if (IsFightStateActive(EventPlayer)) {
+            StartFacingSafe(
+                player: executor, 
+                direction: FacePlayerDirection(executor, executor.aiFightTarget), 
+                turnRate: botAiOptions.TURN_RATE);
+        }});
+
+    Subscribe(OnActionQueueNoLongerEmptyEvent, executor => {
+        if (IsFightStateActive(EventPlayer)) {
+            StopFacingSafe(executor);
+        }});
+}
+
+rule: "Stop Facing if fight state ended" 
+Event.OngoingPlayer
+if (!IsFightStateActive(EventPlayer)) {
+    StopFacingSafe(EventPlayer);
+}

@@ -1,10 +1,11 @@
 rule: "To edit options, add map or extend the mode, download this mode's repo: https://github.com/quartzout/ana-paintball-quartz-ostw" -1 {}
 
-// Framework
-import "Quartz\quartz.rules.ostw";
 
 // Lobby settings
 import "settings.lobby";
+
+// Framework
+import "Quartz\quartz.rules.ostw";
 
 // Debug
 import "debug.rules.ostw";
@@ -17,9 +18,9 @@ import "Options\Map Options\Maps\castillo.ostw";
 // Default map options
 import "Options\Map Options\defaults.ostw";
 
-
 // Regular Options
 import "Options\Regular Options\options.ostw";
+
 
 // Gameplay Modules
 import "Modules\Gameplay\afk\afk.rules.ostw";
@@ -33,6 +34,9 @@ import "Modules\Gameplay\match time\match_time.rules.ostw";
 import "Modules\Gameplay\_Shared\active players\active_players.rules.ostw";
 import "Modules\Gameplay\_Shared\is player scoped\is_player_scoped.rules.ostw";
 import "Modules\Gameplay\enabled_abilities.rules.ostw";
+import "Modules\Gameplay\bot ai\bot_ai.rules.ostw";
+import "Modules\Gameplay\Above\respawn_bot_on_fall.rules.ostw";
+
 
 // Stats Modules
 import "Modules\Stats\_Shared\kills in long period\kills_in_long_period.rules.ostw";
@@ -43,7 +47,7 @@ import "Modules\Stats\scores\scores.rules.ostw";
 // Visuals Modules
 import "Modules\Visuals\back sensor\back_sensor.rules.ostw";
 import "Modules\Visuals\back sensor\back_sensor.hudrules.ostw";
-import "Modules\Visuals\player sensor\player_sensor.rules.ostw";
+// import "Modules\Visuals\player sensor\player_sensor.rules.ostw";
 import "Modules\Visuals\player sensor\player_sensor.hudrules.ostw";
 import "Modules\Visuals\portals\portals.hudrules.ostw";
 import "Modules\Visuals\inactive_screen.hudrules.ostw";
@@ -59,14 +63,16 @@ import "Modules\Visuals\scores.hudrules.ostw";
 import "Modules\Visuals\enviromental_save.hudrules.ostw";
 import "Modules\Visuals\_Shared\player color\player_color.rules.ostw";
 import "Modules\Visuals\player_outlines.hudrules.ostw";
+import "Modules\Visuals\bot_ai.hudrules.ostw";
 
 // Context transfer rules
 import "Modules\Visuals\portals\portals.context.rules.ostw";
 import "Modules\Gameplay\scope time limit\scope_time_limit.context.rules.ostw";
 
-// FIXME: kills in long period just counts kills
 
-
-
-
+//FIXME: First bot color isnt correct
+//FIXME: First bot name on leaderboard isnt correct
+//FIXME: scope timer runs indefinetly
+//FIXME: inactive players can still be killed
+//FIXME: Server crashing after long bot fight
 

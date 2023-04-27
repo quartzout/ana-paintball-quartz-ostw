@@ -1,0 +1,8 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "activate_ai_on_spawn.rules.ostw";
+import "switch_states.rules.ostw";
+import "action_queue/action_queue.rules.ostw";
+import "state rules/fight_state/fight_state.rules.ostw";
+import "state rules/wander_state/wander_state.rules.ostw";
+import "state rules/global/global.rules.ostw";

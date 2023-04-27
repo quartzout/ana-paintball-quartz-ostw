@@ -1,0 +1,11 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "bot_ai.ostw";
+
+rule: "Activate AI on bot spawn" 
+Event.OnPlayerJoin
+if (EventPlayer.IsDummy())
+{
+    WaitUntilPlayerInitialized();
+    EventPlayer.isBotControlledByAi = true;
+}

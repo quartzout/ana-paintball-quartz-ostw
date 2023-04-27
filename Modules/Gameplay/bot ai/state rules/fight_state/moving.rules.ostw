@@ -1,0 +1,21 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "fight_state.ostw";
+
+import "../../bot_ai.ostw";
+import "../../action_queue/action_queue.ostw";
+
+void BrieflyStrafeInDirection(in Player executor, in Vector direction) {
+    WhileThrottling(executor, direction, 1, relative: Relative.ToPlayer, actions: () => {
+        Wait(RandomRealInRange(botAiOptions.RANDOM_STRAFE_DURATION_RANGE));
+    });
+}
+
+rule: "Strafing"
+Event.OngoingPlayer
+if (IsFightStateActive(EventPlayer)) {
+    LoopWhileConditionIsTrue(0, () => {
+        BrieflyStrafeInDirection(EventPlayer, Right());
+        BrieflyStrafeInDirection(EventPlayer, Left());
+    });
+}

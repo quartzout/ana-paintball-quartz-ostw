@@ -1,0 +1,62 @@
+import "\APQ\Quartz\quartz.ostw";
+
+import "wander_state.ostw";
+
+import "../../helpers/facing.ostw";
+import "../../action_queue/action_queue.ostw";
+
+
+import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
+
+playervar Boolean isCollisionCheckActive! = false; 
+rule: "Activate collision check when no actions are in queue" {
+    Subscribe(OnActionQueueEmptiedEvent, executor => executor.isCollisionCheckActive = true);
+    Subscribe(OnActionQueueNoLongerEmptyEvent, executor => executor.isCollisionCheckActive = false);
+}
+
+Number COLLISION_DETECTION_POLLING_DELAY: 0.2;
+Number COLLISION_DETECTION_POLLING_DELAY_TURNING: 0.05;
+Number ANGLE_STEP: 30; 
+
+Vector RayEndpoint(in Vector direction): EventPlayer.EyePosition() + direction * botAiOptions.COLLISION_DETECTION_DISTANCE;
+Boolean IsWallOnTheWay(in Player executor): 
+    IsRayObstructed(
+        From:EventPlayer.EyePosition(), 
+        To: RayEndpoint(FacingDirectionOf(EventPlayer)), 
+        PlayersToInclude: EventPlayer.activeEnemies, 
+        PlayersToExclude: EventPlayer);
+
+rule: "Rotate camera to the left when heading wall"
+Event.OngoingPlayer
+if (IsWanderStateActive(EventPlayer))
+if (isCollisionCheckActive)
+if (IsWallOnTheWay(EventPlayer))
+{
+    Boolean foundClearDirecrtion! = false;
+    Number checkingAngle! = 0;
+    Boolean isRight! = false;
+    Vector newDirection!;
+
+    while (!foundClearDirecrtion) {
+        
+        checkingAngle += ANGLE_STEP + 1.5; // avoid angles by which 360 can be divided to prevent bot from being stuck in an infinite loop
+        isRight = !isRight;
+
+        newDirection = Replace(
+            vector: Rotate(
+                vector: FacingDirectionOf(EventPlayer), 
+                horizontalAngle: isRight ? checkingAngle : -checkingAngle),
+            newVerticalAngle: 0);
+
+        foundClearDirecrtion = !IsRayObstructed(
+            From: EventPlayer.EyePosition(),
+            To: RayEndpoint(newDirection),
+            EventPlayer.activeEnemies, 
+            EventPlayer);
+
+        Wait(COLLISION_DETECTION_POLLING_DELAY_TURNING); // preventing server from overloading
+    }
+
+    FaceDirection(EventPlayer, newDirection);
+
+}

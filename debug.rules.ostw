@@ -4,18 +4,30 @@ import "\APQ\Modules\Gameplay\portals\portals.ostw";
 import "\APQ\Modules\Gameplay\_Shared\player physics\player_physics.ostw";
 import "\APQ\Modules\Gameplay\_Shared\active players\active_players.ostw";
 
+// rule: "Super health"
+// Event.OngoingPlayer {
+//     Number NewHealth: 2000;
+//     SetMaxHealth(EventPlayer, NewHealth);
+//     SetPlayerHealth(EventPlayer, NewHealth);
+// }
+
 rule: "Debug hud" {
 
-
-    // DebugHud(
-    //     // sep:"\n"
-    // );
+    DebugHud(
+        botAiOptions.DEBUG_IGNORE_HOST
+    );
 
 }
 
-# Returns string in human-readible format describing Portal object. Reevaluation supported 
-String Stringify(Portal portal): 
-    $"<Portal {portal}>\nPos: {portal.Position}\nLifetime: {portal.SecondsLeft}";
+rule: "switch ignoring host on Shift + F + Left" 
+if (IsButtonHeld(HostPlayer, Button.PrimaryFire))
+if (IsButtonHeld(HostPlayer, Button.Interact))
+if (IsButtonHeld(HostPlayer, Button.Ability1)) 
+{
+    botAiOptions.DEBUG_IGNORE_HOST = !botAiOptions.DEBUG_IGNORE_HOST;
+    DebugLog("Switching on");
+    Wait(1);
+}
 
 // rule: "" {
 //     Loop(0.3, () => {
@@ -91,17 +103,17 @@ if (debugMode)
     
 }
 
-rule: "bot does repeated action"
-Event.OngoingPlayer
-if(IsDummyBot(EventPlayer))
-if (debugMode) 
-{
-    StartHoldingButton(EventPlayer, Button.SecondaryFire);
-    Loop(1, () => {
-        //SetFacing(EventPlayer, FacingDirectionOf(EventPlayer) + (Up() * RandomReal(-0.1, 0.1)) + (Right() * RandomReal(-0.1, 0.1)));
-        PressButton(EventPlayer, Button.PrimaryFire);
-    });
-}
+// rule: "bot does repeated action"
+// Event.OngoingPlayer
+// if(IsDummyBot(EventPlayer))
+// if (debugMode) 
+// {
+//     StartHoldingButton(EventPlayer, Button.SecondaryFire);
+//     Loop(1, () => {
+//         //SetFacing(EventPlayer, FacingDirectionOf(EventPlayer) + (Up() * RandomReal(-0.1, 0.1)) + (Right() * RandomReal(-0.1, 0.1)));
+//         PressButton(EventPlayer, Button.PrimaryFire);
+//     });
+// }
 
 rule: "Go to welcome screen by pressing CTRL + R"
 Event.OngoingPlayer
